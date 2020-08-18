@@ -68,7 +68,7 @@ import static org.ballerinalang.mime.util.MimeConstants.PROTOCOL_MIME_PKG_ID;
 import static org.ballerinalang.mime.util.MimeConstants.READABLE_BYTE_CHANNEL_STRUCT;
 import static org.ballerinalang.mime.util.MimeConstants.SUBTYPE_FIELD;
 import static org.ballerinalang.mime.util.MimeConstants.SUFFIX_FIELD;
-import static org.ballerinalang.stdlib.common.CommonTestUtils.assertJBytesWithBBytes;
+
 import static org.ballerinalang.stdlib.mime.Util.getTemporaryFile;
 import static org.ballerinalang.stdlib.mime.Util.validateBodyPartContent;
 import static org.ballerinalang.stdlib.mime.Util.verifyMimeError;
@@ -172,7 +172,7 @@ public class MimeUtilityFunctionTest {
         BValue[] returnValues = BRunUtil.invoke(compileResult, "testMimeBase64EncodeBlob", args);
         Assert.assertFalse(returnValues == null || returnValues.length == 0 || returnValues[0] == null,
                            "Invalid return value");
-        assertJBytesWithBBytes(((BValueArray) returnValues[0]).getBytes(), expectedValue.getBytes());
+        Util.assertJBytesWithBBytes(((BValueArray) returnValues[0]).getBytes(), expectedValue.getBytes());
     }
 
     @Test(enabled = false)
@@ -182,7 +182,7 @@ public class MimeUtilityFunctionTest {
         BValue[] returnValues = BRunUtil.invoke(compileResult, "testMimeBase64DecodeBlob", args);
         Assert.assertFalse(returnValues == null || returnValues.length == 0 || returnValues[0] == null,
                            "Invalid return value");
-        assertJBytesWithBBytes(((BValueArray) returnValues[0]).getBytes(), expectedValue.getBytes());
+        Util.assertJBytesWithBBytes(((BValueArray) returnValues[0]).getBytes(), expectedValue.getBytes());
     }
 
     @Test(description = "Set json data to entity and get the content back from entity as json")
