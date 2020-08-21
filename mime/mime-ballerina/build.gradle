@@ -23,6 +23,7 @@ configurations {
     jbalTools
     mimeBallerinaBirDir
     mimeBallerinaJar
+    externalJars
 }
 
 dependencies {
@@ -30,6 +31,9 @@ dependencies {
         transitive = false
     }
     compile project(':mime-native')
+    externalJars (group: 'org.jvnet.mimepull', name: 'mimepull', version: "${mimepullVersion}") {
+        transitive = false
+    }
 }
 
 clean {
@@ -49,6 +53,11 @@ task unpackJballerinaTools(type: Copy) {
         from zipTree(artifact.getFile())
         into new File("${buildDir}/target/extracted-distributions", "jballerina-tools-zip")
     }
+}
+
+task copyToLib(type: Copy) {
+    into "$project.projectDir/lib"
+    from configurations.externalJars
 }
 
 def moduleName = "mime"
@@ -71,15 +80,25 @@ task ballerinaBuild {
         ballerinaConfigFile.text = newConfig
 
         def distributionBinPath =  project.projectDir.absolutePath + "/build/target/extracted-distributions/jballerina-tools-zip/jballerina-tools-${ballerinaLangVersion}/bin"
+        def additionalBuildParams = ""
+
+        if (project.hasProperty("skipBallerinaTests")) {
+            additionalBuildParams += "--skip-tests"
+        }
+
+        if (project.hasProperty("debugBallerina")) {
+            def port = project.getProperty("debugBallerina").toString();
+            additionalBuildParams += "--debug ${port}"
+        }
 
         // Build and populate caches
         exec {
             workingDir project.projectDir
             environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat build -c ${moduleName}"
+                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat build ${additionalBuildParams} -c ${moduleName}"
             } else {
-                commandLine 'sh', '-c', "$distributionBinPath/ballerina build -c ${moduleName}"
+                commandLine 'sh', '-c', "$distributionBinPath/ballerina build ${additionalBuildParams} -c ${moduleName}"
             }
         }
         copy {
@@ -177,6 +196,7 @@ publishing {
     }
 }
 
-ballerinaBuild.dependsOn ":mime-native:build"
+unpackJballerinaTools.dependsOn copyToLib
 ballerinaBuild.dependsOn unpackJballerinaTools
+ballerinaBuild.dependsOn ":mime-native:build"
 build.dependsOn ballerinaBuild
