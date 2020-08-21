@@ -31,6 +31,7 @@ dependencies {
         transitive = false
     }
     compile project(':mime-native')
+    compile group: 'org.ballerinalang', name: 'toml-parser', version: "${ballerinaTomlParserVersion}"
     externalJars (group: 'org.jvnet.mimepull', name: 'mimepull', version: "${mimepullVersion}") {
         transitive = false
     }
