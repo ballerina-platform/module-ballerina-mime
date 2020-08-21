@@ -16,21 +16,20 @@
  */
 
 plugins {
-//    id "com.github.spotbugs" version "4.0.5"
-
-//    id "com.github.johnrengelman.shadow" version "5.2.0"
-//    id "de.undercouch.download" version "4.0.4"
+    id "com.github.spotbugs" version "4.0.5"
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+    id "de.undercouch.download" version "4.0.4"
     id "net.researchgate.release" version "2.6.0"
 }
 
 ext.ballerinaLangVersion = project.ballerinaLangVersion
 ext.puppycrawlCheckstyleVersion = "8.18"
 ext.testngVersion = "6.14.3"
-ext.mimepullVersion = "1.9.11"
+ext.mimepullVersion = project.mimepullVersion
 ext.slf4jVersion = "1.7.30"
 
 allprojects {
-    group = 'org.ballerinalang'
+    group = project.group
     version = project.version
 
     apply plugin: 'jacoco'
