@@ -449,7 +449,6 @@ public function testGetXmlWithNonCompatibleMediaType() {
     assertXmlPayload(entity.getXml(), xmlContent);
 }
 
-//
 @test:Config {}
 public function testGetJsonWithSuffix() {
     Entity entity = new;
@@ -459,7 +458,6 @@ public function testGetJsonWithSuffix() {
     assertJsonPayload(entity.getJson(), jsonContent);
 }
 
-//
 @test:Config {}
 public function testGetJsonWithNonCompatibleMediaType() {
     Entity entity = new;
@@ -470,7 +468,6 @@ public function testGetJsonWithNonCompatibleMediaType() {
     assertJsonPayload(entity.getJson(), jsonContent);
 }
 
-//
 @test:Config {}
 public function testGetTextContentWithNonCompatibleMediaType() {
     Entity entity = new;
@@ -480,7 +477,6 @@ public function testGetTextContentWithNonCompatibleMediaType() {
     assertTextPayload(entity.getText(), textContent);
 }
 
-//
 @test:Config {}
 public function testSetBodyAndGetText() {
     Entity entity = new;
@@ -489,7 +485,6 @@ public function testSetBodyAndGetText() {
     assertTextPayload(entity.getText(), entityBody);
 }
 
-//
 @test:Config {}
 public function testSetBodyAndGetXml() {
     Entity entity = new;
@@ -514,7 +509,6 @@ public function testSetBodyAndGetByteArray() {
     assertByteArray(entity.getByteArray(), content);
 }
 
-//
 @test:Config {}
 public function testSetBodyAndGetByteChannel() {
     string content = "Hello Ballerina!";
@@ -536,7 +530,6 @@ public function testSetBodyAndGetByteChannel() {
     }
 }
 
-//
 @test:Config {}
 public function testSetMediaTypeToEntity() {
     Entity entity = new;
@@ -545,7 +538,6 @@ public function testSetMediaTypeToEntity() {
     test:assertEquals(entity.getContentType(), "application/my-custom-type+json", msg = "Found unexpected output");
 }
 
-//
 @test:Config {}
 public function testSetMediaTypeAndGetValueAsHeader() {
     Entity entity = new;
@@ -555,7 +547,6 @@ public function testSetMediaTypeAndGetValueAsHeader() {
                       msg = "Found unexpected output");
 }
 
-//
 @test:Config {}
 public function testSetHeaderAndGetMediaType() {
     Entity entity = new;
@@ -563,7 +554,6 @@ public function testSetHeaderAndGetMediaType() {
     test:assertEquals(entity.getContentType(), "text/plain; charset=UTF-8", msg = "Found unexpected output");
 }
 
-//
 @test:Config {}
 public function testSetContentDispositionToEntity() {
     Entity entity = new;
@@ -573,7 +563,6 @@ public function testSetContentDispositionToEntity() {
                       msg = "Found unexpected output");
 }
 
-//
 @test:Config {}
 public function testSetContentDispositionAndGetValueAsHeader() {
     Entity entity = new;
@@ -582,7 +571,6 @@ public function testSetContentDispositionAndGetValueAsHeader() {
                       msg = "Found unexpected output");
 }
 
-//
 @test:Config {}
 public function testSetHeaderAndGetContentDisposition() {
     Entity entity = new;
@@ -592,7 +580,6 @@ public function testSetHeaderAndGetContentDisposition() {
                       msg = "Found unexpected output");
 }
 
-//
 @test:Config {}
 public function testSetContentLengthToEntity() {
     Entity entity = new;
@@ -601,7 +588,6 @@ public function testSetContentLengthToEntity() {
     test:assertEquals(length, 45555, msg = "Found unexpected output");
 }
 
-//
 @test:Config {}
 public function testSetContentLengthAndGetValueAsHeader() {
     Entity entity = new;
@@ -609,7 +595,6 @@ public function testSetContentLengthAndGetValueAsHeader() {
     test:assertEquals(entity.getHeader(CONTENT_LENGTH), "45555", msg = "Found unexpected output");
 }
 
-//
 @test:Config {}
 public function testSetContentIdToEntity() {
     Entity entity = new;
@@ -617,7 +602,6 @@ public function testSetContentIdToEntity() {
     test:assertEquals(entity.getContentId(), "test-id", msg = "Found unexpected output");
 }
 
-//
 @test:Config {}
 public function testSetContentIdAndGetValueAsHeader() {
     Entity entity = new;
@@ -625,7 +609,6 @@ public function testSetContentIdAndGetValueAsHeader() {
     test:assertEquals(entity.getHeader(CONTENT_ID), "test-id", msg = "Found unexpected output");
 }
 
-//
 @test:Config {}
 public function testGetAnyStreamAsString() {
     string content = "{'code':'123'}";

@@ -58,9 +58,9 @@ allprojects {
             url = 'https://repo.maven.apache.org/maven2'
         }
 
-//        maven {
-//            url = 'https://maven.pkg.github.com/ballerina-platform/module-ballerina-mime'
-//        }
+        maven {
+            url = 'https://maven.pkg.github.com/ballerina-platform/module-ballerina-mime'
+        }
     }
 }
 
