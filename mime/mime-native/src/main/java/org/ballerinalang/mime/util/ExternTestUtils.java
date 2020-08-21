@@ -16,8 +16,9 @@
 *  under the License.
 */
 
-package org.ballerinalang.stdlib.mime;
+package org.ballerinalang.mime.util;
 
+import org.ballerinalang.jvm.BallerinaErrors;
 import org.ballerinalang.jvm.BallerinaValues;
 import org.ballerinalang.jvm.XMLFactory;
 import org.ballerinalang.jvm.types.BType;
@@ -27,14 +28,10 @@ import org.ballerinalang.jvm.values.ObjectValue;
 import org.ballerinalang.jvm.values.XMLValue;
 import org.ballerinalang.jvm.values.api.BString;
 import org.ballerinalang.jvm.values.utils.StringUtils;
-import org.ballerinalang.mime.util.EntityBodyChannel;
-import org.ballerinalang.mime.util.EntityBodyHandler;
-import org.ballerinalang.mime.util.EntityWrapper;
-import org.ballerinalang.mime.util.HeaderUtil;
-import org.ballerinalang.mime.util.MimeConstants;
-import org.ballerinalang.mime.util.MimeUtil;
 import org.ballerinalang.model.values.BError;
 import org.ballerinalang.model.values.BValue;
+import org.ballerinalang.stdlib.io.channels.base.Channel;
+import org.ballerinalang.stdlib.io.utils.IOConstants;
 import org.jvnet.mimepull.MIMEPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +46,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.activation.MimeTypeParseException;
 
 import static org.ballerinalang.mime.util.MimeConstants.APPLICATION_JSON;
 import static org.ballerinalang.mime.util.MimeConstants.APPLICATION_XML;
@@ -67,8 +66,8 @@ import static org.ballerinalang.mime.util.MimeConstants.TEXT_PLAIN;
  *
  * @since 0.990.3
  */
-public class Util {
-    private static final Logger LOG = LoggerFactory.getLogger(Util.class);
+public class ExternTestUtils {
+    private static final Logger LOG = LoggerFactory.getLogger(ExternTestUtils.class);
 
     /**
      * From a given list of body parts get a ballerina value array.
@@ -250,7 +249,7 @@ public class Util {
     public static ObjectValue getMultipartEntity() {
         ObjectValue multipartEntity = createEntityObject();
         ArrayList<ObjectValue> bodyParts = getMultipleBodyParts();
-        multipartEntity.addNativeData(BODY_PARTS, Util.getArrayOfBodyParts(bodyParts));
+        multipartEntity.addNativeData(BODY_PARTS, ExternTestUtils.getArrayOfBodyParts(bodyParts));
         return multipartEntity;
     }
 
@@ -264,9 +263,9 @@ public class Util {
         ArrayList<ObjectValue> bodyParts = getEmptyBodyPartList();
         for (ObjectValue bodyPart : bodyParts) {
             MimeUtil.setContentType(createMediaTypeObject(), bodyPart, MULTIPART_MIXED);
-            bodyPart.addNativeData(BODY_PARTS, Util.getArrayOfBodyParts(getMultipleBodyParts()));
+            bodyPart.addNativeData(BODY_PARTS, ExternTestUtils.getArrayOfBodyParts(getMultipleBodyParts()));
         }
-        nestedMultipartEntity.addNativeData(BODY_PARTS, Util.getArrayOfBodyParts(bodyParts));
+        nestedMultipartEntity.addNativeData(BODY_PARTS, ExternTestUtils.getArrayOfBodyParts(bodyParts));
         return nestedMultipartEntity;
     }
 
@@ -311,13 +310,41 @@ public class Util {
     }
 
     //@NotNull
-    static File getTemporaryFile(String fileName, String fileType, String valueTobeWritten) throws IOException {
+    public static File getTemporaryFile(String fileName, String fileType, String valueTobeWritten) throws IOException {
         File file = File.createTempFile(fileName, fileType);
         file.deleteOnExit();
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
         bufferedWriter.write(valueTobeWritten);
         bufferedWriter.close();
         return file;
+    }
+
+    public static Object createTemporaryFile(BString fileName, BString fileType, BString valueTobeWritten) {
+        try {
+            File file = File.createTempFile(fileName.getValue(), fileType.getValue());
+            file.deleteOnExit();
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+            bufferedWriter.write(valueTobeWritten.getValue());
+            bufferedWriter.close();
+            return org.ballerinalang.jvm.StringUtils.fromString(file.getAbsolutePath());
+        } catch (IOException ex) {
+            return BallerinaErrors.createError("Error occurred creating file: " + ex.getMessage());
+        }
+    }
+
+    public static void assertGetBodyPartsAsChannel(ObjectValue bodyChannel) {
+        Channel channel = (Channel) bodyChannel.getNativeData(IOConstants.BYTE_CHANNEL_NAME);
+        try {
+            List<MIMEPart> mimeParts = MultipartDecoder.decodeBodyParts("multipart/mixed; boundary=e3a0b9ad7b4e7cdt",
+                                                                        channel.getInputStream());
+            Assert.assertEquals(mimeParts.size(), 4);
+            ObjectValue bodyPart = createEntityObject();
+            validateBodyPartContent(mimeParts, bodyPart);
+        } catch (MimeTypeParseException e) {
+            LOG.error("Error occurred while testing mulitpart/mixed encoding", e.getMessage());
+        } catch (IOException e) {
+            LOG.error("Error occurred while decoding binary part", e.getMessage());
+        }
     }
 
     /**
