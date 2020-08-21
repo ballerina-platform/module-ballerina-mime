@@ -31,8 +31,6 @@ dependencies {
     compile group: 'org.ballerinalang', name: 'ballerina-log-api', version: "${ballerinaLangVersion}"
     compile group: 'org.jvnet.mimepull', name: 'mimepull', version: "${mimepullVersion}"
     compile group: 'org.slf4j', name: 'slf4j-jdk14', version: "${slf4jVersion}"
-
-    testCompile group: 'org.ballerinalang', name: 'ballerina-core', version: "${ballerinaLangVersion}"
-    testCompile group: 'org.ballerinalang', name: 'ballerina-test-utils', version: "${ballerinaLangVersion}"
-    testCompile group: 'org.testng', name: 'testng', version: "${testngVersion}"
+    compile group: 'org.testng', name: 'testng', version: "${testngVersion}"
+    compile group: 'org.ballerinalang', name: 'ballerina-core', version: "${ballerinaLangVersion}"
 }
