@@ -1,0 +1,21 @@
+[project]
+org-name = "ballerina"
+version = "@toml.version@"
+
+[platform]
+target = "java8"
+
+    [[platform.libraries]]
+    artifactId = "mime"
+    version = "@project.version@"
+    path = "../mime-native/build/libs/mime-native-@project.version@.jar"
+    groupId = "ballerina"
+    modules = ["mime"]
+
+    [[platform.libraries]]
+    artifactId = "mimepull"
+    version = "1.9.11"
+    path = "./lib/mimepull-1.9.11.jar"
+    groupId = "org.jvnet.mimepull"
+    modules = ["mime"]
+
