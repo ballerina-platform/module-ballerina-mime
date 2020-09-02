@@ -253,8 +253,8 @@ publishing {
         }
     }
 }
-
 ballerinaBuild.dependsOn ":mime-native:build"
+unpackJballerinaTools.dependsOn copyToLib
 unpackStdLibs.dependsOn unpackJballerinaTools
 copyStdlibs.dependsOn unpackStdLibs
 updateTomlVerions.dependsOn copyStdlibs
