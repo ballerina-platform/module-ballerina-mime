@@ -1,6 +1,11 @@
 [project]
 org-name = "ballerina"
-version = "1.0.0"
+version = "@toml.version@"
+
+[dependencies]
+"ballerina/io" = "@stdlib.io.version@"
+"ballerina/log" = "@stdlib.log.version@"
+"ballerina/stringutils" = "@stdlib.stringutils.version@"
 
 [platform]
 target = "java8"
@@ -18,4 +23,3 @@ target = "java8"
     path = "./lib/mimepull-1.9.11.jar"
     groupId = "org.jvnet.mimepull"
     modules = ["mime"]
-
