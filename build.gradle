@@ -29,7 +29,6 @@ ext.stdlibStringutilsVersion = project.stdlibStringutilsVersion
 ext.puppycrawlCheckstyleVersion = "8.18"
 ext.testngVersion = "6.14.3"
 ext.mimepullVersion = project.mimepullVersion
-ext.ballerinaTomlParserVersion = project.ballerinaTomlParserVersion
 ext.slf4jVersion = "1.7.30"
 
 allprojects {
