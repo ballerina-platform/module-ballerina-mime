@@ -1,4 +1,4 @@
-name: Build master branch
+name: Build
 
 on:
   push:
@@ -7,7 +7,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
