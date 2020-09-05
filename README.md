@@ -50,7 +50,7 @@ Execute the commands below to build from source.
 
 As an open source project, Ballerina welcomes contributions from the community. 
 
-You can also check for [open issues](https://github.com/ballerina-platform/module-ballerina-sql/issues) that interest you. We look forward to receiving your contributions.
+You can also check for [open issues](https://github.com/ballerina-platform/module-ballerina-mime/issues) that interest you. We look forward to receiving your contributions.
 
 For more information, go to the [contribution guidelines](https://github.com/ballerina-platform/ballerina-lang/blob/master/CONTRIBUTING.md).
 
