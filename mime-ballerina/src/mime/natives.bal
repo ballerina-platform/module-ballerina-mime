@@ -58,10 +58,10 @@ public const string CONTENT_DISPOSITION = "content-disposition";
 # + parameters - A set of parameters specified in the `attribute=value` notation
 public class ContentDisposition {
 
-    public string fileName;
-    public string disposition;
-    public string name;
-    public map<string> parameters;
+    public string fileName = "";
+    public string disposition = "";
+    public string name = "";
+    public map<string> parameters = {};
 
     # Converts the `ContentDisposition` type to a string suitable to use as the value of a corresponding MIME header.
     # ```ballerina
@@ -86,10 +86,10 @@ function convertContentDispositionToString(ContentDisposition contentDisposition
 # + parameters - A set of parameters specified in an `attribute=value` notation
 public class MediaType {
 
-    public string primaryType;
-    public string subType;
-    public string suffix;
-    public map<string> parameters;
+    public string primaryType = "";
+    public string subType = "";
+    public string suffix = "";
+    public map<string> parameters = {};
 
     # Gets the “primaryType/subtype+suffix” combination in a `string` format.
     # ```ballerina
