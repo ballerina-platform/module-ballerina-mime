@@ -1,7 +1,7 @@
 Ballerina MIME Library
 ===================
 
-  [![Build](https://github.com/ballerina-platform/module-ballerina-mime/workflows/Build%20master%20branch/badge.svg)](https://github.com/ballerina-platform/module-ballerina-mime/actions?query=workflow%3ABuild)
+  [![Build](https://github.com/ballerina-platform/module-ballerina-mime/workflows/Build/badge.svg)](https://github.com/ballerina-platform/module-ballerina-mime/actions?query=workflow%3ABuild)
   [![Daily build](https://github.com/ballerina-platform/module-ballerina-mime/workflows/Daily%20build/badge.svg)](https://github.com/ballerina-platform/module-ballerina-mime/actions?query=workflow%3A%22Daily+build%22)
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-mime.svg)](https://github.com/ballerina-platform/module-ballerina-mime/commits/master)
   [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -44,7 +44,7 @@ Execute the commands below to build from source.
 
 4. To debug the tests:
 
-        ./gradlew clean build -Pdebug=<port>
+        ./gradlew clean test -Pdebug=<port>
 
 ## Contributing to Ballerina
 
@@ -63,4 +63,3 @@ All contributors are encouraged to read the [Ballerina Code of Conduct](https://
 * Discuss about code changes of the Ballerina project in [ballerina-dev@googlegroups.com](mailto:ballerina-dev@googlegroups.com).
 * Chat live with us via our [Slack channel](https://ballerina.io/community/slack/).
 * Post all technical questions on Stack Overflow with the [#ballerina](https://stackoverflow.com/questions/tagged/ballerina) tag.
-* View the [Ballerina performance test results](performance/benchmarks/summary.md).

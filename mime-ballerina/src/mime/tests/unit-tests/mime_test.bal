@@ -56,7 +56,7 @@ public function testGetMediaTypeFunction() {
 public function getMediaTypeWithIncorrectContentType() {
     MediaType|error returnVal = getMediaType("testContentType");
     if returnVal is error {
-        test:assertEquals(returnVal.message(), "error Unable to find a sub type.", msg = "Found unexpected output");
+        test:assertEquals(returnVal.message(), "error(\"Unable to find a sub type.\")", msg = "Found unexpected output");
     } else {
         test:assertFail(msg = "Found unexpected output type");
     }
@@ -399,7 +399,7 @@ public function testGetTextDataSource() {
     if (result is io:ReadableByteChannel) {
         consumeChannel(result);
     } else {
-        log:printError("error in reading byte channel");
+        log:printError("error in reading byte channel", result);
     }
     assertTextPayload(entity.getText(), "");
 }
@@ -418,7 +418,7 @@ public function testGetJsonDataSource() {
     if (result is io:ReadableByteChannel) {
         consumeChannel(result);
     } else {
-        log:printError("error in reading byte channel");
+        log:printError("error in reading byte channel", result);
     }
 
     var payload = entity.getJson();
@@ -813,9 +813,9 @@ function assertJsonPayload(json|error payload, json expectValue) {
 
 public function createTemporaryFile(string fileName, string fileType, string valueTobeWritten) returns string|error
 = @java:Method {
-    class: "org/ballerinalang/mime/util/ExternTestUtils"
+    'class: "org/ballerinalang/mime/util/ExternTestUtils"
 } external;
 
 public function assertGetBodyPartsAsChannel(io:ReadableByteChannel bodyChannel) = @java:Method {
-    class: "org/ballerinalang/mime/util/ExternTestUtils"
+    'class: "org/ballerinalang/mime/util/ExternTestUtils"
 } external;
