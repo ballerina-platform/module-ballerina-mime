@@ -70,7 +70,7 @@ public type Error ParserError|EncodeError|DecodeError|GenericMimeError|SetHeader
 #
 # + detail - Error details
 # + return - An `EncodeError` with the given details set to the message
-public function prepareEncodingErrorWithDetail(string detail) returns EncodeError {
+public isolated function prepareEncodingErrorWithDetail(string detail) returns EncodeError {
     return EncodeError(detail);
 }
 
@@ -78,6 +78,6 @@ public function prepareEncodingErrorWithDetail(string detail) returns EncodeErro
 #
 # + detail - Error details
 # + return - `DecodeError` with the given details set to the message
-public function prepareDecodingErrorWithDetail(string detail) returns DecodeError {
+public isolated function prepareDecodingErrorWithDetail(string detail) returns DecodeError {
     return DecodeError(detail);
 }
