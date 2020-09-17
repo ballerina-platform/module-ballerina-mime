@@ -69,12 +69,12 @@ public class ContentDisposition {
     # ```
     #
     # + return - The `string` representation of the `ContentDisposition` object
-    public function toString() returns string {
+    public isolated function toString() returns string {
         return convertContentDispositionToString(self);
     }
 }
 
-function convertContentDispositionToString(ContentDisposition contentDisposition) returns string = @java:Method {
+isolated function convertContentDispositionToString(ContentDisposition contentDisposition) returns string = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.ContentDisposition"
 } external;
 
@@ -97,7 +97,7 @@ public class MediaType {
     # ```
     #
     # + return - Base type as a `string` from the `MediaType` struct
-    public function getBaseType() returns string {
+    public isolated function getBaseType() returns string {
         return self.primaryType + "/" + self.subType;
     }
 
@@ -107,7 +107,7 @@ public class MediaType {
     # ```
     #
     # + return - Content type with parameters as a `string`
-    public function toString() returns string {
+    public isolated function toString() returns string {
         string contentType = self.getBaseType();
         // map<string> parameters = self.parameters;
         string[] arrKeys = self.parameters.keys();
@@ -156,7 +156,7 @@ public class Entity {
     #
     # + mediaType - Content type, which needs to be set to the entity
     # + return - `()` if successful or else an `mime:InvalidContentTypeError` in case of invalid media-type
-    public function setContentType(@untainted string mediaType) returns InvalidContentTypeError? {
+    public isolated function setContentType(@untainted string mediaType) returns InvalidContentTypeError? {
         self.cType = check getMediaType(mediaType);
         self.setHeader(CONTENT_TYPE, mediaType);
     }
@@ -167,7 +167,7 @@ public class Entity {
     # ```
     #
     # + return - Content type as a `string`
-    public function getContentType() returns @tainted string {
+    public isolated function getContentType() returns @tainted string {
         string contentTypeHeaderValue = "";
         if (self.hasHeader(CONTENT_TYPE)) {
             contentTypeHeaderValue = self.getHeader(CONTENT_TYPE);
@@ -181,7 +181,7 @@ public class Entity {
     # ```
     #
     # + contentId - Content ID, which needs to be set to the entity
-    public function setContentId(@untainted string contentId) {
+    public isolated function setContentId(@untainted string contentId) {
         self.cId = contentId;
         self.setHeader(CONTENT_ID, contentId);
     }
@@ -192,7 +192,7 @@ public class Entity {
     # ```
     #
     # + return - Content ID as a `string`
-    public function getContentId() returns @tainted string {
+    public isolated function getContentId() returns @tainted string {
         string contentId = "";
         if (self.hasHeader(CONTENT_ID)) {
             contentId = self.getHeader(CONTENT_ID);
@@ -206,7 +206,7 @@ public class Entity {
     # ```
     #
     # + contentLength - Content length, which needs to be set to the entity
-    public function setContentLength(@untainted int contentLength) {
+    public isolated function setContentLength(@untainted int contentLength) {
         self.cLength = contentLength;
         var contentLengthStr = contentLength.toString();
         self.setHeader(CONTENT_LENGTH, contentLengthStr);
@@ -218,7 +218,7 @@ public class Entity {
     # ```
     #
     # + return - Content length as an `int` or else an error in case of a failure
-    public function getContentLength() returns @tainted int|error {
+    public isolated function getContentLength() returns @tainted int|error {
         string contentLength = "";
         if (self.hasHeader(CONTENT_LENGTH)) {
             contentLength = self.getHeader(CONTENT_LENGTH);
@@ -236,7 +236,7 @@ public class Entity {
     # ```
     #
     # + contentDisposition - Content disposition, which needs to be set to the entity
-    public function setContentDisposition(ContentDisposition contentDisposition) {
+    public isolated function setContentDisposition(ContentDisposition contentDisposition) {
         self.cDisposition = contentDisposition;
         self.setHeader(CONTENT_DISPOSITION, contentDisposition.toString());
     }
@@ -244,7 +244,7 @@ public class Entity {
     # Gets the content disposition of the entity.
     #
     # + return - A `ContentDisposition` object
-    public function getContentDisposition() returns ContentDisposition {
+    public isolated function getContentDisposition() returns ContentDisposition {
         string contentDispositionVal = "";
         if (self.hasHeader(CONTENT_DISPOSITION)) {
             contentDispositionVal = self.getHeader(CONTENT_DISPOSITION);
@@ -259,7 +259,7 @@ public class Entity {
     # ```
     #
     # + entityBody - Entity body can be of the type `string`,`xml`,`json`,`byte[]`,`io:ReadableByteChannel`, or `Entity[]`.
-    public function setBody(@untainted string|xml|json|byte[]|io:ReadableByteChannel|Entity[] entityBody) {
+    public isolated function setBody(@untainted string|xml|json|byte[]|io:ReadableByteChannel|Entity[] entityBody) {
         if (entityBody is string) {
             self.setText(entityBody);
         } else if (entityBody is xml) {
@@ -300,14 +300,14 @@ public class Entity {
     # + jsonContent - JSON content, which needs to be set to the entity
     # + contentType - Content type to be used with the payload. This is an optional parameter.
     #                The default value is `application/json`
-    public function setJson(@untainted json jsonContent, @untainted string contentType = "application/json") {
+    public isolated function setJson(@untainted json jsonContent, @untainted string contentType = "application/json") {
         return externSetJson(self, jsonContent, contentType);
     }
 
     # Extracts the JSON body from the entity.
     #
     # + return - `json` data extracted from the entity body or else an `mime:ParserError` if the entity body is not a JSON
-    public function getJson() returns @tainted json|ParserError {
+    public isolated function getJson() returns @tainted json|ParserError {
         return externGetJson(self);
     }
 
@@ -321,14 +321,14 @@ public class Entity {
     # + xmlContent - XML content, which needs to be set to the entity
     # + contentType - Content type to be used with the payload. This is an optional parameter.
     #               The default value is `application/xml`
-    public function setXml(@untainted xml xmlContent, @untainted string contentType = "application/xml") {
+    public isolated function setXml(@untainted xml xmlContent, @untainted string contentType = "application/xml") {
         return externSetXml(self, xmlContent, contentType);
     }
 
     # Extracts the `xml` body from the entity.
     #
     # + return - `xml` data extracted from the entity body or else an `mime:ParserError` if the entity body is not an XML
-    public function getXml() returns @tainted xml|ParserError {
+    public isolated function getXml() returns @tainted xml|ParserError {
         return externGetXml(self);
     }
 
@@ -342,7 +342,7 @@ public class Entity {
     # + textContent - Text content, which needs to be set to the entity
     # + contentType - Content type to be used with the payload. This is an optional parameter.
     #                The default value is `text/plain`
-    public function setText(@untainted string textContent, @untainted string contentType = "text/plain") {
+    public isolated function setText(@untainted string textContent, @untainted string contentType = "text/plain") {
         return externSetText(self, textContent, contentType);
     }
 
@@ -350,7 +350,7 @@ public class Entity {
     #
     # + return - `string` data extracted from the the entity body or else an `mime:ParserError` if the entity body is not
     #            text compatible
-    public function getText() returns @tainted string|ParserError {
+    public isolated function getText() returns @tainted string|ParserError {
         return externGetText(self);
     }
 
@@ -361,7 +361,7 @@ public class Entity {
     # + blobContent - byte[] content that needs to be set to the entity
     # + contentType - Content type to be used with the payload. This is an optional parameter.
     #                 The default value is `application/octet-stream`
-    public function setByteArray(@untainted byte[] blobContent,
+    public isolated function setByteArray(@untainted byte[] blobContent,
                                  @untainted string contentType = "application/octet-stream") {
         return externSetByteArray(self, blobContent, contentType);
     }
@@ -371,7 +371,7 @@ public class Entity {
     #
     # + return - `byte[]` data extracted from the the entity body or else a `mime:ParserError` in case of
     #            errors
-    public function getByteArray() returns @tainted byte[]|ParserError {
+    public isolated function getByteArray() returns @tainted byte[]|ParserError {
         return externGetByteArray(self);
     }
 
@@ -382,7 +382,7 @@ public class Entity {
     # + byteChannel - Byte channel, which needs to be set to the entity
     # + contentType - Content-type to be used with the payload. This is an optional parameter.
     #                 The `application/octet-stream` is the default value
-    public function setByteChannel(io:ReadableByteChannel byteChannel,
+    public isolated function setByteChannel(io:ReadableByteChannel byteChannel,
                                    @untainted string contentType = "application/octet-stream") {
         return externSetByteChannel(self, byteChannel, contentType);
     }
@@ -390,7 +390,7 @@ public class Entity {
     # Gets the entity body as a byte channel from a given entity.
     #
     # + return - An `io:ReadableByteChannel` or else a `mime:ParserError` record will be returned in case of errors
-    public function getByteChannel() returns @tainted io:ReadableByteChannel|ParserError {
+    public isolated function getByteChannel() returns @tainted io:ReadableByteChannel|ParserError {
         return externGetByteChannel(self);
     }
 
@@ -398,14 +398,14 @@ public class Entity {
     #
     # + return - An array of body parts(`Entity[]`) extracted from the entity body or else a `mime:ParserError` if the
     #            entity body is not a set of the body parts
-    public function getBodyParts() returns Entity[]|ParserError {
+    public isolated function getBodyParts() returns Entity[]|ParserError {
         return externGetBodyParts(self);
     }
 
     # Gets the body parts as a byte channel from a given entity.
     #
     # + return - Body parts as a byte channel
-    public function getBodyPartsAsChannel() returns @tainted io:ReadableByteChannel|ParserError {
+    public isolated function getBodyPartsAsChannel() returns @tainted io:ReadableByteChannel|ParserError {
         return externGetBodyPartsAsChannel(self);
     }
 
@@ -416,7 +416,7 @@ public class Entity {
     # + bodyParts - Body parts, which needs to be set to the entity
     # + contentType - Content-type to be used with the payload. This is an optional parameter.
     #                The default value is `multipart/form-data`.
-    public function setBodyParts(@untainted Entity[] bodyParts,
+    public isolated function setBodyParts(@untainted Entity[] bodyParts,
                                  @untainted string contentType = "multipart/form-data") {
         return externSetBodyParts(self, bodyParts, contentType);
     }
@@ -430,7 +430,7 @@ public class Entity {
     # + return - Header value associated with the given header name as a `string`. If multiple header values are
     #            present, then the first value is returned. An exception is thrown if no header is found. Use
     #            `Entity.hasHeader()` beforehand to check the existence of a header
-    public function getHeader(@untainted string headerName) returns @tainted string {
+    public isolated function getHeader(@untainted string headerName) returns @tainted string {
         return self.getHeaders(headerName.toLowerAscii())[0];
     }
 
@@ -439,7 +439,7 @@ public class Entity {
     # + headerName - Header name
     # + return - All the header values associated with the given header name as a `string[]`. Panics if no header is
     #            found. Use the `Entity.hasHeader()` beforehand to check the existence of a header
-    public function getHeaders(@untainted string headerName) returns @tainted string[] {
+    public isolated function getHeaders(@untainted string headerName) returns @tainted string[] {
         string lowerCaseHeaderName = headerName.toLowerAscii();
         string[]? value = self.headerMap[lowerCaseHeaderName];
         if (value is ()) {
@@ -455,7 +455,7 @@ public class Entity {
     # ```
     #
     # + return - All header names as a `string[]`
-    public function getHeaderNames() returns @tainted string[] {
+    public isolated function getHeaderNames() returns @tainted string[] {
         return self.headerNames.clone();
     }
 
@@ -466,7 +466,7 @@ public class Entity {
     #
     # + headerName - Header name
     # + headerValue - The header value to be added
-    public function addHeader(@untainted string headerName, string headerValue) {
+    public isolated function addHeader(@untainted string headerName, string headerValue) {
         string lowerCaseHeaderName = headerName.toLowerAscii();
         if (self.hasHeader(lowerCaseHeaderName)) {
             string[] headerList = self.getHeaders(lowerCaseHeaderName);
@@ -484,7 +484,7 @@ public class Entity {
     #
     # + headerName - Header name
     # + headerValue - Header value
-    public function setHeader(@untainted string headerName, string headerValue) {
+    public isolated function setHeader(@untainted string headerName, string headerValue) {
         string[] value = [headerValue];
         self.headerMap[headerName.toLowerAscii()] = value;
 
@@ -498,7 +498,7 @@ public class Entity {
     # Removes the given header from the entity.
     #
     # + headerName - Header name
-    public function removeHeader(@untainted string headerName) {
+    public isolated function removeHeader(@untainted string headerName) {
         if !(self.hasHeader(headerName)) {
             return;
         }
@@ -516,7 +516,7 @@ public class Entity {
     }
 
     # Removes all headers associated with the entity.
-    public function removeAllHeaders() {
+    public isolated function removeAllHeaders() {
         self.headerMap = {};
         self.headerNames.removeAll();
     }
@@ -525,72 +525,72 @@ public class Entity {
     #
     # + headerName - Header name
     # + return - `true` if the specified header key exists
-    public function hasHeader(@untainted string headerName) returns boolean {
+    public isolated function hasHeader(@untainted string headerName) returns boolean {
         return self.headerMap.hasKey(headerName.toLowerAscii());
     }
 }
 
-function externSetJson(Entity entity, json jsonContent, string contentType) = @java:Method {
+isolated function externSetJson(Entity entity, json jsonContent, string contentType) = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "setJson"
 } external;
 
-function externGetJson(Entity entity) returns @tainted json|ParserError = @java:Method {
+isolated function externGetJson(Entity entity) returns @tainted json|ParserError = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeDataSourceBuilder",
     name: "getJson"
 } external;
 
-function externSetXml(Entity entity, xml xmlContent, string contentType) = @java:Method {
+isolated function externSetXml(Entity entity, xml xmlContent, string contentType) = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "setXml"
 } external;
 
-function externGetXml(Entity entity) returns @tainted xml|ParserError = @java:Method {
+isolated function externGetXml(Entity entity) returns @tainted xml|ParserError = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeDataSourceBuilder",
     name: "getXml"
 } external;
 
-function externSetText(Entity entity, string textContent, string contentType) = @java:Method {
+isolated function externSetText(Entity entity, string textContent, string contentType) = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "setText"
 } external;
 
-function externGetText(Entity entity) returns @tainted string|ParserError = @java:Method {
+isolated function externGetText(Entity entity) returns @tainted string|ParserError = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeDataSourceBuilder",
     name: "getText"
 } external;
 
-function externSetByteArray(Entity entity, byte[] byteArray, string contentType) = @java:Method {
+isolated function externSetByteArray(Entity entity, byte[] byteArray, string contentType) = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "setByteArray"
 } external;
 
-function externGetByteArray(Entity entity) returns @tainted byte[]|ParserError = @java:Method {
+isolated function externGetByteArray(Entity entity) returns @tainted byte[]|ParserError = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeDataSourceBuilder",
     name: "getByteArray"
 } external;
 
-function externSetByteChannel(Entity entity, io:ReadableByteChannel byteChannel, string contentType) = @java:Method {
+isolated function externSetByteChannel(Entity entity, io:ReadableByteChannel byteChannel, string contentType) = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "setByteChannel"
 } external;
 
-function externGetByteChannel(Entity entity) returns @tainted io:ReadableByteChannel|ParserError = @java:Method {
+isolated function externGetByteChannel(Entity entity) returns @tainted io:ReadableByteChannel|ParserError = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "getByteChannel"
 } external;
 
-function externSetBodyParts(Entity entity, Entity[] bodyParts, string contentType) = @java:Method {
+isolated function externSetBodyParts(Entity entity, Entity[] bodyParts, string contentType) = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "setBodyParts"
 } external;
 
-function externGetBodyParts(Entity entity) returns Entity[]|ParserError = @java:Method {
+isolated function externGetBodyParts(Entity entity) returns Entity[]|ParserError = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "getBodyParts"
 } external;
 
-function externGetBodyPartsAsChannel(Entity entity) returns @tainted io:ReadableByteChannel|ParserError = @java:Method {
+isolated function externGetBodyPartsAsChannel(Entity entity) returns @tainted io:ReadableByteChannel|ParserError = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "getBodyPartsAsChannel"
 } external;
@@ -602,7 +602,7 @@ function externGetBodyPartsAsChannel(Entity entity) returns @tainted io:Readable
 # + return - An encoded `string` if the given input is of type string, an encoded `byte[]` if the given input is of
 #            type byte[], an encoded `io:ReadableByteChannel` if the given input is of type `io:ReadableByteChannel`,
 #            or else a `mime:EncodeError` record in case of errors
-public function base64Encode((string|byte[]|io:ReadableByteChannel) contentToBeEncoded, string charset = "utf-8")
+public isolated function base64Encode((string|byte[]|io:ReadableByteChannel) contentToBeEncoded, string charset = "utf-8")
                 returns (string|byte[]|io:ReadableByteChannel|EncodeError) = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeBase64",
     name: "base64Encode"
@@ -615,7 +615,7 @@ public function base64Encode((string|byte[]|io:ReadableByteChannel) contentToBeE
 # + return - A decoded `string` if the given input is of type string, a decoded `byte[]` if the given input is of
 #            type byte[], a decoded `io:ReadableByteChannel` if the given input is of type io:ReadableByteChannel
 #            or else a `mime:DecodeError` in case of errors
-public function base64Decode((string|byte[]|io:ReadableByteChannel) contentToBeDecoded, string charset = "utf-8")
+public isolated function base64Decode((string|byte[]|io:ReadableByteChannel) contentToBeDecoded, string charset = "utf-8")
     returns (string|byte[]|io:ReadableByteChannel|DecodeError) = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeBase64",
     name: "base64Decode"
@@ -625,7 +625,7 @@ public function base64Decode((string|byte[]|io:ReadableByteChannel) contentToBeD
 #
 # + valueToBeEncoded - Content, which needs to be encoded
 # + return - An encoded byte[] or else a `mime:EncodeError` record in case of errors
-public function base64EncodeBlob(byte[] valueToBeEncoded) returns byte[]|EncodeError {
+public isolated function base64EncodeBlob(byte[] valueToBeEncoded) returns byte[]|EncodeError {
     var result = base64Encode(valueToBeEncoded);
     if (result is byte[]|EncodeError) {
         return result;
@@ -638,7 +638,7 @@ public function base64EncodeBlob(byte[] valueToBeEncoded) returns byte[]|EncodeE
 #
 # + valueToBeDecoded - Content, which needs to be decoded
 # + return - A decoded `byte[]` or else a `mime:DecodeError` record in case of errors
-public function base64DecodeBlob(byte[] valueToBeDecoded) returns byte[]|DecodeError {
+public isolated function base64DecodeBlob(byte[] valueToBeDecoded) returns byte[]|DecodeError {
     var result = base64Decode(valueToBeDecoded);
     if (result is byte[]|DecodeError) {
         return result;
@@ -651,11 +651,11 @@ public function base64DecodeBlob(byte[] valueToBeDecoded) returns byte[]|DecodeE
 #
 # + contentType - A MediaType struct
 # + return - The encoding value as a `string`
-function getEncoding(MediaType contentType) returns string? {
+isolated function getEncoding(MediaType contentType) returns string? {
     return contentType.parameters[CHARSET];
 }
 
-function getCaseSensitiveHeaderName(string[] headerNames, string headerName) returns string? {
+isolated function getCaseSensitiveHeaderName(string[] headerNames, string headerName) returns string? {
     foreach string name in headerNames {
         if (name.toLowerAscii() == headerName.toLowerAscii()) {
             return name;
@@ -668,7 +668,7 @@ function getCaseSensitiveHeaderName(string[] headerNames, string headerName) ret
 #
 # + contentType - Content-Type in string
 # + return - `MediaType` object or else a `mime:InvalidContentTypeError` in case of an invalid content-type
-public function getMediaType(string contentType) returns MediaType|InvalidContentTypeError = @java:Method {
+public isolated function getMediaType(string contentType) returns MediaType|InvalidContentTypeError = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "getMediaType"
 } external;
@@ -677,7 +677,7 @@ public function getMediaType(string contentType) returns MediaType|InvalidConten
 #
 # + contentDisposition - Content disposition string
 # + return - A `ContentDisposition` object
-public function getContentDispositionObject(string contentDisposition) returns ContentDisposition = @java:Method {
+public isolated function getContentDispositionObject(string contentDisposition) returns ContentDisposition = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.ContentDisposition",
     name: "getContentDispositionObject"
 } external;
