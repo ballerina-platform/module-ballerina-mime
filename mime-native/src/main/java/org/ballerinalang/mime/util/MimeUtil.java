@@ -254,7 +254,8 @@ public class MimeUtil {
             } else {
                 dispositionValue = contentDispositionHeaderWithParams;
             }
-            contentDisposition.set(DISPOSITION_FIELD, org.ballerinalang.jvm.api.BStringUtils.fromString(dispositionValue));
+            contentDisposition.set(DISPOSITION_FIELD,
+                                   org.ballerinalang.jvm.api.BStringUtils.fromString(dispositionValue));
             BMap<BString, Object> paramMap = HeaderUtil.getParamMap(contentDispositionHeaderWithParams);
             for (BString key : paramMap.getKeys()) {
                 BString paramValue = (BString) paramMap.get(key);
