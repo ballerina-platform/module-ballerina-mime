@@ -41,8 +41,10 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -309,23 +311,19 @@ public class ExternTestUtils {
         return BValueCreator.createObjectValue(PROTOCOL_MIME_PKG_ID, CONTENT_DISPOSITION_STRUCT);
     }
 
-    //@NotNull
     public static File getTemporaryFile(String fileName, String fileType, String valueTobeWritten) throws IOException {
         File file = File.createTempFile(fileName, fileType);
         file.deleteOnExit();
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
-        bufferedWriter.write(valueTobeWritten);
-        bufferedWriter.close();
-        return file;
+        OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(file), Charset.defaultCharset());
+        try (BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
+            bufferedWriter.write(valueTobeWritten);
+            return file;
+        }
     }
 
     public static Object createTemporaryFile(BString fileName, BString fileType, BString valueTobeWritten) {
         try {
-            File file = File.createTempFile(fileName.getValue(), fileType.getValue());
-            file.deleteOnExit();
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
-            bufferedWriter.write(valueTobeWritten.getValue());
-            bufferedWriter.close();
+            File file = getTemporaryFile(fileName.getValue(), fileType.getValue(), valueTobeWritten.getValue());
             return org.ballerinalang.jvm.api.BStringUtils.fromString(file.getAbsolutePath());
         } catch (IOException ex) {
             return BErrorCreator
