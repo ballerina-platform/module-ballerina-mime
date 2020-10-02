@@ -48,7 +48,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.activation.MimeTypeParseException;
 
@@ -313,34 +312,19 @@ public class ExternTestUtils {
     }
 
     public static File getTemporaryFile(String fileName, String fileType, String valueTobeWritten) throws IOException {
-        BufferedWriter bufferedWriter = null;
-        try {
-            File file = File.createTempFile(fileName, fileType);
-            file.deleteOnExit();
-            OutputStreamWriter fileWriter = new OutputStreamWriter(
-                    new FileOutputStream(file), Charset.defaultCharset());
-            bufferedWriter = new BufferedWriter(fileWriter);
+        File file = File.createTempFile(fileName, fileType);
+        file.deleteOnExit();
+        OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(file), Charset.defaultCharset());
+        try (BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
             bufferedWriter.write(valueTobeWritten);
             return file;
-        } finally {
-            Objects.requireNonNull(bufferedWriter).close();
         }
     }
 
     public static Object createTemporaryFile(BString fileName, BString fileType, BString valueTobeWritten) {
         try {
-            File file = File.createTempFile(fileName.getValue(), fileType.getValue());
-            file.deleteOnExit();
-            BufferedWriter bufferedWriter = null;
-            try {
-                OutputStreamWriter fileWriter = new OutputStreamWriter(
-                        new FileOutputStream(file), Charset.defaultCharset());
-                bufferedWriter = new BufferedWriter(fileWriter);
-                bufferedWriter.write(valueTobeWritten.getValue());
-                return org.ballerinalang.jvm.api.BStringUtils.fromString(file.getAbsolutePath());
-            } finally {
-                Objects.requireNonNull(bufferedWriter).close();
-            }
+            File file = getTemporaryFile(fileName.getValue(), fileType.getValue(), valueTobeWritten.getValue());
+            return org.ballerinalang.jvm.api.BStringUtils.fromString(file.getAbsolutePath());
         } catch (IOException ex) {
             return BErrorCreator
                     .createError(BStringUtils.fromString("Error occurred creating file: " + ex.getMessage()));
