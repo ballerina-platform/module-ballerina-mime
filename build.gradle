@@ -45,10 +45,6 @@ allprojects {
         }
 
         maven {
-            url = 'https://maven.wso2.org/nexus/content/repositories/snapshots/'
-        }
-
-        maven {
             url = 'https://maven.wso2.org/nexus/content/groups/wso2-public/'
         }
 
@@ -58,14 +54,6 @@ allprojects {
 
         maven {
             url = 'https://maven.pkg.github.com/ballerina-platform/ballerina-lang'
-            credentials {
-                username System.getenv("packageUser")
-                password System.getenv("packagePAT")
-            }
-        }
-
-        maven {
-            url = 'https://maven.pkg.github.com/ballerina-platform/module-ballerina-mime'
             credentials {
                 username System.getenv("packageUser")
                 password System.getenv("packagePAT")
