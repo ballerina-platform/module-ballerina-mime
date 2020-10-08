@@ -20,4 +20,6 @@ module io.ballerina.stdlib.mime {
     requires io.ballerina.jvm;
     requires org.jvnet.mimepull;
     requires org.slf4j;
+    exports org.ballerinalang.mime.nativeimpl;
+    exports org.ballerinalang.mime.util;
 }
