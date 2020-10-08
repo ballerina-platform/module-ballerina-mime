@@ -34,10 +34,11 @@ dependencies {
     compile group: 'org.ballerinalang', name: 'ballerina-java', version: "${ballerinaLangVersion}"
     compile group: 'org.ballerinalang', name: 'ballerina-runtime-api', version: "${ballerinaLangVersion}"
     compile group: 'org.ballerinalang', name: 'ballerina-log-api', version: "${ballerinaLangVersion}"
+    compile group: 'org.ballerinalang', name: 'ballerina-core', version: "${ballerinaLangVersion}"
+
     compile group: 'org.jvnet.mimepull', name: 'mimepull', version: "${mimepullVersion}"
     compile group: 'org.slf4j', name: 'slf4j-jdk14', version: "${slf4jVersion}"
     compile group: 'org.testng', name: 'testng', version: "${testngVersion}"
-    compile group: 'org.ballerinalang', name: 'ballerina-core', version: "${ballerinaLangVersion}"
 }
 
 checkstyle {
@@ -85,5 +86,14 @@ publishing {
                 password = System.getenv("packagePAT")
             }
         }
+    }
+}
+
+compileJava {
+    doFirst {
+        options.compilerArgs = [
+                '--module-path', classpath.asPath,
+        ]
+        classpath = files()
     }
 }
