@@ -18,8 +18,11 @@
 
 module io.ballerina.stdlib.mime {
     requires io.ballerina.jvm;
-    requires org.jvnet.mimepull;
+    requires io.ballerina.lang;
+    requires io.ballerina.stdlib.io;
     requires org.slf4j;
+    requires org.jvnet.mimepull;
+    requires jakarta.activation;
     exports org.ballerinalang.mime.nativeimpl;
     exports org.ballerinalang.mime.util;
 }
