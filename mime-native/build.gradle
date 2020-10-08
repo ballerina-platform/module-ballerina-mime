@@ -29,12 +29,8 @@ dependencies {
 
     compile group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
     compile group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
-    compile group: 'org.ballerinalang', name: 'ballerina-file', version: "${ballerinaLangVersion}"
-    compile group: 'org.ballerinalang', name: 'ballerina-io', version: "${ballerinaLangVersion}"
-    compile group: 'org.ballerinalang', name: 'ballerina-java', version: "${ballerinaLangVersion}"
-    compile group: 'org.ballerinalang', name: 'ballerina-runtime-api', version: "${ballerinaLangVersion}"
-    compile group: 'org.ballerinalang', name: 'ballerina-log-api', version: "${ballerinaLangVersion}"
     compile group: 'org.ballerinalang', name: 'ballerina-core', version: "${ballerinaLangVersion}"
+    compile group: 'org.ballerinalang', name: 'io-native', version: "${stdlibIoVersion}"
 
     compile group: 'org.jvnet.mimepull', name: 'mimepull', version: "${mimepullVersion}"
     compile group: 'jakarta.activation', name: 'jakarta.activation-api', version: "${jakartaActivationVersion}"
