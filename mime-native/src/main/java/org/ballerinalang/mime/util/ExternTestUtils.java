@@ -18,6 +18,8 @@
 
 package org.ballerinalang.mime.util;
 
+import org.ballerinalang.core.model.values.BError;
+import org.ballerinalang.core.model.values.BValue;
 import org.ballerinalang.jvm.XMLFactory;
 import org.ballerinalang.jvm.api.BErrorCreator;
 import org.ballerinalang.jvm.api.BStringUtils;
@@ -28,8 +30,6 @@ import org.ballerinalang.jvm.types.BType;
 import org.ballerinalang.jvm.values.ArrayValue;
 import org.ballerinalang.jvm.values.ArrayValueImpl;
 import org.ballerinalang.jvm.values.XMLValue;
-import org.ballerinalang.model.values.BError;
-import org.ballerinalang.model.values.BValue;
 import org.ballerinalang.stdlib.io.channels.base.Channel;
 import org.ballerinalang.stdlib.io.utils.IOConstants;
 import org.jvnet.mimepull.MIMEPart;

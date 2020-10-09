@@ -32,6 +32,9 @@ dependencies {
     externalJars (group: 'org.jvnet.mimepull', name: 'mimepull', version: "${mimepullVersion}") {
         transitive = false
     }
+    externalJars (group: 'com.sun.activation', name: 'jakarta.activation', version: "${jakartaActivationVersion}") {
+        transitive = false
+    }
 }
 
 clean {
@@ -114,12 +117,16 @@ task updateTomlVerions {
         def stdlibDependentIoVersion = project.stdlibIoVersion.split("-")[0]
         def stdlibDependentLogVersion = project.stdlibLogVersion.split("-")[0]
         def stdlibDependentStringutilsVersion = project.stdlibStringutilsVersion.split("-")[0]
+        def stdlibDependentMimepullVersion = project.mimepullVersion
+        def stdlibDependentJakartaActivationVersion = project.jakartaActivationVersion
 
         def newConfig = ballerinaConfigFile.text.replace("@project.version@", project.version)
         newConfig = newConfig.replace("@toml.version@", tomlVersion)
         newConfig = newConfig.replace("@stdlib.io.version@", stdlibDependentIoVersion)
         newConfig = newConfig.replace("@stdlib.log.version@", stdlibDependentLogVersion)
         newConfig = newConfig.replace("@stdlib.stringutils.version@", stdlibDependentStringutilsVersion)
+        newConfig = newConfig.replace("@mimepull.version@", stdlibDependentMimepullVersion)
+        newConfig = newConfig.replace("@jakarta.activation.version@", stdlibDependentJakartaActivationVersion)
         ballerinaConfigFile.text = newConfig
     }
 }
@@ -147,9 +154,9 @@ task ballerinaTest {
             workingDir project.projectDir
             environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
             if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat test --code-coverage --all ${debugParams} && exit %%ERRORLEVEL%%"
+                commandLine 'cmd', '/c', "$distributionBinPath/ballerina.bat test --all ${debugParams} && exit %%ERRORLEVEL%%"
             } else {
-                commandLine 'sh', '-c', "$distributionBinPath/ballerina test --code-coverage --all ${debugParams}"
+                commandLine 'sh', '-c', "$distributionBinPath/ballerina test --all ${debugParams}"
             }
         }
     }

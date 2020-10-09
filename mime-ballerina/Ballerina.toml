@@ -8,7 +8,7 @@ version = "@toml.version@"
 "ballerina/stringutils" = "@stdlib.stringutils.version@"
 
 [platform]
-target = "java8"
+target = "java11"
 
     [[platform.libraries]]
     artifactId = "mime"
@@ -19,7 +19,14 @@ target = "java8"
 
     [[platform.libraries]]
     artifactId = "mimepull"
-    version = "1.9.11"
-    path = "./lib/mimepull-1.9.11.jar"
+    version = "@mimepull.version@"
+    path = "./lib/mimepull-@mimepull.version@.jar"
     groupId = "org.jvnet.mimepull"
+    modules = ["mime"]
+
+    [[platform.libraries]]
+    artifactId = "jakarta.activation"
+    version = "@jakarta.activation.version@"
+    path = "./lib/jakarta.activation-@jakarta.activation.version@.jar"
+    groupId = "com.sun.activation"
     modules = ["mime"]
