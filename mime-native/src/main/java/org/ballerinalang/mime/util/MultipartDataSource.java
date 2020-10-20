@@ -18,16 +18,16 @@
 
 package org.ballerinalang.mime.util;
 
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.BValueCreator;
-import org.ballerinalang.jvm.api.values.BLink;
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.api.values.BObject;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.types.BTypes;
-import org.ballerinalang.jvm.values.ArrayValue;
-import org.ballerinalang.jvm.values.ArrayValueImpl;
-import org.ballerinalang.jvm.values.RefValue;
+import io.ballerina.runtime.api.PredefinedTypes;
+import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.values.BLink;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.values.ArrayValue;
+import io.ballerina.runtime.values.ArrayValueImpl;
+import io.ballerina.runtime.values.RefValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,10 +130,11 @@ public class MultipartDataSource implements RefValue {
             if (mediaType.get(PARAMETER_MAP_FIELD) != null) {
                 paramMap = (BMap<BString, Object>) mediaType.get(PARAMETER_MAP_FIELD);
             } else {
-                paramMap = BValueCreator.createMapValue(new org.ballerinalang.jvm.types.BMapType(BTypes.typeString));
+                paramMap = ValueCreator
+                        .createMapValue(new io.ballerina.runtime.types.BMapType(PredefinedTypes.TYPE_STRING));
             }
 
-            paramMap.put(BStringUtils.fromString(BOUNDARY), BStringUtils.fromString(childBoundaryString));
+            paramMap.put(StringUtils.fromString(BOUNDARY), StringUtils.fromString(childBoundaryString));
             mediaType.set(PARAMETER_MAP_FIELD, paramMap);
         }
         writeBodyPartHeaders(writer, childPart);
@@ -229,7 +230,7 @@ public class MultipartDataSource implements RefValue {
     }
 
     @Override
-    public org.ballerinalang.jvm.types.BType getType() {
+    public io.ballerina.runtime.api.types.Type getType() {
         return null;
     }
 

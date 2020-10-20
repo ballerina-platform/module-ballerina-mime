@@ -17,7 +17,7 @@
  */
 
 module io.ballerina.stdlib.mime {
-    requires io.ballerina.jvm;
+    requires io.ballerina.runtime;
     requires io.ballerina.lang;
     requires io.ballerina.core;
     requires io.ballerina.stdlib.io;
