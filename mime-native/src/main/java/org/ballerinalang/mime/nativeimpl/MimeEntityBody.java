@@ -18,11 +18,11 @@
 
 package org.ballerinalang.mime.nativeimpl;
 
-import org.ballerinalang.jvm.api.BValueCreator;
-import org.ballerinalang.jvm.api.values.BObject;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.values.ArrayValue;
-import org.ballerinalang.jvm.values.XMLValue;
+import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.values.ArrayValue;
+import io.ballerina.runtime.values.XMLValue;
 import org.ballerinalang.mime.util.EntityBodyChannel;
 import org.ballerinalang.mime.util.EntityBodyHandler;
 import org.ballerinalang.mime.util.EntityWrapper;
@@ -110,7 +110,7 @@ public class MimeEntityBody {
                 EntityBodyChannel entityBodyChannel = new EntityBodyChannel(new ByteArrayInputStream(
                         outputStream.toByteArray()));
                 MimeUtil.closeOutputStream(outputStream);
-                BObject byteChannelObj = BValueCreator.createObjectValue(IOConstants.IO_PACKAGE_ID,
+                BObject byteChannelObj = ValueCreator.createObjectValue(IOConstants.IO_PACKAGE_ID,
                                                                          READABLE_BYTE_CHANNEL_STRUCT);
                 byteChannelObj.addNativeData(IOConstants.BYTE_CHANNEL_NAME, new EntityWrapper(entityBodyChannel));
                 return byteChannelObj;
@@ -127,7 +127,7 @@ public class MimeEntityBody {
     public static Object getByteChannel(BObject entityObj) {
         BObject byteChannelObj;
         try {
-            byteChannelObj = BValueCreator.createObjectValue(PROTOCOL_IO_PKG_ID, READABLE_BYTE_CHANNEL_STRUCT);
+            byteChannelObj = ValueCreator.createObjectValue(PROTOCOL_IO_PKG_ID, READABLE_BYTE_CHANNEL_STRUCT);
             Channel byteChannel = EntityBodyHandler.getByteChannel(entityObj);
             if (byteChannel != null) {
                 byteChannelObj.addNativeData(IOConstants.BYTE_CHANNEL_NAME, byteChannel);
@@ -155,7 +155,7 @@ public class MimeEntityBody {
 
     public static Object getMediaType(BString contentType) {
         try {
-            BObject mediaType = BValueCreator.createObjectValue(PROTOCOL_MIME_PKG_ID, MEDIA_TYPE);
+            BObject mediaType = ValueCreator.createObjectValue(PROTOCOL_MIME_PKG_ID, MEDIA_TYPE);
             return MimeUtil.parseMediaType(mediaType, contentType.getValue());
         } catch (Throwable err) {
             return MimeUtil.createError(INVALID_CONTENT_TYPE_ERROR, getErrorMsg(err));

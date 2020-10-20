@@ -18,18 +18,18 @@
 
 package org.ballerinalang.mime.nativeimpl;
 
-import org.ballerinalang.jvm.JSONParser;
-import org.ballerinalang.jvm.TypeChecker;
-import org.ballerinalang.jvm.XMLFactory;
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.BValueCreator;
-import org.ballerinalang.jvm.api.values.BError;
-import org.ballerinalang.jvm.api.values.BObject;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.types.BType;
-import org.ballerinalang.jvm.values.ArrayValue;
-import org.ballerinalang.jvm.values.RefValue;
-import org.ballerinalang.jvm.values.XMLValue;
+import io.ballerina.runtime.JSONParser;
+import io.ballerina.runtime.TypeChecker;
+import io.ballerina.runtime.XMLFactory;
+import io.ballerina.runtime.api.StringUtils;
+import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.values.BError;
+import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.values.ArrayValue;
+import io.ballerina.runtime.values.RefValue;
+import io.ballerina.runtime.values.XMLValue;
 import org.ballerinalang.mime.util.EntityBodyHandler;
 import org.ballerinalang.mime.util.EntityHeaderHandler;
 import org.ballerinalang.mime.util.MimeConstants;
@@ -74,13 +74,13 @@ public abstract class MimeDataSourceBuilder {
         if (isNotNullAndEmpty(contentTypeValue)) {
             String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
             if (isNotNullAndEmpty(charsetValue)) {
-                return BValueCreator.createArrayValue(
-                        BStringUtils.getJsonString(messageDataSource).getBytes(charsetValue));
+                return ValueCreator.createArrayValue(
+                        StringUtils.getJsonString(messageDataSource).getBytes(charsetValue));
             }
-            return BValueCreator.createArrayValue(
-                    BStringUtils.getJsonString(messageDataSource).getBytes(Charset.defaultCharset()));
+            return ValueCreator.createArrayValue(
+                    StringUtils.getJsonString(messageDataSource).getBytes(Charset.defaultCharset()));
         }
-        return BValueCreator.createArrayValue(new byte[0]);
+        return ValueCreator.createArrayValue(new byte[0]);
     }
 
     public static Object getJson(BObject entityObj) {
@@ -114,7 +114,7 @@ public abstract class MimeDataSourceBuilder {
     private static boolean isJSON(Object value) {
         // If the value is string, it could represent any type of payload.
         // Therefore it needs to be parsed as JSON.
-        BType objectType = TypeChecker.getType(value);
+        Type objectType = TypeChecker.getType(value);
         return objectType.getTag() != TypeTags.STRING && MimeUtil.isJSONCompatible(objectType);
     }
 
@@ -123,7 +123,7 @@ public abstract class MimeDataSourceBuilder {
         try {
             Object dataSource = EntityBodyHandler.getMessageDataSource(entityObj);
             if (dataSource != null) {
-                return org.ballerinalang.jvm.api.BStringUtils.fromString(MimeUtil.getMessageAsString(dataSource));
+                return io.ballerina.runtime.api.StringUtils.fromString(MimeUtil.getMessageAsString(dataSource));
             }
             result = EntityBodyHandler.constructStringDataSource(entityObj);
             updateDataSource(entityObj, result);
