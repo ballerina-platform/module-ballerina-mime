@@ -2,7 +2,6 @@ Ballerina MIME Library
 ===================
 
   [![Build](https://github.com/ballerina-platform/module-ballerina-mime/workflows/Build/badge.svg)](https://github.com/ballerina-platform/module-ballerina-mime/actions?query=workflow%3ABuild)
-  [![Daily build](https://github.com/ballerina-platform/module-ballerina-mime/workflows/Daily%20build/badge.svg)](https://github.com/ballerina-platform/module-ballerina-mime/actions?query=workflow%3A%22Daily+build%22)
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-mime.svg)](https://github.com/ballerina-platform/module-ballerina-mime/commits/master)
   [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -14,9 +13,9 @@ For more information go to [The MIME Module](https://ballerina.io/swan-lake/lear
 
 For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/swan-lake/learn/by-example/).
 
-## `Issues` and `Projects` 
+## Issues and Projects 
 
-`Issues` and `Project` tabs are disabled for this repository as this is one of the Ballerina Standard Libraries. To report bugs, request new features, start new discussions, view project boards, etc. please visit Ballerina Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library). 
+Issues and Projects tabs are disabled for this repository as this is part of the Ballerina Standard Library. To report bugs, request new features, start new discussions, view project boards, etc. please visit Ballerina Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library). 
 
 This repository only contains the source code for the module.
 
