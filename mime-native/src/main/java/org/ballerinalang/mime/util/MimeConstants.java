@@ -34,7 +34,7 @@ public class MimeConstants {
     public static final String MEDIA_TYPE = "MediaType";
     public static final String CONTENT_DISPOSITION_STRUCT = "ContentDisposition";
     public static final String PROTOCOL_PACKAGE_MIME = BALLERINA_PACKAGE_PREFIX + "mime";
-    public static final String PROTOCOL_MIME_PKG_VERSION = "1.0.1";
+    public static final String PROTOCOL_MIME_PKG_VERSION = "1.0.2";
     public static final String PROTOCOL_IO_PKG_VERSION = "0.5.1";
     public static final Module PROTOCOL_MIME_PKG_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "mime",
                                                                      PROTOCOL_MIME_PKG_VERSION);
