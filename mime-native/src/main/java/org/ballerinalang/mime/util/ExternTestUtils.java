@@ -18,16 +18,16 @@
 
 package org.ballerinalang.mime.util;
 
-import io.ballerina.runtime.XMLFactory;
-import io.ballerina.runtime.api.ErrorCreator;
-import io.ballerina.runtime.api.StringUtils;
-import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.creators.ErrorCreator;
+import io.ballerina.runtime.api.creators.TypeCreator;
+import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.utils.XmlUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.values.ArrayValue;
-import io.ballerina.runtime.values.ArrayValueImpl;
-import io.ballerina.runtime.values.XMLValue;
+import io.ballerina.runtime.api.values.BXml;
 import org.ballerinalang.core.model.values.BError;
 import org.ballerinalang.core.model.values.BValue;
 import org.ballerinalang.stdlib.io.channels.base.Channel;
@@ -77,10 +77,10 @@ public class ExternTestUtils {
      * @param bodyParts List of body parts
      * @return BValueArray representing an array of entities
      */
-    public static ArrayValue getArrayOfBodyParts(ArrayList<BObject> bodyParts) {
+    public static BArray getArrayOfBodyParts(ArrayList<BObject> bodyParts) {
         Type typeOfBodyPart = bodyParts.get(0).getType();
         BObject[] result = bodyParts.toArray(new BObject[bodyParts.size()]);
-        return new ArrayValueImpl(result, new io.ballerina.runtime.types.BArrayType(typeOfBodyPart));
+        return ValueCreator.createArrayValue(result, TypeCreator.createArrayType(typeOfBodyPart));
     }
 
     /**
@@ -181,7 +181,7 @@ public class ExternTestUtils {
      * @return A ballerina struct that represent a body part
      */
     public static BObject getXmlBodyPart() {
-        XMLValue xmlNode = (XMLValue) XMLFactory.parse("<name>Ballerina</name>");
+        BXml xmlNode = (BXml) XmlUtils.parse("<name>Ballerina</name>");
         BObject bodyPart = createEntityObject();
         EntityBodyChannel byteChannel = new EntityBodyChannel(new ByteArrayInputStream(
                 xmlNode.stringValue(null).getBytes(StandardCharsets.UTF_8)));
@@ -324,7 +324,7 @@ public class ExternTestUtils {
     public static Object createTemporaryFile(BString fileName, BString fileType, BString valueTobeWritten) {
         try {
             File file = getTemporaryFile(fileName.getValue(), fileType.getValue(), valueTobeWritten.getValue());
-            return io.ballerina.runtime.api.StringUtils.fromString(file.getAbsolutePath());
+            return io.ballerina.runtime.api.utils.StringUtils.fromString(file.getAbsolutePath());
         } catch (IOException ex) {
             return ErrorCreator
                     .createError(StringUtils.fromString("Error occurred creating file: " + ex.getMessage()));
@@ -361,7 +361,7 @@ public class ExternTestUtils {
         Assert.assertEquals(StringUtils.getJsonString(jsonData), "{\"" + "bodyPart" + "\":\"" + "jsonPart" + "\"}");
 
         EntityBodyHandler.populateBodyContent(bodyPart, mimeParts.get(1));
-        XMLValue xmlData = EntityBodyHandler.constructXmlDataSource(bodyPart);
+        BXml xmlData = EntityBodyHandler.constructXmlDataSource(bodyPart);
         Assert.assertNotNull(xmlData);
         Assert.assertEquals(xmlData.stringValue(null), "<name>Ballerina xml file part</name>");
 
@@ -371,7 +371,7 @@ public class ExternTestUtils {
         Assert.assertEquals(textData.getValue(), "Ballerina text body part");
 
         EntityBodyHandler.populateBodyContent(bodyPart, mimeParts.get(3));
-        ArrayValue blobDataSource = EntityBodyHandler.constructBlobDataSource(bodyPart);
+        BArray blobDataSource = EntityBodyHandler.constructBlobDataSource(bodyPart);
         Assert.assertNotNull(blobDataSource);
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();

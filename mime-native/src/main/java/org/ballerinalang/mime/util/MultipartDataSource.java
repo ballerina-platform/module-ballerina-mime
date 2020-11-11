@@ -19,15 +19,15 @@
 package org.ballerinalang.mime.util;
 
 import io.ballerina.runtime.api.PredefinedTypes;
-import io.ballerina.runtime.api.StringUtils;
-import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.creators.TypeCreator;
+import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BLink;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BRefValue;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.values.ArrayValue;
-import io.ballerina.runtime.values.ArrayValueImpl;
-import io.ballerina.runtime.values.RefValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +51,7 @@ import static org.ballerinalang.mime.util.MimeConstants.PARAMETER_MAP_FIELD;
  *
  * @since 0.963.0
  */
-public class MultipartDataSource implements RefValue {
+public class MultipartDataSource implements BRefValue {
     private static final Logger log = LoggerFactory.getLogger(MultipartDataSource.class);
 
     private BObject parentEntity;
@@ -85,8 +85,8 @@ public class MultipartDataSource implements RefValue {
     private void serializeBodyPart(OutputStream outputStream, String parentBoundaryString,
                                    BObject parentBodyPart) {
         final Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream, Charset.defaultCharset()));
-        ArrayValue childParts = parentBodyPart.getNativeData(BODY_PARTS) != null ?
-                (ArrayValue) parentBodyPart.getNativeData(BODY_PARTS) : null;
+        BArray childParts = parentBodyPart.getNativeData(BODY_PARTS) != null ?
+                (BArray) parentBodyPart.getNativeData(BODY_PARTS) : null;
         try {
             if (childParts == null) {
                 return;
@@ -130,8 +130,7 @@ public class MultipartDataSource implements RefValue {
             if (mediaType.get(PARAMETER_MAP_FIELD) != null) {
                 paramMap = (BMap<BString, Object>) mediaType.get(PARAMETER_MAP_FIELD);
             } else {
-                paramMap = ValueCreator
-                        .createMapValue(new io.ballerina.runtime.types.BMapType(PredefinedTypes.TYPE_STRING));
+                paramMap = ValueCreator.createMapValue(TypeCreator.createMapType(PredefinedTypes.TYPE_STRING));
             }
 
             paramMap.put(StringUtils.fromString(BOUNDARY), StringUtils.fromString(childBoundaryString));
@@ -140,7 +139,7 @@ public class MultipartDataSource implements RefValue {
         writeBodyPartHeaders(writer, childPart);
         //Serialize nested parts
         if (childBoundaryString != null) {
-            ArrayValue nestedParts = (ArrayValue) childPart.getNativeData(BODY_PARTS);
+            BArray nestedParts = (BArray) childPart.getNativeData(BODY_PARTS);
             if (nestedParts != null && nestedParts.size() > 0) {
                 serializeBodyPart(this.outputStream, childBoundaryString, childPart);
             }
@@ -174,7 +173,7 @@ public class MultipartDataSource implements RefValue {
             writer.write(String.valueOf(entry.getKey()));
             writer.write(COLON);
             writer.write(SPACE);
-            ArrayValueImpl value = (ArrayValueImpl) entry.getValue();
+            BArray value = (BArray) entry.getValue();
             writer.write(String.valueOf(value.getBString(0)));
             writer.write(CRLF);
         }
@@ -213,7 +212,7 @@ public class MultipartDataSource implements RefValue {
                     messageDataSource instanceof Boolean) {
                 outputStream.write(messageDataSource.toString().getBytes(Charset.defaultCharset()));
             } else {
-                ((RefValue) messageDataSource).serialize(outputStream);
+                ((BRefValue) messageDataSource).serialize(outputStream);
             }
         } else {
             EntityBodyHandler.writeByteChannelToOutputStream(bodyPart, outputStream);

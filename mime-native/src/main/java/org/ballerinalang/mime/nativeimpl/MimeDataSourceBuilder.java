@@ -18,18 +18,18 @@
 
 package org.ballerinalang.mime.nativeimpl;
 
-import io.ballerina.runtime.JSONParser;
-import io.ballerina.runtime.TypeChecker;
-import io.ballerina.runtime.XMLFactory;
-import io.ballerina.runtime.api.StringUtils;
-import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.utils.JsonUtils;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.utils.TypeUtils;
+import io.ballerina.runtime.api.utils.XmlUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BRefValue;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.values.ArrayValue;
-import io.ballerina.runtime.values.RefValue;
-import io.ballerina.runtime.values.XMLValue;
+import io.ballerina.runtime.api.values.BXml;
 import org.ballerinalang.mime.util.EntityBodyHandler;
 import org.ballerinalang.mime.util.EntityHeaderHandler;
 import org.ballerinalang.mime.util.MimeConstants;
@@ -57,7 +57,7 @@ public abstract class MimeDataSourceBuilder {
             if (messageDataSource != null) {
                 return getAlreadyBuiltByteArray(entityObj, messageDataSource);
             }
-            ArrayValue result = EntityBodyHandler.constructBlobDataSource(entityObj);
+            BArray result = EntityBodyHandler.constructBlobDataSource(entityObj);
             updateDataSource(entityObj, result);
             return result;
         } catch (Exception ex) {
@@ -67,7 +67,7 @@ public abstract class MimeDataSourceBuilder {
 
     protected static Object getAlreadyBuiltByteArray(BObject entityObj, Object messageDataSource)
             throws UnsupportedEncodingException {
-        if (messageDataSource instanceof ArrayValue) {
+        if (messageDataSource instanceof BArray) {
             return messageDataSource;
         }
         String contentTypeValue = EntityHeaderHandler.getHeaderValue(entityObj, MimeConstants.CONTENT_TYPE);
@@ -84,13 +84,13 @@ public abstract class MimeDataSourceBuilder {
     }
 
     public static Object getJson(BObject entityObj) {
-        RefValue result;
+        BRefValue result;
         try {
             Object dataSource = EntityBodyHandler.getMessageDataSource(entityObj);
             if (dataSource != null) {
                 return getAlreadyBuiltJson(dataSource);
             }
-            result = (RefValue) EntityBodyHandler.constructJsonDataSource(entityObj);
+            result = (BRefValue) EntityBodyHandler.constructJsonDataSource(entityObj);
             updateJsonDataSource(entityObj, result);
             return result;
         } catch (Exception ex) {
@@ -100,13 +100,13 @@ public abstract class MimeDataSourceBuilder {
 
     protected static Object getAlreadyBuiltJson(Object dataSource) {
         // If the value is already a JSON, then return as it is.
-        RefValue result;
+        BRefValue result;
         if (isJSON(dataSource)) {
-            result = (RefValue) dataSource;
+            result = (BRefValue) dataSource;
         } else {
             // Else, build the JSON from the string representation of the payload.
             String payload = MimeUtil.getMessageAsString(dataSource);
-            result = (RefValue) JSONParser.parse(payload);
+            result = (BRefValue) JsonUtils.parse(payload);
         }
         return result;
     }
@@ -114,7 +114,7 @@ public abstract class MimeDataSourceBuilder {
     private static boolean isJSON(Object value) {
         // If the value is string, it could represent any type of payload.
         // Therefore it needs to be parsed as JSON.
-        Type objectType = TypeChecker.getType(value);
+        Type objectType = TypeUtils.getType(value);
         return objectType.getTag() != TypeTags.STRING && MimeUtil.isJSONCompatible(objectType);
     }
 
@@ -123,7 +123,7 @@ public abstract class MimeDataSourceBuilder {
         try {
             Object dataSource = EntityBodyHandler.getMessageDataSource(entityObj);
             if (dataSource != null) {
-                return io.ballerina.runtime.api.StringUtils.fromString(MimeUtil.getMessageAsString(dataSource));
+                return StringUtils.fromString(MimeUtil.getMessageAsString(dataSource));
             }
             result = EntityBodyHandler.constructStringDataSource(entityObj);
             updateDataSource(entityObj, result);
@@ -134,7 +134,7 @@ public abstract class MimeDataSourceBuilder {
     }
 
     public static Object getXml(BObject entityObj) {
-        XMLValue result;
+        BXml result;
         try {
             Object dataSource = EntityBodyHandler.getMessageDataSource(entityObj);
             if (dataSource != null) {
@@ -150,12 +150,12 @@ public abstract class MimeDataSourceBuilder {
     }
 
     protected static Object getAlreadyBuiltXml(Object dataSource) {
-        if (dataSource instanceof XMLValue) {
+        if (dataSource instanceof BXml) {
             return dataSource;
         }
         // Build the XML from string representation of the payload.
         String payload = MimeUtil.getMessageAsString(dataSource);
-        return XMLFactory.parse(payload);
+        return XmlUtils.parse(payload);
     }
 
     protected static void updateDataSource(BObject entityObj, Object result) {
