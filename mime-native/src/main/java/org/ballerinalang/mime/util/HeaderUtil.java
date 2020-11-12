@@ -19,12 +19,13 @@
 package org.ballerinalang.mime.util;
 
 import io.ballerina.runtime.api.PredefinedTypes;
-import io.ballerina.runtime.api.StringUtils;
-import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.creators.TypeCreator;
+import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.types.MapType;
+import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.types.BMapType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,7 +49,7 @@ import static org.ballerinalang.mime.util.MimeConstants.SEMICOLON;
  */
 public class HeaderUtil {
 
-    private static final BMapType stringMapType = new BMapType(PredefinedTypes.TYPE_STRING);
+    private static final MapType stringMapType = TypeCreator.createMapType(PredefinedTypes.TYPE_STRING);
 
     /**
      * Given a header value, get it's parameters.

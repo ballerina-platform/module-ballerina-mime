@@ -19,14 +19,14 @@
 package org.ballerinalang.mime.util;
 
 import io.ballerina.runtime.api.PredefinedTypes;
-import io.ballerina.runtime.api.StringUtils;
-import io.ballerina.runtime.api.ValueCreator;
+import io.ballerina.runtime.api.creators.TypeCreator;
+import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.types.MapType;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.runtime.types.BArrayType;
-import io.ballerina.runtime.types.BMapType;
-import io.ballerina.runtime.values.ArrayValue;
 import org.jvnet.mimepull.Header;
 
 import java.util.List;
@@ -42,7 +42,8 @@ import static org.ballerinalang.mime.util.MimeConstants.HEADER_NAMES_ARRAY_FIELD
  */
 public class EntityHeaderHandler {
 
-    private static BMapType mapType = new BMapType(new BArrayType(PredefinedTypes.TYPE_STRING));
+    private static MapType mapType = TypeCreator.createMapType(
+            TypeCreator.createArrayType(PredefinedTypes.TYPE_STRING));
 
     /**
      * Get the entity header map. If not exist, creates new one.
@@ -60,8 +61,8 @@ public class EntityHeaderHandler {
         return httpHeaders;
     }
 
-    private static ArrayValue getEntityHeaderNameArray(BObject entity) {
-        ArrayValue headerNames = (ArrayValue) entity.get(HEADER_NAMES_ARRAY_FIELD);
+    private static BArray getEntityHeaderNameArray(BObject entity) {
+        BArray headerNames = (BArray) entity.get(HEADER_NAMES_ARRAY_FIELD);
         if (headerNames == null) {
             headerNames = getNewHeaderNamesArray();
             entity.set(HEADER_NAMES_ARRAY_FIELD, headerNames);
@@ -71,7 +72,7 @@ public class EntityHeaderHandler {
 
     static void populateBodyPartHeaders(BObject partStruct, List<? extends Header> bodyPartHeaders) {
         BMap<BString, Object> httpHeaders = getNewHeaderMap();
-        ArrayValue headerNames = getNewHeaderNamesArray();
+        BArray headerNames = getNewHeaderNamesArray();
 
         int index = 0;
         for (final Header header : bodyPartHeaders) {
@@ -96,7 +97,7 @@ public class EntityHeaderHandler {
         if (headerMap == null) {
             return null;
         }
-        ArrayValue headerValues = (ArrayValue) headerMap.get(StringUtils.fromString(headerName));
+        BArray headerValues = (BArray) headerMap.get(StringUtils.fromString(headerName));
         if (headerValues == null || headerValues.size() < 1) {
             return null;
         }
@@ -117,7 +118,7 @@ public class EntityHeaderHandler {
                     ValueCreator.createArrayValue(new BString[]{StringUtils.fromString(value)}));
 
         // update header name array
-        ArrayValue headerNames = getEntityHeaderNameArray(entity);
+        BArray headerNames = getEntityHeaderNameArray(entity);
         headerNames.add(headerNames.size(), StringUtils.fromString(key));
     }
 
@@ -130,7 +131,7 @@ public class EntityHeaderHandler {
         return ValueCreator.createMapValue(mapType);
     }
 
-    private static ArrayValue getNewHeaderNamesArray() {
-        return (ArrayValue) ValueCreator.createArrayValue(new BString[0]);
+    private static BArray getNewHeaderNamesArray() {
+        return (BArray) ValueCreator.createArrayValue(new BString[0]);
     }
 }
