@@ -1,39 +1,39 @@
 [package]
 org = "ballerina"
 name = "mime"
-version = "1.0.2"
+version = "@toml.version@"
 
 [[dependency]]
 org = "ballerina"
 name = "io"
-version = "0.5.2"
+version = "@stdlib.io.version@"
 
 [[dependency]]
 org = "ballerina"
 name = "log"
-version = "1.0.2"
+version = "@stdlib.log.version@"
 
 [[dependency]]
 org = "ballerina"
 name = "stringutils"
-version = "0.5.2"
+version = "@stdlib.stringutils.version@"
 
 [[platform.java11.dependency]]
-path = "../mime-native/build/libs/mime-native-1.0.2-SNAPSHOT.jar"
+path = "../mime-native/build/libs/mime-native-@project.version@.jar"
 groupId = "ballerina"
 artifactId = "mime"
-version = "1.0.2-SNAPSHOT"
+version = "@project.version@"
 
 
 [[platform.java11.dependency]]
-path = "./lib/mimepull-1.9.11.jar"
+path = "./lib/mimepull-@mimepull.version@.jar"
 groupId = "org.jvnet.mimepull"
 artifactId = "mimepull"
-version = "1.9.11"
+version = "@mimepull.version@"
 
 
 [[platform.java11.dependency]]
-path = "./lib/jakarta.activation-1.2.2.jar"
+path = "./lib/jakarta.activation-@jakarta.activation.version@.jar"
 groupId = "com.sun.activation"
 artifactId = "jakarta.activation"
-version = "1.2.2"
+version = "@jakarta.activation.version@"
