@@ -662,7 +662,7 @@ public function testGetBodyPartsAsChannel() {
 
     //Create another body part with a xml file.
     Entity bodyPart2 = new;
-    bodyPart2.setFileAsEntityBody("src/mime/tests/resources/datafiles/file.xml", TEXT_XML);
+    bodyPart2.setFileAsEntityBody("tests/resources/datafiles/file.xml", TEXT_XML);
 
     //Create a text body part.
     Entity bodyPart3 = new;
@@ -670,7 +670,7 @@ public function testGetBodyPartsAsChannel() {
 
     //Create another body part with a text file.
     Entity bodyPart4 = new;
-    bodyPart4.setFileAsEntityBody("src/mime/tests/resources/datafiles/test.tmp");
+    bodyPart4.setFileAsEntityBody("tests/resources/datafiles/test.tmp");
 
     //Create an array to hold all the body parts.
     Entity[] bodyParts = [bodyPart1, bodyPart2, bodyPart3, bodyPart4];
