@@ -130,19 +130,19 @@ public function testGetJsonMoreThanOnce() {
     if (returnContent1 is json) {
         content1 = returnContent1;
     } else {
-        log:printError("error in returnContent1", returnContent1);
+        log:printError("error in returnContent1", err = returnContent1);
     }
 
     if (returnContent2 is json) {
         content2 = returnContent2;
     } else {
-        log:printError("error in returnContent2", returnContent2);
+        log:printError("error in returnContent2", err = returnContent2);
     }
 
     if (returnContent3 is json) {
         content3 = returnContent3;
     } else {
-        log:printError("error in returnContent3", returnContent3);
+        log:printError("error in returnContent3", err = returnContent3);
     }
 
     json returnContent = { concatContent: [content1, content2, content3] };
@@ -222,19 +222,19 @@ public function testGetTextMoreThanOnce() {
     if (returnContent1 is string) {
         content1 = returnContent1;
     } else {
-        log:printError("error in returnContent1", returnContent1);
+        log:printError("error in returnContent1", err = returnContent1);
     }
 
     if (returnContent2 is string) {
         content2 = returnContent2;
     } else {
-        log:printError("error in returnContent2", returnContent2);
+        log:printError("error in returnContent2", err = returnContent2);
     }
 
     if (returnContent3 is string) {
         content3 = returnContent3;
     } else {
-        log:printError("error in returnContent3", returnContent3);
+        log:printError("error in returnContent3", err = returnContent3);
     }
 
     string returnContent = content1 + content2 + content3;
@@ -268,19 +268,19 @@ public function testGetByteArrayMoreThanOnce() {
     if (returnContent1 is byte[]) {
         content1 = returnContent1;
     } else {
-        log:printError("error in returnContent1", returnContent1);
+        log:printError("error in returnContent1", err = returnContent1);
     }
 
     if (returnContent2 is byte[]) {
         content2 = returnContent2;
     } else {
-        log:printError("error in returnContent2", returnContent2);
+        log:printError("error in returnContent2", err = returnContent2);
     }
 
     if (returnContent3 is byte[]) {
         content3 = returnContent3;
     } else {
-        log:printError("error in returnContent3", returnContent3);
+        log:printError("error in returnContent3", err = returnContent3);
     }
 
     var name = strings:fromBytes(content1);
@@ -399,7 +399,7 @@ public function testGetTextDataSource() {
     if (result is io:ReadableByteChannel) {
         consumeChannel(result);
     } else {
-        log:printError("error in reading byte channel", result);
+        log:printError("error in reading byte channel", err = result);
     }
     assertTextPayload(entity.getText(), "");
 }
@@ -418,7 +418,7 @@ public function testGetJsonDataSource() {
     if (result is io:ReadableByteChannel) {
         consumeChannel(result);
     } else {
-        log:printError("error in reading byte channel", result);
+        log:printError("error in reading byte channel", err = result);
     }
 
     var payload = entity.getJson();
