@@ -443,7 +443,7 @@ public class Entity {
         string lowerCaseHeaderName = headerName.toLowerAscii();
         string[]? value = self.headerMap[lowerCaseHeaderName];
         if (value is ()) {
-            panic HeaderNotFoundError("Http header does not exist");
+            panic error HeaderNotFoundError("Http header does not exist");
         } else {
             return value;
         }
@@ -630,7 +630,7 @@ public isolated function base64EncodeBlob(byte[] valueToBeEncoded) returns byte[
     if (result is byte[]|EncodeError) {
         return result;
     } else {
-        return EncodeError("Error occurred while encoding byte[]");
+        return error EncodeError("Error occurred while encoding byte[]");
     }
 }
 
@@ -643,7 +643,7 @@ public isolated function base64DecodeBlob(byte[] valueToBeDecoded) returns byte[
     if (result is byte[]|DecodeError) {
         return result;
     } else {
-        return DecodeError("Error occurred while decoding byte[]");
+        return error DecodeError("Error occurred while decoding byte[]");
     }
 }
 

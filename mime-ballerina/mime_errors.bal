@@ -71,7 +71,7 @@ public type Error ParserError|EncodeError|DecodeError|GenericMimeError|SetHeader
 # + detail - Error details
 # + return - An `EncodeError` with the given details set to the message
 public isolated function prepareEncodingErrorWithDetail(string detail) returns EncodeError {
-    return EncodeError(detail);
+    return error EncodeError(detail);
 }
 
 # Constructs a `DecodeError` with the given details.
@@ -79,5 +79,5 @@ public isolated function prepareEncodingErrorWithDetail(string detail) returns E
 # + detail - Error details
 # + return - `DecodeError` with the given details set to the message
 public isolated function prepareDecodingErrorWithDetail(string detail) returns DecodeError {
-    return DecodeError(detail);
+    return error DecodeError(detail);
 }
