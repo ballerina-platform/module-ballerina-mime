@@ -19,7 +19,6 @@ import ballerina/java;
 import ballerina/lang.'string as strings;
 import ballerina/log;
 import ballerina/test;
-import ballerina/stringutils;
 
 function getMediaTypeTestObj() returns MediaType {
     MediaType mediaType = new;
@@ -425,11 +424,11 @@ public function testGetJsonDataSource() {
     if payload is json {
         test:assertEquals(payload, "", msg = "Found unexpected output");
     } else {
-        test:assertTrue(stringutils:contains(payload.message(),
+        test:assertTrue(strings:includes(payload.message(),
             "Error occurred while extracting json data from entity"), msg = "Found unexpected output");
         var err = payload.cause();
         if (err is error) {
-            test:assertTrue(stringutils:contains(err.message(), "empty JSON document"),
+            test:assertTrue(strings:includes(err.message(), "empty JSON document"),
                 msg = "Found unexpected output");
         }
     }
