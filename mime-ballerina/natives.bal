@@ -169,8 +169,9 @@ public class Entity {
     # + return - Content type as a `string`
     public isolated function getContentType() returns @tainted string {
         string contentTypeHeaderValue = "";
-        if (self.hasHeader(CONTENT_TYPE)) {
-            contentTypeHeaderValue = self.getHeader(CONTENT_TYPE);
+        var value = self.getHeader(CONTENT_TYPE);
+        if (value is string) {
+            contentTypeHeaderValue = value;
         }
         return contentTypeHeaderValue;
     }
@@ -194,8 +195,9 @@ public class Entity {
     # + return - Content ID as a `string`
     public isolated function getContentId() returns @tainted string {
         string contentId = "";
-        if (self.hasHeader(CONTENT_ID)) {
-            contentId = self.getHeader(CONTENT_ID);
+        var value = self.getHeader(CONTENT_ID);
+        if (value is string) {
+            contentId = value;
         }
         return contentId;
     }
@@ -220,8 +222,9 @@ public class Entity {
     # + return - Content length as an `int` or else an error in case of a failure
     public isolated function getContentLength() returns @tainted int|error {
         string contentLength = "";
-        if (self.hasHeader(CONTENT_LENGTH)) {
-            contentLength = self.getHeader(CONTENT_LENGTH);
+        var length = self.getHeader(CONTENT_LENGTH);
+        if (length is string) {
+            contentLength = length;
         }
         if (contentLength == "") {
             return -1;
@@ -246,8 +249,9 @@ public class Entity {
     # + return - A `ContentDisposition` object
     public isolated function getContentDisposition() returns ContentDisposition {
         string contentDispositionVal = "";
-        if (self.hasHeader(CONTENT_DISPOSITION)) {
-            contentDispositionVal = self.getHeader(CONTENT_DISPOSITION);
+        var value = self.getHeader(CONTENT_DISPOSITION);
+        if (value is string) {
+            contentDispositionVal = value;
         }
         return getContentDispositionObject(contentDispositionVal);
     }
@@ -423,27 +427,35 @@ public class Entity {
 
     # Gets the header value associated with the given header name.
     # ```ballerina
-    # string headerName = mimeEntity.getHeader(mime:CONTENT_LENGTH);
+    # string|mime:HeaderNotFoundError headerName = mimeEntity.getHeader(mime:CONTENT_LENGTH);
     # ```
     #
     # + headerName - Header name
     # + return - Header value associated with the given header name as a `string`. If multiple header values are
-    #            present, then the first value is returned. An exception is thrown if no header is found. Use
-    #            `Entity.hasHeader()` beforehand to check the existence of a header
-    public isolated function getHeader(@untainted string headerName) returns @tainted string {
-        return self.getHeaders(headerName.toLowerAscii())[0];
+    #            present, then the first value is returned. The `HeaderNotFoundError` is returned if the header is not
+    #            found
+    public isolated function getHeader(@untainted string headerName) returns @tainted string|HeaderNotFoundError {
+        string[]|HeaderNotFoundError value = self.getHeaders(headerName.toLowerAscii());
+        if (value is string[]) {
+            return value[0];
+        } else {
+            return value;
+        }
     }
 
     # Gets all the header values associated with the given header name.
+    # ```ballerina
+    # string[]|mime:HeaderNotFoundError headerNames = mimeEntity.getHeaders(mime:CONTENT_TYPE);
+    # ```
     #
     # + headerName - Header name
-    # + return - All the header values associated with the given header name as a `string[]`. Panics if no header is
-    #            found. Use the `Entity.hasHeader()` beforehand to check the existence of a header
-    public isolated function getHeaders(@untainted string headerName) returns @tainted string[] {
+    # + return - All the header values associated with the given header name as a `string[]` or the
+    #            `HeaderNotFoundError` if the header is not found
+    public isolated function getHeaders(@untainted string headerName) returns @tainted string[]|HeaderNotFoundError {
         string lowerCaseHeaderName = headerName.toLowerAscii();
         string[]? value = self.headerMap[lowerCaseHeaderName];
         if (value is ()) {
-            panic error HeaderNotFoundError("Http header does not exist");
+            return error HeaderNotFoundError("Http header does not exist");
         } else {
             return value;
         }
@@ -468,8 +480,8 @@ public class Entity {
     # + headerValue - The header value to be added
     public isolated function addHeader(@untainted string headerName, string headerValue) {
         string lowerCaseHeaderName = headerName.toLowerAscii();
-        if (self.hasHeader(lowerCaseHeaderName)) {
-            string[] headerList = self.getHeaders(lowerCaseHeaderName);
+        var headerList = self.getHeaders(lowerCaseHeaderName);
+        if (headerList is string[]) {
             headerList.push(headerValue);
         } else {
             self.setHeader(headerName, headerValue);
