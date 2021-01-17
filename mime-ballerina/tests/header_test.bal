@@ -68,11 +68,16 @@ public function testAddingMultipleValuesToSameHeaderKey() {
     entity.addHeader("header1", "value3");
     entity.addHeader("hEader2", "value3");
     entity.addHeader("headeR2", "value4");
-    string[] headers = entity.getHeaders("header1");
-    test:assertEquals(headers[0], "value1", msg = "Found unexpected output");
-    test:assertEquals(headers[1], "value2", msg = "Found unexpected output");
-    test:assertEquals(headers[2], "value3", msg = "Found unexpected output");
-    test:assertEquals(entity.getHeader("header2"), "value3", msg = "Found unexpected output");
+    var headers = entity.getHeaders("header1");
+    if (headers is string[]) {
+        test:assertEquals(headers[0], "value1", msg = "Found unexpected output");
+        test:assertEquals(headers[1], "value2", msg = "Found unexpected output");
+        test:assertEquals(headers[2], "value3", msg = "Found unexpected output");
+    }
+    var header = entity.getHeader("header2");
+    if (header is string) {
+        test:assertEquals(header, "value3", msg = "Found unexpected output");
+    }
 }
 
 //Test set header function
@@ -80,9 +85,14 @@ public function testAddingMultipleValuesToSameHeaderKey() {
 public function testSetHeaderWitheHeaders() {
     Entity entity = new;
     entity.setHeader("HeADEr2", "totally different value");
-    string[] headers = entity.getHeaders("header2");
-    test:assertEquals(headers[0], "totally different value", msg = "Found unexpected output");
-    test:assertEquals(entity.getHeader("header2"), "totally different value", msg = "Found unexpected output");
+    var headers = entity.getHeaders("header2");
+    if (headers is string[]) {
+        test:assertEquals(headers[0], "totally different value", msg = "Found unexpected output");
+    }
+    var header = entity.getHeader("header2");
+    if (header is string) {
+        test:assertEquals(header, "totally different value", msg = "Found unexpected output");
+    }
 }
 
 //Test set header after add header
@@ -95,11 +105,16 @@ public function testSetHeaderAfterAddheader() {
     entity.addHeader("hEader2", "value3");
     entity.addHeader("headeR2", "value4");
     entity.setHeader("HeADEr2", "totally different value");
-    string[] headers = entity.getHeaders("header1");
-    test:assertEquals(headers[0], "value1", msg = "Found unexpected output");
-    test:assertEquals(headers[1], "value2", msg = "Found unexpected output");
-    test:assertEquals(headers[2], "value3", msg = "Found unexpected output");
-    test:assertEquals(entity.getHeader("header2"), "totally different value", msg = "Found unexpected output");
+    var headers = entity.getHeaders("header1");
+    if (headers is string[]) {
+        test:assertEquals(headers[0], "value1", msg = "Found unexpected output");
+        test:assertEquals(headers[1], "value2", msg = "Found unexpected output");
+        test:assertEquals(headers[2], "value3", msg = "Found unexpected output");
+    }
+    var header = entity.getHeader("header2");
+    if (header is string) {
+        test:assertEquals(header, "totally different value", msg = "Found unexpected output");
+    }
 }
 
 //Test add header after set header
@@ -112,10 +127,15 @@ public function testAddHeaderAfterTheSetHeader() {
     entity.addHeader("hEader2", "value3");
     entity.setHeader("HeADEr2", "totally different value");
     entity.addHeader("headeR2", "value4");
-    string[] headers = entity.getHeaders("header2");
-    test:assertEquals(headers[0], "totally different value", msg = "Found unexpected output");
-    test:assertEquals(headers[1], "value4", msg = "Found unexpected output");
-    test:assertEquals(entity.getHeader("header2"), "totally different value", msg = "Found unexpected output");
+    var headers = entity.getHeaders("header2");
+    if (headers is string[]) {
+        test:assertEquals(headers[0], "totally different value", msg = "Found unexpected output");
+        test:assertEquals(headers[1], "value4", msg = "Found unexpected output");
+    }
+    var header = entity.getHeader("header2");
+    if (header is string) {
+        test:assertEquals(header, "totally different value", msg = "Found unexpected output");
+    }
 }
 
 //Test remove header function
@@ -130,7 +150,7 @@ public function testRemoveHeaderError() {
     entity.setHeader("HeADEr2", "totally different value");
     entity.removeHeader("HEADER1");
     entity.removeHeader("NONE_EXISTENCE_HEADER");
-    var result = trap entity.getHeaders("header1");
+    var result = entity.getHeaders("header1");
     if (result is error) {
         test:assertEquals(result.message(), "Http header does not exist", msg = "Found unexpected output");
     }
@@ -141,7 +161,7 @@ public function testRemoveHeaderError() {
 public function testForNonExistenceHeader() {
     Entity entity = new;
     entity.addHeader("heAder1", "value1");
-    var result = trap entity.getHeader("header");
+    var result = entity.getHeader("header");
     if (result is error) {
         test:assertEquals(result.message(), "Http header does not exist", msg = "Found unexpected output");
     }
@@ -211,5 +231,9 @@ function testAddHeader(string headerName, string headerValue, string headerNameT
         @tainted string {
     Entity entity = new;
     entity.addHeader(headerName, headerValue);
-    return entity.getHeader(headerNameToBeUsedForRetrieval);
+    var value = entity.getHeader(headerNameToBeUsedForRetrieval);
+    if (value is string) {
+        return value;
+    }
+    return "Header not found";
 }
