@@ -13,11 +13,6 @@ org = "ballerina"
 name = "log"
 version = "@stdlib.log.version@"
 
-[[dependency]]
-org = "ballerina"
-name = "stringutils"
-version = "@stdlib.stringutils.version@"
-
 [[platform.java11.dependency]]
 path = "../mime-native/build/libs/mime-native-@project.version@.jar"
 groupId = "ballerina"
