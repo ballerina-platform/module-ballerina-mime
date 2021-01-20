@@ -49,6 +49,29 @@ public const string CONTENT_TYPE = "content-type";
 # Represents `content-disposition` header name.
 public const string CONTENT_DISPOSITION = "content-disposition";
 
+type StreamEntry record {|
+    Byte[] value;
+|};
+
+class MimeByteIterator {
+
+    Entity entity;
+    int offset = 0;
+
+    public isolated function init(Entity entity) {
+        self.entity = entity;
+    }
+
+    public isolated function next() returns record StreamEntry|ParserError? {
+        var result = externGetByteArrayRecord(self.entity, offset);
+        if (result is StreamEntry) {
+            offset = offset + 8196;
+            return result
+        }
+        return result;
+    }
+};
+
 # Represents values in `Content-Disposition` header.
 #
 # + fileName - Default filename for storing the body part if the receiving agent wishes to store it in an external
@@ -391,11 +414,40 @@ public class Entity {
         return externSetByteChannel(self, byteChannel, contentType);
     }
 
+    # Sets the entity body with the given byte channel content. This method overrides any existing content-type headers
+    # with the default content-type, which is `application/octet-stream`. This default value
+    # can be overridden by passing the content-type as an optional parameter.
+    #
+    # + byteChannel - Byte channel, which needs to be set to the entity
+    # + contentType - Content-type to be used with the payload. This is an optional parameter.
+    #                 The `application/octet-stream` is the default value
+    public isolated function setByteStream(stream<byte[], io:Error?> byteStream,
+                                   @untainted string contentType = "application/octet-stream") {
+        return externSetByteStream(self, byteStream, contentType);
+    }
+
     # Gets the entity body as a byte channel from a given entity.
     #
     # + return - An `io:ReadableByteChannel` or else a `mime:ParserError` record will be returned in case of errors
     public isolated function getByteChannel() returns @tainted io:ReadableByteChannel|ParserError {
         return externGetByteChannel(self);
+    }
+
+    # Gets the entity body as a stream of blocks from a given entity.
+    #
+    # + blockSize - An optional size of the byte block. Default size is 4KB
+    # + return - A stream of `io:Block` or else a `mime:ParserError` record will be returned in case of errors
+    public isolated function getByteStream() returns @tainted stream<byte[], io:Error?>|ParserError {
+        // return externGetByteChannel(self);
+        MimeByteIterator byteIterator  = new;
+        stream<byte[], io:Error?> str  = new stream<byte[], io:Error?>(byteIterator);
+
+        var byteChannel = externGetByteChannel(self);
+        if (byteChannel is ReadableByteChannel) {
+            return byteChannel.blockStream(blockSize);
+        } else {
+            return byteChannel;
+        }
     }
 
     # Gets the body parts from a given entity.
@@ -587,10 +639,26 @@ isolated function externSetByteChannel(Entity entity, io:ReadableByteChannel byt
     name: "setByteChannel"
 } external;
 
+isolated function externGetByteArrayRecord(Entity entity, int offset) = @java:Method {
+    'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
+    name: "getByteArrayRecord"
+} external;
+
 isolated function externGetByteChannel(Entity entity) returns @tainted io:ReadableByteChannel|ParserError = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "getByteChannel"
 } external;
+
+isolated function externGetStream(Entity entity) returns @tainted stream<byte[], io:Error?>|ParserError = @java:Method {
+    'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
+    name: "getByteStream"
+} external;
+
+isolated function externGetStream(Entity entity) returns @tainted stream<byte[], io:Error?>|ParserError = @java:Method {
+    'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
+    name: "getByteStream"
+} external;
+
 
 isolated function externSetBodyParts(Entity entity, Entity[] bodyParts, string contentType) = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",

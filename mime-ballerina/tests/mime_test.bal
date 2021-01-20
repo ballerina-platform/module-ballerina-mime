@@ -734,11 +734,16 @@ public function getChannelFromMultipartEntity() {
 //Test whether the string body is retrieved from the cache
 @test:Config {}
 public function getAnyStreamAsStringFromCache() {
-    string content = "{'code':'123'}";
-    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
-    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    // string content = "{'code':'123'}";
+    // string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    // io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+
+    byte[][] content = [[60, 78, 39, 28]];
+    stream<byte[], io:Error> byteStream = content.toStream();
+
     Entity entity = new;
-    entity.setByteChannel(byteChannel, "application/json");
+    entity.setByteStream(byteStream, "application/json");
+    entity.getByteStream();
     string returnContent;
     returnContent = checkpanic entity.getText();
     //String body should be retrieved from the cache the second time this is called

@@ -21,6 +21,7 @@ package org.ballerinalang.mime.nativeimpl;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BStream;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BXml;
 import org.ballerinalang.mime.util.EntityBodyChannel;
@@ -44,6 +45,7 @@ import static org.ballerinalang.mime.util.MimeConstants.APPLICATION_JSON;
 import static org.ballerinalang.mime.util.MimeConstants.APPLICATION_XML;
 import static org.ballerinalang.mime.util.MimeConstants.BODY_PARTS;
 import static org.ballerinalang.mime.util.MimeConstants.ENTITY_BYTE_CHANNEL;
+import static org.ballerinalang.mime.util.MimeConstants.ENTITY_BYTE_STREAM;
 import static org.ballerinalang.mime.util.MimeConstants.INVALID_CONTENT_TYPE_ERROR;
 import static org.ballerinalang.mime.util.MimeConstants.MEDIA_TYPE;
 import static org.ballerinalang.mime.util.MimeConstants.MESSAGE_AS_PRIMARY_TYPE;
@@ -153,6 +155,46 @@ public class MimeEntityBody {
         }
     }
 
+    public static Object getByteStream(BObject entityObj) {
+        BStream byteStream = EntityBodyHandler.getByteStream(entityObj);
+        if (byteStream != null) {
+            return byteStream;
+        }
+
+        if (EntityBodyHandler.getMessageDataSource(entityObj) != null) {
+            return MimeUtil.createError(PARSER_ERROR, "Byte stream is not available but " +
+                    "payload can be obtain either as xml, json, string or byte[] " +
+                    "type");
+        } else if (EntityBodyHandler.getBodyPartArray(entityObj) != null && EntityBodyHandler.
+                getBodyPartArray(entityObj).size() != 0) {
+            return MimeUtil.createError(PARSER_ERROR,
+                                        "Byte stream is not available since payload contains a set of body " +
+                                                "parts");
+        } else {
+            return MimeUtil.createError(PARSER_ERROR, "Byte stream is not available as payload");
+        }
+    }
+
+    public static Object getByteArrayRecord(BObject entityObj, long offset) {
+        BStream byteStream = EntityBodyHandler.getByteStream(entityObj);
+        if (byteStream != null) {
+            return byteStream;
+        }
+
+        if (EntityBodyHandler.getMessageDataSource(entityObj) != null) {
+            return MimeUtil.createError(PARSER_ERROR, "Byte stream is not available but " +
+                    "payload can be obtain either as xml, json, string or byte[] " +
+                    "type");
+        } else if (EntityBodyHandler.getBodyPartArray(entityObj) != null && EntityBodyHandler.
+                getBodyPartArray(entityObj).size() != 0) {
+            return MimeUtil.createError(PARSER_ERROR,
+                                        "Byte stream is not available since payload contains a set of body " +
+                                                "parts");
+        } else {
+            return MimeUtil.createError(PARSER_ERROR, "Byte stream is not available as payload");
+        }
+    }
+
     public static Object getMediaType(BString contentType) {
         try {
             BObject mediaType = ValueCreator.createObjectValue(PROTOCOL_MIME_PKG_ID, MEDIA_TYPE);
@@ -175,6 +217,15 @@ public class MimeEntityBody {
     public static void setByteChannel(BObject entityObj, BObject byteChannel,
                                       BString contentType) {
         entityObj.addNativeData(ENTITY_BYTE_CHANNEL, byteChannel.getNativeData(IOConstants.BYTE_CHANNEL_NAME));
+        Object dataSource = EntityBodyHandler.getMessageDataSource(entityObj);
+        if (dataSource != null) { //Clear message data source when the user set a byte channel to entity
+            entityObj.addNativeData(MESSAGE_DATA_SOURCE, null);
+        }
+        MimeUtil.setMediaTypeToEntity(entityObj, contentType != null ? contentType.getValue() : OCTET_STREAM);
+    }
+
+    public static void setByteStream(BObject entityObj, BStream byteStream, BString contentType) {
+        entityObj.addNativeData(ENTITY_BYTE_STREAM, byteStream);
         Object dataSource = EntityBodyHandler.getMessageDataSource(entityObj);
         if (dataSource != null) { //Clear message data source when the user set a byte channel to entity
             entityObj.addNativeData(MESSAGE_DATA_SOURCE, null);

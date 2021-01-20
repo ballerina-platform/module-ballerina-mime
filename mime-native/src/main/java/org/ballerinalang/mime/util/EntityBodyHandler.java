@@ -18,6 +18,8 @@
 
 package org.ballerinalang.mime.util;
 
+import io.ballerina.runtime.api.Environment;
+import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
@@ -28,7 +30,10 @@ import io.ballerina.runtime.api.utils.JsonUtils;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.XmlUtils;
 import io.ballerina.runtime.api.values.BArray;
+import io.ballerina.runtime.api.values.BError;
+import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BStream;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BXml;
 import org.ballerinalang.stdlib.io.channels.TempFileIOChannel;
@@ -59,6 +64,7 @@ import static org.ballerinalang.mime.util.MimeConstants.CHARSET;
 import static org.ballerinalang.mime.util.MimeConstants.CONTENT_TYPE;
 import static org.ballerinalang.mime.util.MimeConstants.ENTITY;
 import static org.ballerinalang.mime.util.MimeConstants.ENTITY_BYTE_CHANNEL;
+import static org.ballerinalang.mime.util.MimeConstants.ENTITY_BYTE_STREAM;
 import static org.ballerinalang.mime.util.MimeConstants.FIRST_BODY_PART_INDEX;
 import static org.ballerinalang.mime.util.MimeConstants.MESSAGE_DATA_SOURCE;
 import static org.ballerinalang.mime.util.MimeConstants.MULTIPART_AS_PRIMARY_TYPE;
@@ -382,6 +388,48 @@ public class EntityBodyHandler {
     }
 
     /**
+     * Write byte channel stream directly into outputstream without converting it to a data source.
+     *
+     * @param entityObj        Represent a ballerina entity
+     * @param messageOutputStream Represent the outputstream that the message should be written to
+     * @throws IOException When an error occurs while writing inputstream to outputstream
+     */
+    public static void writeByteStreamToOutputStream(Environment env, BObject entityObj,
+                                                     OutputStream messageOutputStream) throws IOException {
+        BStream byteStream = EntityBodyHandler.getByteStream(entityObj);
+        BObject iteratorObj = byteStream.getIteratorObj();
+        writeContent(env, entityObj, messageOutputStream, iteratorObj);
+    }
+
+    private static void writeContent(Environment env, BObject entityObj, OutputStream messageOutputStream,
+                                     BObject iteratorObj) {
+        env.getRuntime().invokeMethodAsync(iteratorObj, "next", null, null, new Callback() {
+            @Override
+            public void notifySuccess(Object recordValue) {
+                if (recordValue == null) {
+                    //Set the byte channel to null, once it is consumed
+                    entityObj.addNativeData(ENTITY_BYTE_CHANNEL, null);
+                    return;
+                }
+
+                BArray arrayValue = ((BMap) recordValue).getArrayValue(StringUtils.fromString("value"));
+                byte[] bytes = arrayValue.getBytes();
+                try (ByteArrayInputStream str = new ByteArrayInputStream(bytes)) {
+                    MimeUtil.writeInputToOutputStream(str, messageOutputStream);
+                } catch (IOException e) {
+                    log.error("Error occurred while writing content parts to outputstream", e.getMessage());
+                }
+                writeContent(env, entityObj, messageOutputStream, iteratorObj);
+            }
+
+            @Override
+            public void notifyFailure(BError bError) {
+
+            }
+        });
+    }
+
+    /**
      * Decode a given entity body to get a set of child parts and set them to parent entity's multipart data field.
      *
      * @param entityObj   Parent entity that the nested parts reside
@@ -414,6 +462,11 @@ public class EntityBodyHandler {
     public static Channel getByteChannel(BObject entityObj) {
         return entityObj.getNativeData(ENTITY_BYTE_CHANNEL) != null ? (Channel) entityObj.getNativeData
                 (ENTITY_BYTE_CHANNEL) : null;
+    }
+
+    public static BStream getByteStream(BObject entityObj) {
+        return entityObj.getNativeData(ENTITY_BYTE_STREAM) != null ? (BStream) entityObj.getNativeData
+                (ENTITY_BYTE_STREAM) : null;
     }
 
     private static void closeByteChannel(Channel byteChannel) {
