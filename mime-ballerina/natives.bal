@@ -262,8 +262,8 @@ public class Entity {
     # mimeEntity.setBody("body string");
     # ```
     #
-    # + entityBody - Entity body can be of the type `string`,`xml`,`json`,`byte[]`,`io:ReadableByteChannel`, or `Entity[]`.
-    public isolated function setBody(@untainted string|xml|json|byte[]|io:ReadableByteChannel|Entity[] entityBody) {
+    # + entityBody - Entity body can be of the type `string`,`xml`,`json`,`byte[]`, or `Entity[]`.
+    public isolated function setBody(@untainted string|xml|json|byte[]|Entity[] entityBody) {
         if (entityBody is string) {
             self.setText(entityBody);
         } else if (entityBody is xml) {
@@ -272,8 +272,6 @@ public class Entity {
             self.setByteArray(entityBody);
         } else if (entityBody is json) {
             self.setJson(entityBody);
-        } else if(entityBody is io:ReadableByteChannel) {
-            self.setByteChannel(entityBody);
         } else {
             self.setBodyParts(entityBody);
         }
@@ -386,7 +384,7 @@ public class Entity {
     # + byteChannel - Byte channel, which needs to be set to the entity
     # + contentType - Content-type to be used with the payload. This is an optional parameter.
     #                 The `application/octet-stream` is the default value
-    public isolated function setByteChannel(io:ReadableByteChannel byteChannel,
+    isolated function setByteChannel(io:ReadableByteChannel byteChannel,
                                    @untainted string contentType = "application/octet-stream") {
         return externSetByteChannel(self, byteChannel, contentType);
     }
@@ -394,7 +392,7 @@ public class Entity {
     # Gets the entity body as a byte channel from a given entity.
     #
     # + return - An `io:ReadableByteChannel` or else a `mime:ParserError` record will be returned in case of errors
-    public isolated function getByteChannel() returns @tainted io:ReadableByteChannel|ParserError {
+    isolated function getByteChannel() returns @tainted io:ReadableByteChannel|ParserError {
         return externGetByteChannel(self);
     }
 
@@ -409,7 +407,7 @@ public class Entity {
     # Gets the body parts as a byte channel from a given entity.
     #
     # + return - Body parts as a byte channel
-    public isolated function getBodyPartsAsChannel() returns @tainted io:ReadableByteChannel|ParserError {
+    isolated function getBodyPartsAsChannel() returns @tainted io:ReadableByteChannel|ParserError {
         return externGetBodyPartsAsChannel(self);
     }
 
