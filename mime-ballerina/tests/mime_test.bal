@@ -662,7 +662,8 @@ public function testSetContentIdAndGetValueAsHeader() {
 // }
 
 //Test whether the body parts in a multipart entity can be retrieved as a byte channel
-@test:Config {}
+//TODO: Enable with new byteStream API
+@test:Config { enable: false }
 public function testGetBodyPartsAsChannel() {
     //Create a body part with json content.
     Entity bodyPart1 = new;
