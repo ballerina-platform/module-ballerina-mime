@@ -62,7 +62,6 @@ import static org.ballerinalang.mime.util.MimeConstants.ENTITY_BYTE_CHANNEL;
 import static org.ballerinalang.mime.util.MimeConstants.FIRST_BODY_PART_INDEX;
 import static org.ballerinalang.mime.util.MimeConstants.MESSAGE_DATA_SOURCE;
 import static org.ballerinalang.mime.util.MimeConstants.MULTIPART_AS_PRIMARY_TYPE;
-import static org.ballerinalang.mime.util.MimeConstants.PROTOCOL_MIME_PKG_ID;
 import static org.ballerinalang.mime.util.MimeUtil.isNotNullAndEmpty;
 
 /**
@@ -74,7 +73,7 @@ public class EntityBodyHandler {
 
     private static final Logger log = LoggerFactory.getLogger(EntityBodyHandler.class);
     private static final Type MIME_ENTITY_TYPE =
-            ValueCreator.createObjectValue(PROTOCOL_MIME_PKG_ID, ENTITY).getType();
+            ValueCreator.createObjectValue(MimeUtil.getMimePackage(), ENTITY).getType();
     private static final ArrayType mimeEntityArrayType = TypeCreator.createArrayType(MIME_ENTITY_TYPE);
 
     /**

@@ -60,7 +60,6 @@ import static org.ballerinalang.mime.util.MimeConstants.ENTITY_BYTE_CHANNEL;
 import static org.ballerinalang.mime.util.MimeConstants.MEDIA_TYPE;
 import static org.ballerinalang.mime.util.MimeConstants.MULTIPART_MIXED;
 import static org.ballerinalang.mime.util.MimeConstants.OCTET_STREAM;
-import static org.ballerinalang.mime.util.MimeConstants.PROTOCOL_MIME_PKG_ID;
 import static org.ballerinalang.mime.util.MimeConstants.TEXT_PLAIN;
 
 /**
@@ -299,16 +298,16 @@ public class ExternTestUtils {
     }
 
     public static BObject createEntityObject() {
-        return ValueCreator.createObjectValue(PROTOCOL_MIME_PKG_ID, ENTITY);
+        return ValueCreator.createObjectValue(MimeUtil.getMimePackage(), ENTITY);
     }
 
 
     public static BObject createMediaTypeObject() {
-        return ValueCreator.createObjectValue(PROTOCOL_MIME_PKG_ID, MEDIA_TYPE);
+        return ValueCreator.createObjectValue(MimeUtil.getMimePackage(), MEDIA_TYPE);
     }
 
     public static BObject getContentDispositionStruct() {
-        return ValueCreator.createObjectValue(PROTOCOL_MIME_PKG_ID, CONTENT_DISPOSITION_STRUCT);
+        return ValueCreator.createObjectValue(MimeUtil.getMimePackage(), CONTENT_DISPOSITION_STRUCT);
     }
 
     public static File getTemporaryFile(String fileName, String fileType, String valueTobeWritten) throws IOException {

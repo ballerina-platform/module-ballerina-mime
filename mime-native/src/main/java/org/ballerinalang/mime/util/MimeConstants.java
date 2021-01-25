@@ -21,6 +21,7 @@ package org.ballerinalang.mime.util;
 import io.ballerina.runtime.api.Module;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BString;
+import org.ballerinalang.stdlib.io.utils.IOUtils;
 
 import static io.ballerina.runtime.api.constants.RuntimeConstants.BALLERINA_BUILTIN_PKG_PREFIX;
 import static io.ballerina.runtime.api.constants.RuntimeConstants.BALLERINA_PACKAGE_PREFIX;
@@ -34,13 +35,13 @@ public class MimeConstants {
     public static final String MEDIA_TYPE = "MediaType";
     public static final String CONTENT_DISPOSITION_STRUCT = "ContentDisposition";
     public static final String PROTOCOL_PACKAGE_MIME = BALLERINA_PACKAGE_PREFIX + "mime";
+    @Deprecated
     public static final String PROTOCOL_MIME_PKG_VERSION = "1.0.6";
-    public static final String PROTOCOL_IO_PKG_VERSION = "0.5.6";
+    @Deprecated
     public static final Module PROTOCOL_MIME_PKG_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "mime",
                                                                      PROTOCOL_MIME_PKG_VERSION);
     public static final String PROTOCOL_PACKAGE_IO = BALLERINA_PACKAGE_PREFIX + "io";
-    public static final Module PROTOCOL_IO_PKG_ID = new Module(BALLERINA_BUILTIN_PKG_PREFIX, "io",
-                                                                   PROTOCOL_IO_PKG_VERSION);
+    public static final Module PROTOCOL_IO_PKG_ID = IOUtils.getIOPackage();
     public static final String READABLE_BYTE_CHANNEL_STRUCT = "ReadableByteChannel";
     public static final String MIME_ERROR_MESSAGE = "message";
 

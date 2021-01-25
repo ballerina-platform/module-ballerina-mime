@@ -53,7 +53,6 @@ import static org.ballerinalang.mime.util.MimeConstants.MULTIPART_FORM_DATA;
 import static org.ballerinalang.mime.util.MimeConstants.OCTET_STREAM;
 import static org.ballerinalang.mime.util.MimeConstants.PARSER_ERROR;
 import static org.ballerinalang.mime.util.MimeConstants.PROTOCOL_IO_PKG_ID;
-import static org.ballerinalang.mime.util.MimeConstants.PROTOCOL_MIME_PKG_ID;
 import static org.ballerinalang.mime.util.MimeConstants.READABLE_BYTE_CHANNEL_STRUCT;
 import static org.ballerinalang.mime.util.MimeConstants.TEXT_PLAIN;
 import static org.ballerinalang.mime.util.MimeUtil.getContentTypeWithParameters;
@@ -155,7 +154,7 @@ public class MimeEntityBody {
 
     public static Object getMediaType(BString contentType) {
         try {
-            BObject mediaType = ValueCreator.createObjectValue(PROTOCOL_MIME_PKG_ID, MEDIA_TYPE);
+            BObject mediaType = ValueCreator.createObjectValue(MimeUtil.getMimePackage(), MEDIA_TYPE);
             return MimeUtil.parseMediaType(mediaType, contentType.getValue());
         } catch (Throwable err) {
             return MimeUtil.createError(INVALID_CONTENT_TYPE_ERROR, getErrorMsg(err));
