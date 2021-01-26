@@ -26,7 +26,6 @@ import org.ballerinalang.mime.util.MimeUtil;
 
 import static org.ballerinalang.mime.util.MimeConstants.CONTENT_DISPOSITION_STRUCT;
 import static org.ballerinalang.mime.util.MimeConstants.DISPOSITION_FIELD;
-import static org.ballerinalang.mime.util.MimeConstants.PROTOCOL_MIME_PKG_ID;
 
 /**
  * Functionality related to content disposition.
@@ -36,8 +35,8 @@ import static org.ballerinalang.mime.util.MimeConstants.PROTOCOL_MIME_PKG_ID;
 public class ContentDisposition {
 
     public static BObject getContentDispositionObject(BString contentDisposition) {
-        BObject contentDispositionObj = ValueCreator.createObjectValue(PROTOCOL_MIME_PKG_ID,
-                                                                                          CONTENT_DISPOSITION_STRUCT);
+        BObject contentDispositionObj = ValueCreator.createObjectValue(MimeUtil.getMimePackage(),
+                                                                       CONTENT_DISPOSITION_STRUCT);
         MimeUtil.populateContentDispositionObject(contentDispositionObj, contentDisposition.getValue());
         return contentDispositionObj;
     }
