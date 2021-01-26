@@ -230,7 +230,7 @@ public class MimeUtil {
     }
 
     public static void setMediaTypeToEntity(BObject entityStruct, String contentType) {
-        BObject mediaType = ValueCreator.createObjectValue(MimeUtil.getMimePackage(), MEDIA_TYPE);
+        BObject mediaType = ValueCreator.createObjectValue(getMimePackage(), MEDIA_TYPE);
         MimeUtil.setContentType(mediaType, entityStruct, contentType);
         HeaderUtil.setHeaderToEntity(entityStruct, CONTENT_TYPE, contentType);
     }
