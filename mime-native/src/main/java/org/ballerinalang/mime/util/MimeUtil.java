@@ -18,6 +18,7 @@
 
 package org.ballerinalang.mime.util;
 
+import io.ballerina.runtime.api.Module;
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.TypeTags;
 import io.ballerina.runtime.api.creators.ErrorCreator;
@@ -32,6 +33,7 @@ import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BStreamingJson;
 import io.ballerina.runtime.api.values.BString;
+import org.ballerinalang.mime.nativeimpl.ModuleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +70,6 @@ import static org.ballerinalang.mime.util.MimeConstants.MULTIPART_AS_PRIMARY_TYP
 import static org.ballerinalang.mime.util.MimeConstants.MULTIPART_FORM_DATA;
 import static org.ballerinalang.mime.util.MimeConstants.PARAMETER_MAP_FIELD;
 import static org.ballerinalang.mime.util.MimeConstants.PRIMARY_TYPE_FIELD;
-import static org.ballerinalang.mime.util.MimeConstants.PROTOCOL_MIME_PKG_ID;
 import static org.ballerinalang.mime.util.MimeConstants.READABLE_BUFFER_SIZE;
 import static org.ballerinalang.mime.util.MimeConstants.SEMICOLON;
 import static org.ballerinalang.mime.util.MimeConstants.SIZE_FIELD;
@@ -229,7 +230,7 @@ public class MimeUtil {
     }
 
     public static void setMediaTypeToEntity(BObject entityStruct, String contentType) {
-        BObject mediaType = ValueCreator.createObjectValue(PROTOCOL_MIME_PKG_ID, MEDIA_TYPE);
+        BObject mediaType = ValueCreator.createObjectValue(getMimePackage(), MEDIA_TYPE);
         MimeUtil.setContentType(mediaType, entityStruct, contentType);
         HeaderUtil.setHeaderToEntity(entityStruct, CONTENT_TYPE, contentType);
     }
@@ -456,7 +457,7 @@ public class MimeUtil {
      * @return Ballerina error value
      */
     public static BError createError(String errorTypeName, String errMsg) {
-        return ErrorCreator.createDistinctError(errorTypeName, PROTOCOL_MIME_PKG_ID,
+        return ErrorCreator.createDistinctError(errorTypeName, MimeUtil.getMimePackage(),
                                                  StringUtils.fromString(errMsg));
     }
 
@@ -469,7 +470,7 @@ public class MimeUtil {
      * @return Ballerina error value
      */
     public static BError createError(String errorTypeName, String errMsg, BError errorValue) {
-        return ErrorCreator.createDistinctError(errorTypeName, PROTOCOL_MIME_PKG_ID,
+        return ErrorCreator.createDistinctError(errorTypeName, MimeUtil.getMimePackage(),
                                                  StringUtils.fromString(errMsg), errorValue);
     }
 
@@ -552,5 +553,14 @@ public class MimeUtil {
         if (outputStream != null) {
             outputStream.close();
         }
+    }
+
+    /**
+     * Gets ballerina mime package.
+     *
+     * @return mime package.
+     */
+    public static Module getMimePackage() {
+        return ModuleUtils.getModule();
     }
 }

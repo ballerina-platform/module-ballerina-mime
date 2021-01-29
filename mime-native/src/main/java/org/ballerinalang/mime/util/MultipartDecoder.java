@@ -41,7 +41,6 @@ import static org.ballerinalang.mime.util.MimeConstants.MAX_THRESHOLD_PERCENTAGE
 import static org.ballerinalang.mime.util.MimeConstants.MEDIA_TYPE;
 import static org.ballerinalang.mime.util.MimeConstants.NO_CONTENT_LENGTH_FOUND;
 import static org.ballerinalang.mime.util.MimeConstants.PARSER_ERROR;
-import static org.ballerinalang.mime.util.MimeConstants.PROTOCOL_MIME_PKG_ID;
 
 /**
  * Responsible for decoding an inputstream to get a set of multiparts.
@@ -115,8 +114,8 @@ public class MultipartDecoder {
                                                List<MIMEPart> mimeParts) {
         ArrayList<BObject> bodyParts = new ArrayList<>();
         for (final MIMEPart mimePart : mimeParts) {
-            BObject partStruct = ValueCreator.createObjectValue(PROTOCOL_MIME_PKG_ID, ENTITY);
-            BObject mediaType = ValueCreator.createObjectValue(PROTOCOL_MIME_PKG_ID, MEDIA_TYPE);
+            BObject partStruct = ValueCreator.createObjectValue(MimeUtil.getMimePackage(), ENTITY);
+            BObject mediaType = ValueCreator.createObjectValue(MimeUtil.getMimePackage(), MEDIA_TYPE);
             populateBodyPart(mimePart, partStruct, mediaType);
             bodyParts.add(partStruct);
         }
@@ -138,7 +137,7 @@ public class MultipartDecoder {
         populateContentType(mimePart, partStruct, mediaType);
         List<String> contentDispositionHeaders = mimePart.getHeader(MimeConstants.CONTENT_DISPOSITION);
         if (HeaderUtil.isHeaderExist(contentDispositionHeaders)) {
-            BObject contentDisposition = ValueCreator.createObjectValue(PROTOCOL_MIME_PKG_ID,
+            BObject contentDisposition = ValueCreator.createObjectValue(MimeUtil.getMimePackage(),
                                                                                CONTENT_DISPOSITION_STRUCT);
             populateContentDisposition(partStruct, contentDispositionHeaders, contentDisposition);
         }
