@@ -31,6 +31,7 @@ import org.ballerinalang.mime.util.MimeUtil;
 import org.ballerinalang.mime.util.MultipartDataSource;
 import org.ballerinalang.stdlib.io.channels.base.Channel;
 import org.ballerinalang.stdlib.io.utils.IOConstants;
+import org.ballerinalang.stdlib.io.utils.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +53,6 @@ import static org.ballerinalang.mime.util.MimeConstants.MULTIPART_AS_PRIMARY_TYP
 import static org.ballerinalang.mime.util.MimeConstants.MULTIPART_FORM_DATA;
 import static org.ballerinalang.mime.util.MimeConstants.OCTET_STREAM;
 import static org.ballerinalang.mime.util.MimeConstants.PARSER_ERROR;
-import static org.ballerinalang.mime.util.MimeConstants.PROTOCOL_IO_PKG_ID;
 import static org.ballerinalang.mime.util.MimeConstants.READABLE_BYTE_CHANNEL_STRUCT;
 import static org.ballerinalang.mime.util.MimeConstants.TEXT_PLAIN;
 import static org.ballerinalang.mime.util.MimeUtil.getContentTypeWithParameters;
@@ -109,8 +109,8 @@ public class MimeEntityBody {
                 EntityBodyChannel entityBodyChannel = new EntityBodyChannel(new ByteArrayInputStream(
                         outputStream.toByteArray()));
                 MimeUtil.closeOutputStream(outputStream);
-                BObject byteChannelObj = ValueCreator.createObjectValue(IOConstants.IO_PACKAGE_ID,
-                                                                         READABLE_BYTE_CHANNEL_STRUCT);
+                BObject byteChannelObj = ValueCreator.createObjectValue(IOUtils.getIOPackage(),
+                                                                        READABLE_BYTE_CHANNEL_STRUCT);
                 byteChannelObj.addNativeData(IOConstants.BYTE_CHANNEL_NAME, new EntityWrapper(entityBodyChannel));
                 return byteChannelObj;
             } else {
@@ -126,7 +126,7 @@ public class MimeEntityBody {
     public static Object getByteChannel(BObject entityObj) {
         BObject byteChannelObj;
         try {
-            byteChannelObj = ValueCreator.createObjectValue(PROTOCOL_IO_PKG_ID, READABLE_BYTE_CHANNEL_STRUCT);
+            byteChannelObj = ValueCreator.createObjectValue(IOUtils.getIOPackage(), READABLE_BYTE_CHANNEL_STRUCT);
             Channel byteChannel = EntityBodyHandler.getByteChannel(entityObj);
             if (byteChannel != null) {
                 byteChannelObj.addNativeData(IOConstants.BYTE_CHANNEL_NAME, byteChannel);
