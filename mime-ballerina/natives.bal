@@ -56,17 +56,19 @@ type StreamEntry record {|
 class MimeByteIterator {
 
     Entity entity;
+    int limit;
     int offset = 0;
 
-    public isolated function init(Entity entity) {
+    public isolated function init(Entity entity, int limit) {
         self.entity = entity;
+        self.limit = limit;
     }
 
-    public isolated function next() returns record StreamEntry|ParserError? {
-        var result = externGetByteArrayRecord(self.entity, offset);
+    public isolated function next() returns StreamEntry|ParserError? {
+        var result = externGetByteArrayRecord(self.entity, limit, offset);
         if (result is StreamEntry) {
-            offset = offset + 8196;
-            return result
+            offset = offset + limit;
+            return result;
         }
         return result;
     }
@@ -433,19 +435,15 @@ public class Entity {
 
     # Gets the entity body as a stream of blocks from a given entity.
     #
-    # + blockSize - An optional size of the byte block. Default size is 4KB
+    # + arraySize - An optional size of the byte array. Default size is 8KB
     # + return - A stream of `io:Block` or else a `mime:ParserError` record will be returned in case of errors
-    public isolated function getByteStream() returns @tainted stream<byte[], io:Error?>|ParserError {
+    public isolated function getByteStream(int arraySize = 8196) returns @tainted stream<byte[], io:Error?>|ParserError {
         // return externGetByteChannel(self);
-        MimeByteIterator byteIterator  = new;
-        stream<byte[], io:Error?> str  = new stream<byte[], io:Error?>(byteIterator);
+        return externGetByteStream(self, byteStream, contentType);
 
-        var byteChannel = externGetByteChannel(self);
-        if (byteChannel is ReadableByteChannel) {
-            return byteChannel.blockStream(blockSize);
-        } else {
-            return byteChannel;
-        }
+
+        MimeByteIterator byteIterator  = new(self, arraySize);
+        stream<byte[], io:Error?> str  = new stream<byte[], io:Error?>(byteIterator);
     }
 
     # Gets the body parts from a given entity.
@@ -637,26 +635,20 @@ isolated function externSetByteChannel(Entity entity, io:ReadableByteChannel byt
     name: "setByteChannel"
 } external;
 
-isolated function externGetByteArrayRecord(Entity entity, int offset) = @java:Method {
-    'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
-    name: "getByteArrayRecord"
-} external;
-
 isolated function externGetByteChannel(Entity entity) returns @tainted io:ReadableByteChannel|ParserError = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "getByteChannel"
 } external;
 
-isolated function externGetStream(Entity entity) returns @tainted stream<byte[], io:Error?>|ParserError = @java:Method {
+isolated function externGetByteStream(Entity entity) returns @tainted stream<byte[], io:Error?>|ParserError = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "getByteStream"
 } external;
 
-isolated function externGetStream(Entity entity) returns @tainted stream<byte[], io:Error?>|ParserError = @java:Method {
+isolated function externGetByteArrayRecord(Entity entity, int offset) returns StreamEntry|ParserError? = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
-    name: "getByteStream"
+    name: "getByteArrayRecord"
 } external;
-
 
 isolated function externSetBodyParts(Entity entity, Entity[] bodyParts, string contentType) = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
