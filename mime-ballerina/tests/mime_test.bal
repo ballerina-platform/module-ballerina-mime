@@ -349,6 +349,97 @@ public function testSetFileAsEntityBody() {
 //     }
 // }
 
+//Set byte channel as entity body and get that channel back
+@test:Config {}
+public function testSetByteChannelAndGetByteStream() {
+    string content = "Hello Ballerina!";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+
+    var str = entity.getByteStream(arraySize = 8);
+
+    if (str is stream<byte[], io:Error>) {
+        record {|byte[] value;|}|io:Error? arr1 = str.next();
+        if (arr1 is record {|byte[] value;|}) {
+            string name = checkpanic strings:fromBytes(arr1.value);
+            test:assertEquals(name, "Hello Ba", msg = "Found unexpected output");
+            record {|byte[] value;|}|io:Error? arr2 = str.next();
+            if (arr2 is record {|byte[] value;|}) {
+                name = checkpanic strings:fromBytes(arr2.value);
+                test:assertEquals(name, "llerina!", msg = "Found unexpected output");
+                record {|byte[] value;|}|io:Error? arr3 = str.next();
+                test:assertTrue(arr3 is (), msg = "Found unexpected output");
+            } else {
+                test:assertFail(msg = "Found unexpected arr2 output type");
+            }
+        } else {
+            test:assertFail(msg = "Found unexpected arr1 output type");
+        }
+    } else {
+       test:assertFail(msg = "Found unexpected str output type" + str.message());
+    }
+}
+
+@test:Config {}
+public function testSetByteChannelAndGetByteStream8k() {
+    string content = "Hello Ballerina!";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+
+    var str = entity.getByteStream();
+
+    if (str is stream<byte[], io:Error>) {
+        record {|byte[] value;|}|io:Error? arr1 = str.next();
+        if (arr1 is record {|byte[] value;|}) {
+            string name = checkpanic strings:fromBytes(arr1.value);
+            test:assertEquals(name, content, msg = "Found unexpected output");
+            
+            record {|byte[] value;|}|io:Error? arr2 = str.next();
+            test:assertTrue(arr2 is (), msg = "Found unexpected output");
+        } else {
+            test:assertFail(msg = "Found unexpected arr1 output type");
+        }
+    } else {
+       test:assertFail(msg = "Found unexpected str output type" + str.message());
+    }
+}
+
+@test:Config {}
+public function testSetByteChannelAndGetByteStream10() {
+    string content = "Hello Ballerina!";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+
+    var str = entity.getByteStream(arraySize = 10);
+
+    if (str is stream<byte[], io:Error>) {
+        record {|byte[] value;|}|io:Error? arr1 = str.next();
+        if (arr1 is record {|byte[] value;|}) {
+            string name = checkpanic strings:fromBytes(arr1.value);
+            test:assertEquals(name, "Hello Ball", msg = "Found unexpected output");
+            record {|byte[] value;|}|io:Error? arr2 = str.next();
+            if (arr2 is record {|byte[] value;|}) {
+                name = checkpanic strings:fromBytes(arr2.value);
+                test:assertEquals(name, "erina!", msg = "Found unexpected output");
+                record {|byte[] value;|}|io:Error? arr3 = str.next();
+                test:assertTrue(arr3 is (), msg = "Found unexpected output");
+            } else {
+                test:assertFail(msg = "Found unexpected arr2 output type");
+            }
+        } else {
+            test:assertFail(msg = "Found unexpected arr1 output type");
+        }
+    } else {
+       test:assertFail(msg = "Found unexpected str output type" + str.message());
+    }
+}
+
 //TODO: Enable with new byteStream API
 // //Set entity body as a byte channel get the content back as a string
 // @test:Config {}
@@ -740,7 +831,7 @@ public function getChannelFromMultipartEntity() {
     }
 }
 
-//TODO: Enable with new byteStream API
+// TODO: Enable with new byteStream API
 // //Test whether the string body is retrieved from the cache
 // @test:Config {}
 // public function getAnyStreamAsStringFromCache() {
@@ -756,25 +847,36 @@ public function getChannelFromMultipartEntity() {
 //     test:assertEquals(returnContent, "{'code':'123'}{'code':'123'}", msg = "Found unexpected output");
 // }
 
-//Test whether the string body is retrieved from the cache
-// @test:Config {}
-// public function geStreamTestssssssssssssss() {
-//     // string content = "{'code':'123'}";
-//     // string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
-//     // io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+@test:Config {}
+public function testseStreamAndGetStream() {
+    byte[][] content = ["ballerina".toBytes(), "language".toBytes()];
+    stream<byte[], io:Error> byteStream = content.toStream();
 
-//     byte[][] content = [[60, 78, 39, 28]];
-//     stream<byte[], io:Error> byteStream = content.toStream();
+    Entity entity = new;
+    entity.setByteStream(byteStream);
+    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
 
-//     Entity entity = new;
-//     entity.setByteStream(byteStream, "application/json");
-//     entity.getByteStream();
-//     string returnContent;
-//     returnContent = checkpanic entity.getText();
-//     //String body should be retrieved from the cache the second time this is called
-//     returnContent = returnContent + checkpanic entity.getText();
-//     test:assertEquals(returnContent, "{'code':'123'}{'code':'123'}", msg = "Found unexpected output");
-// }
+    if (str is stream<byte[], io:Error>) {
+        record {|byte[] value;|}|io:Error? arr1 = str.next();
+        if (arr1 is record {|byte[] value;|}) {
+            string name = checkpanic strings:fromBytes(arr1.value);
+            test:assertEquals(name, "ballerina", msg = "Found unexpected output");
+            record {|byte[] value;|}|io:Error? arr2 = str.next();
+            if (arr2 is record {|byte[] value;|}) {
+                name = checkpanic strings:fromBytes(arr2.value);
+                test:assertEquals(name, "language", msg = "Found unexpected output");
+                record {|byte[] value;|}|io:Error? arr3 = str.next();
+                test:assertTrue(arr3 is (), msg = "Found unexpected output");
+            } else {
+                test:assertFail(msg = "Found unexpected arr2 output type");
+            }
+        } else {
+            test:assertFail(msg = "Found unexpected arr1 output type");
+        }
+    } else {
+       test:assertFail(msg = "Found unexpected str output type" + str.message());
+    }
+}
 
 //TODO: Enable with new byteStream API
 // //Test whether the xml content can be constructed properly once the body has been retrieved as a byte array first

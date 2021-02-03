@@ -437,8 +437,6 @@ public class Entity {
 
         var value = externGetByteStream(self);
         if (value is ()) {
-            
-        io:println("------------externGetByteStream is (), so create new-------------------");
             MimeByteIterator byteIterator  = new(self, arraySize);
             stream<byte[], io:Error> str  = new stream<byte[], io:Error>(byteIterator);
             return str;
