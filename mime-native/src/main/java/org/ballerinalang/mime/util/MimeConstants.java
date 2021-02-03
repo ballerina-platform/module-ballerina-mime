@@ -182,6 +182,10 @@ public class MimeConstants {
     public static final String CONTENT_DISPOSITION_FILE_NAME = "filename";
     public static final String CONTENT_DISPOSITION_NAME = "name";
 
+    // Stream entry record
+    public static final String STREAM_ENTRY_RECORD = "StreamEntry";
+    public static final BString FIELD_VALUE = StringUtils.fromString("value");
+
     /**
      * Describes the format of the body part.
      */

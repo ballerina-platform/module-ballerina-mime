@@ -20,6 +20,7 @@ package org.ballerinalang.mime.nativeimpl;
 
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.values.BArray;
+import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BStream;
 import io.ballerina.runtime.api.values.BString;
@@ -28,6 +29,7 @@ import org.ballerinalang.mime.util.EntityBodyChannel;
 import org.ballerinalang.mime.util.EntityBodyHandler;
 import org.ballerinalang.mime.util.EntityWrapper;
 import org.ballerinalang.mime.util.HeaderUtil;
+import org.ballerinalang.mime.util.MimeConstants;
 import org.ballerinalang.mime.util.MimeUtil;
 import org.ballerinalang.mime.util.MultipartDataSource;
 import org.ballerinalang.stdlib.io.channels.base.Channel;
@@ -38,6 +40,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Locale;
 
 import static org.ballerinalang.mime.nativeimpl.MimeDataSourceBuilder.getErrorMsg;
@@ -56,8 +60,10 @@ import static org.ballerinalang.mime.util.MimeConstants.MULTIPART_FORM_DATA;
 import static org.ballerinalang.mime.util.MimeConstants.OCTET_STREAM;
 import static org.ballerinalang.mime.util.MimeConstants.PARSER_ERROR;
 import static org.ballerinalang.mime.util.MimeConstants.READABLE_BYTE_CHANNEL_STRUCT;
+import static org.ballerinalang.mime.util.MimeConstants.STREAM_ENTRY_RECORD;
 import static org.ballerinalang.mime.util.MimeConstants.TEXT_PLAIN;
 import static org.ballerinalang.mime.util.MimeUtil.getContentTypeWithParameters;
+import static org.ballerinalang.mime.util.MimeUtil.getMimePackage;
 import static org.ballerinalang.mime.util.MimeUtil.getNewMultipartDelimiter;
 
 /**
@@ -160,43 +166,56 @@ public class MimeEntityBody {
             return byteStream;
         }
 
-        if (EntityBodyHandler.getMessageDataSource(entityObj) != null) {
-            return MimeUtil.createError(PARSER_ERROR, "Byte stream is not available but " +
-                    "payload can be obtain either as xml, json, string or byte[] " +
-                    "type");
-        } else if (EntityBodyHandler.getBodyPartArray(entityObj) != null && EntityBodyHandler.
-                getBodyPartArray(entityObj).size() != 0) {
-            return MimeUtil.createError(PARSER_ERROR,
-                                        "Byte stream is not available since payload contains a set of body " +
-                                                "parts");
+        Channel byteChannel = EntityBodyHandler.getByteChannel(entityObj);
+        if (byteChannel != null) {
+            // Return value implies the absence of previously set byte stream, but to return new iterator to
+            // retrieve the byte channel content.
+            return null;
         } else {
-            return MimeUtil.createError(PARSER_ERROR, "Byte stream is not available as payload");
+            if (EntityBodyHandler.getMessageDataSource(entityObj) != null) {
+                return MimeUtil.createError(PARSER_ERROR, "Byte stream is not available but " +
+                        "payload can be obtain either as xml, json, string or byte[] type");
+            } else if (EntityBodyHandler.getBodyPartArray(entityObj) != null && EntityBodyHandler.
+                    getBodyPartArray(entityObj).size() != 0) {
+                return MimeUtil.createError(PARSER_ERROR, "Byte stream is not available since payload contains a set" +
+                        " of body parts");
+            } else {
+                return MimeUtil.createError(PARSER_ERROR, "Byte stream is not available as payload");
+            }
         }
     }
 
-    public static Object getByteArrayRecord(BObject entityObj, long offset) {
-        BStream byteStream = EntityBodyHandler.getByteStream(entityObj);
-        if (byteStream != null) {
-            return byteStream;
+    public static Object getStreamEntryRecord(BObject entityObj, long arraySize) {
+        Channel byteChannel = EntityBodyHandler.getByteChannel(entityObj);
+        if (byteChannel == null) {
+            return IOUtils.createError(IOConstants.ErrorCode.GenericError,
+                                       "Error occurred while reading stream: byte channel is empty");
+        }
+        byte[] bytes;
+        try {
+            InputStream inputStream = byteChannel.getInputStream();
+            try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+                byte[] buffer = new byte[(int) arraySize];
+                int len = inputStream.read(buffer, 0, (int) arraySize);
+                if (len == -1) {
+                    return null;
+                }
+                output.write(buffer, 0, len);
+                bytes = output.toByteArray();
+            }
+        } catch (IOException ex) {
+            return IOUtils.createError(IOConstants.ErrorCode.GenericError,
+                                       "Error occurred while reading stream:" + ex.getMessage());
         }
 
-        if (EntityBodyHandler.getMessageDataSource(entityObj) != null) {
-            return MimeUtil.createError(PARSER_ERROR, "Byte stream is not available but " +
-                    "payload can be obtain either as xml, json, string or byte[] " +
-                    "type");
-        } else if (EntityBodyHandler.getBodyPartArray(entityObj) != null && EntityBodyHandler.
-                getBodyPartArray(entityObj).size() != 0) {
-            return MimeUtil.createError(PARSER_ERROR,
-                                        "Byte stream is not available since payload contains a set of body " +
-                                                "parts");
-        } else {
-            return MimeUtil.createError(PARSER_ERROR, "Byte stream is not available as payload");
-        }
+        BMap<BString, Object> streamEntry = ValueCreator.createRecordValue(getMimePackage(), STREAM_ENTRY_RECORD);
+        streamEntry.put(MimeConstants.FIELD_VALUE, ValueCreator.createArrayValue(bytes));
+        return streamEntry;
     }
 
     public static Object getMediaType(BString contentType) {
         try {
-            BObject mediaType = ValueCreator.createObjectValue(MimeUtil.getMimePackage(), MEDIA_TYPE);
+            BObject mediaType = ValueCreator.createObjectValue(getMimePackage(), MEDIA_TYPE);
             return MimeUtil.parseMediaType(mediaType, contentType.getValue());
         } catch (Throwable err) {
             return MimeUtil.createError(INVALID_CONTENT_TYPE_ERROR, getErrorMsg(err));
@@ -226,9 +245,10 @@ public class MimeEntityBody {
     public static void setByteStream(BObject entityObj, BStream byteStream, BString contentType) {
         entityObj.addNativeData(ENTITY_BYTE_STREAM, byteStream);
         Object dataSource = EntityBodyHandler.getMessageDataSource(entityObj);
-        if (dataSource != null) { //Clear message data source when the user set a byte channel to entity
-            entityObj.addNativeData(MESSAGE_DATA_SOURCE, null);
-        }
+        //Clear message data source/byteChannel when the user set a byte stream to entity
+        entityObj.addNativeData(ENTITY_BYTE_CHANNEL, null);
+        entityObj.addNativeData(MESSAGE_DATA_SOURCE, null);
+
         MimeUtil.setMediaTypeToEntity(entityObj, contentType != null ? contentType.getValue() : OCTET_STREAM);
     }
 
