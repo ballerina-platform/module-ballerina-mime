@@ -65,6 +65,7 @@ import static org.ballerinalang.mime.util.MimeConstants.CONTENT_TYPE;
 import static org.ballerinalang.mime.util.MimeConstants.ENTITY;
 import static org.ballerinalang.mime.util.MimeConstants.ENTITY_BYTE_CHANNEL;
 import static org.ballerinalang.mime.util.MimeConstants.ENTITY_BYTE_STREAM;
+import static org.ballerinalang.mime.util.MimeConstants.FIELD_VALUE;
 import static org.ballerinalang.mime.util.MimeConstants.FIRST_BODY_PART_INDEX;
 import static org.ballerinalang.mime.util.MimeConstants.MESSAGE_DATA_SOURCE;
 import static org.ballerinalang.mime.util.MimeConstants.MULTIPART_AS_PRIMARY_TYPE;
@@ -196,7 +197,7 @@ public class EntityBodyHandler {
     public static Object constructJsonDataSource(BObject entityObj) {
         Channel byteChannel = getByteChannel(entityObj);
         if (byteChannel == null) {
-            return null;
+            throw ErrorCreator.createError(StringUtils.fromString("empty JSON document"));
         }
         try {
             return constructJsonDataSource(entityObj, byteChannel.getInputStream());
@@ -387,15 +388,17 @@ public class EntityBodyHandler {
     }
 
     /**
-     * Write byte channel stream directly into outputstream without converting it to a data source.
+     * Write byte stream directly into output-stream without converting it to a data source.
      *
-     * @param entityObj        Represent a ballerina entity
-     * @param messageOutputStream Represent the outputstream that the message should be written to
-     * @throws IOException When an error occurs while writing inputstream to outputstream
+     * @param entityObj           Represent a ballerina entity
+     * @param messageOutputStream Represent the output-stream that the message should be written to
      */
     public static void writeByteStreamToOutputStream(Environment env, BObject entityObj,
-                                                     OutputStream messageOutputStream) throws IOException {
+                                                     OutputStream messageOutputStream) {
         BStream byteStream = EntityBodyHandler.getByteStream(entityObj);
+        if (byteStream ==  null) {
+            throw ErrorCreator.createError(StringUtils.fromString("Payload is not available as byte stream"));
+        }
         BObject iteratorObj = byteStream.getIteratorObj();
         writeContent(env, entityObj, messageOutputStream, iteratorObj);
     }
@@ -406,24 +409,25 @@ public class EntityBodyHandler {
             @Override
             public void notifySuccess(Object recordValue) {
                 if (recordValue == null) {
-                    //Set the byte channel to null, once it is consumed
-                    entityObj.addNativeData(ENTITY_BYTE_CHANNEL, null);
+                    //Set the byte stream to null, once it is consumed
+                    entityObj.addNativeData(ENTITY_BYTE_STREAM, null);
                     return;
                 }
 
-                BArray arrayValue = ((BMap) recordValue).getArrayValue(StringUtils.fromString("value"));
+                BArray arrayValue = ((BMap) recordValue).getArrayValue(FIELD_VALUE);
                 byte[] bytes = arrayValue.getBytes();
                 try (ByteArrayInputStream str = new ByteArrayInputStream(bytes)) {
                     MimeUtil.writeInputToOutputStream(str, messageOutputStream);
                 } catch (IOException e) {
-                    log.error("Error occurred while writing content parts to outputstream", e.getMessage());
+                    throw ErrorCreator.createError(StringUtils.fromString(
+                            "Error occurred while writing content parts to outputstream: " + e.getMessage()));
                 }
                 writeContent(env, entityObj, messageOutputStream, iteratorObj);
             }
 
             @Override
             public void notifyFailure(BError bError) {
-
+                //TODO byte API, handle error
             }
         });
     }
@@ -468,7 +472,7 @@ public class EntityBodyHandler {
                 (ENTITY_BYTE_STREAM) : null;
     }
 
-    private static void closeByteChannel(Channel byteChannel) {
+    public static void closeByteChannel(Channel byteChannel) {
         try {
             byteChannel.close();
         } catch (IOException e) {

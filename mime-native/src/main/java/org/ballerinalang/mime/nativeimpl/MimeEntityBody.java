@@ -109,14 +109,7 @@ public class MimeEntityBody {
         try {
             String contentType = getContentTypeWithParameters(entityObj);
             if (isMultipart(contentType)) {
-                String boundaryValue = HeaderUtil.extractBoundaryParameter(contentType);
-                String multipartDataBoundary = boundaryValue != null ? boundaryValue : getNewMultipartDelimiter();
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                MultipartDataSource multipartDataSource = new MultipartDataSource(entityObj, multipartDataBoundary);
-                multipartDataSource.serialize(outputStream);
-                EntityBodyChannel entityBodyChannel = new EntityBodyChannel(new ByteArrayInputStream(
-                        outputStream.toByteArray()));
-                MimeUtil.closeOutputStream(outputStream);
+                EntityBodyChannel entityBodyChannel = creatEntityBodyChannel(entityObj, contentType);
                 BObject byteChannelObj = ValueCreator.createObjectValue(IOUtils.getIOPackage(),
                                                                         READABLE_BYTE_CHANNEL_STRUCT);
                 byteChannelObj.addNativeData(IOConstants.BYTE_CHANNEL_NAME, new EntityWrapper(entityBodyChannel));
@@ -129,6 +122,35 @@ public class MimeEntityBody {
             return MimeUtil.createError(PARSER_ERROR, "Error occurred while constructing a byte " +
                     "channel out of body parts : " + getErrorMsg(err));
         }
+    }
+
+    public static Object getBodyPartsAsStream(BObject entityObj) {
+        try {
+            String contentType = getContentTypeWithParameters(entityObj);
+            if (isMultipart(contentType)) {
+                EntityBodyChannel entityBodyChannel = creatEntityBodyChannel(entityObj, contentType);
+                entityObj.addNativeData(ENTITY_BYTE_CHANNEL, new EntityWrapper(entityBodyChannel));
+                return null;
+            } else {
+                return MimeUtil.createError(PARSER_ERROR, "Entity doesn't contain body parts");
+            }
+        } catch (Throwable err) {
+            log.error("Error occurred while constructing a byte stream out of body parts", err);
+            return MimeUtil.createError(PARSER_ERROR, "Error occurred while constructing a byte " +
+                    "stream out of body parts : " + getErrorMsg(err));
+        }
+    }
+
+    private static EntityBodyChannel creatEntityBodyChannel(BObject entityObj, String contentType) throws IOException {
+        String boundaryValue = HeaderUtil.extractBoundaryParameter(contentType);
+        String multipartDataBoundary = boundaryValue != null ? boundaryValue : getNewMultipartDelimiter();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        MultipartDataSource multipartDataSource = new MultipartDataSource(entityObj, multipartDataBoundary);
+        multipartDataSource.serialize(outputStream);
+        EntityBodyChannel entityBodyChannel = new EntityBodyChannel(new ByteArrayInputStream(
+                outputStream.toByteArray()));
+        MimeUtil.closeOutputStream(outputStream);
+        return entityBodyChannel;
     }
 
     public static Object getByteChannel(BObject entityObj) {
@@ -188,16 +210,18 @@ public class MimeEntityBody {
     public static Object getStreamEntryRecord(BObject entityObj, long arraySize) {
         Channel byteChannel = EntityBodyHandler.getByteChannel(entityObj);
         if (byteChannel == null) {
-            return IOUtils.createError(IOConstants.ErrorCode.GenericError,
-                                       "Error occurred while reading stream: byte channel is empty");
+            return null;
         }
         byte[] bytes;
+        int arraySizeInt = (int) arraySize;
         try {
             InputStream inputStream = byteChannel.getInputStream();
             try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-                byte[] buffer = new byte[(int) arraySize];
-                int len = inputStream.read(buffer, 0, (int) arraySize);
+                byte[] buffer = new byte[arraySizeInt];
+                int len = inputStream.read(buffer, 0, arraySizeInt);
                 if (len == -1) {
+                    EntityBodyHandler.closeByteChannel(byteChannel);
+                    entityObj.addNativeData(ENTITY_BYTE_CHANNEL, null);
                     return null;
                 }
                 output.write(buffer, 0, len);
@@ -211,6 +235,18 @@ public class MimeEntityBody {
         BMap<BString, Object> streamEntry = ValueCreator.createRecordValue(getMimePackage(), STREAM_ENTRY_RECORD);
         streamEntry.put(MimeConstants.FIELD_VALUE, ValueCreator.createArrayValue(bytes));
         return streamEntry;
+    }
+
+    public static Object closeInputByteStream(BObject entityObj) {
+        Channel byteChannel = EntityBodyHandler.getByteChannel(entityObj);
+        if (byteChannel != null) {
+            try {
+                byteChannel.close();
+            } catch (IOException e) {
+                return IOUtils.createError(e);
+            }
+        }
+        return null;
     }
 
     public static Object getMediaType(BString contentType) {
@@ -244,7 +280,6 @@ public class MimeEntityBody {
 
     public static void setByteStream(BObject entityObj, BStream byteStream, BString contentType) {
         entityObj.addNativeData(ENTITY_BYTE_STREAM, byteStream);
-        Object dataSource = EntityBodyHandler.getMessageDataSource(entityObj);
         //Clear message data source/byteChannel when the user set a byte stream to entity
         entityObj.addNativeData(ENTITY_BYTE_CHANNEL, null);
         entityObj.addNativeData(MESSAGE_DATA_SOURCE, null);

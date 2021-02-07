@@ -215,7 +215,13 @@ public class MultipartDataSource implements BRefValue {
                 ((BRefValue) messageDataSource).serialize(outputStream);
             }
         } else {
-            EntityBodyHandler.writeByteChannelToOutputStream(bodyPart, outputStream);
+            Object byteStream = EntityBodyHandler.getByteStream(bodyPart);
+            if (byteStream != null) {
+                // TODO stream API: Check if this is needed
+//                EntityBodyHandler.writeByteStreamToOutputStream(bodyPart, outputStream);
+            } else {
+                EntityBodyHandler.writeByteChannelToOutputStream(bodyPart, outputStream);
+            }
         }
     }
 
