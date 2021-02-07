@@ -1116,7 +1116,7 @@ public function testSeStreamAndGetStream() {
     }
 }
 
-//TODO check Stream.close()
+//TODO check Stream.close(), I think we need to use custom stream here rather the default
 @test:Config {enable:false}
 public function testStreamClose() {
     byte[][] content = ["ballerina".toBytes(), "language".toBytes()];

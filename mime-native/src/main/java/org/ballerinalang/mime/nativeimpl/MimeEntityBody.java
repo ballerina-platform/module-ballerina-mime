@@ -18,6 +18,7 @@
 
 package org.ballerinalang.mime.nativeimpl;
 
+import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BMap;
@@ -105,11 +106,11 @@ public class MimeEntityBody {
         }
     }
 
-    public static Object getBodyPartsAsChannel(BObject entityObj) {
+    public static Object getBodyPartsAsChannel(Environment env, BObject entityObj) {
         try {
             String contentType = getContentTypeWithParameters(entityObj);
             if (isMultipart(contentType)) {
-                EntityBodyChannel entityBodyChannel = creatEntityBodyChannel(entityObj, contentType);
+                EntityBodyChannel entityBodyChannel = creatEntityBodyChannel(env, entityObj, contentType);
                 BObject byteChannelObj = ValueCreator.createObjectValue(IOUtils.getIOPackage(),
                                                                         READABLE_BYTE_CHANNEL_STRUCT);
                 byteChannelObj.addNativeData(IOConstants.BYTE_CHANNEL_NAME, new EntityWrapper(entityBodyChannel));
@@ -124,11 +125,11 @@ public class MimeEntityBody {
         }
     }
 
-    public static Object getBodyPartsAsStream(BObject entityObj) {
+    public static Object getBodyPartsAsStream(Environment env, BObject entityObj) {
         try {
             String contentType = getContentTypeWithParameters(entityObj);
             if (isMultipart(contentType)) {
-                EntityBodyChannel entityBodyChannel = creatEntityBodyChannel(entityObj, contentType);
+                EntityBodyChannel entityBodyChannel = creatEntityBodyChannel(env, entityObj, contentType);
                 entityObj.addNativeData(ENTITY_BYTE_CHANNEL, new EntityWrapper(entityBodyChannel));
                 return null;
             } else {
@@ -141,11 +142,12 @@ public class MimeEntityBody {
         }
     }
 
-    private static EntityBodyChannel creatEntityBodyChannel(BObject entityObj, String contentType) throws IOException {
+    private static EntityBodyChannel creatEntityBodyChannel(Environment env, BObject entityObj, String contentType)
+            throws IOException {
         String boundaryValue = HeaderUtil.extractBoundaryParameter(contentType);
         String multipartDataBoundary = boundaryValue != null ? boundaryValue : getNewMultipartDelimiter();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        MultipartDataSource multipartDataSource = new MultipartDataSource(entityObj, multipartDataBoundary);
+        MultipartDataSource multipartDataSource = new MultipartDataSource(env, entityObj, multipartDataBoundary);
         multipartDataSource.serialize(outputStream);
         EntityBodyChannel entityBodyChannel = new EntityBodyChannel(new ByteArrayInputStream(
                 outputStream.toByteArray()));

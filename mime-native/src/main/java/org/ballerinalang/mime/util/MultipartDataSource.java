@@ -18,6 +18,7 @@
 
 package org.ballerinalang.mime.util;
 
+import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
@@ -54,6 +55,7 @@ import static org.ballerinalang.mime.util.MimeConstants.PARAMETER_MAP_FIELD;
 public class MultipartDataSource implements BRefValue {
     private static final Logger log = LoggerFactory.getLogger(MultipartDataSource.class);
 
+    private Environment env;
     private BObject parentEntity;
     private String boundaryString;
     private OutputStream outputStream;
@@ -64,7 +66,8 @@ public class MultipartDataSource implements BRefValue {
     private static final char COLON = ':';
     private static final char SPACE = ' ';
 
-    public MultipartDataSource(BObject entityStruct, String boundaryString) {
+    public MultipartDataSource(Environment env, BObject entityStruct, String boundaryString) {
+        this.env = env;
         this.parentEntity = entityStruct;
         this.boundaryString = boundaryString;
     }
@@ -217,8 +220,7 @@ public class MultipartDataSource implements BRefValue {
         } else {
             Object byteStream = EntityBodyHandler.getByteStream(bodyPart);
             if (byteStream != null) {
-                // TODO stream API: Check if this is needed
-//                EntityBodyHandler.writeByteStreamToOutputStream(bodyPart, outputStream);
+                EntityBodyHandler.writeByteStreamToOutputStream(env, bodyPart, outputStream);
             } else {
                 EntityBodyHandler.writeByteChannelToOutputStream(bodyPart, outputStream);
             }

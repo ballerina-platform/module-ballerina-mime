@@ -412,8 +412,8 @@ public class Entity {
 
     # Gets the entity body as a stream of byte[] from a given entity.
     #
-    # + arraySize - An optional size of the byte array. Default size is 8KB
-    # + return - A stream of `io:Block` or else a `mime:ParserError` record will be returned in case of errors
+    # + arraySize - A defaultable paramerter to state the size of the byte array. Default size is 8KB
+    # + return - A byte stream from which the payload can be read or `mime:ParserError` in case of errors
     public isolated function getByteStream(int arraySize = 8196) returns @tainted stream<byte[], io:Error>|ParserError {
         var value = externGetByteStream(self);
         if (value is ()) {
@@ -441,6 +441,7 @@ public class Entity {
 
     # Gets the body parts as a byte stream from a given entity.
     #
+    # + arraySize - A defaultable paramerter to state the size of the byte array. Default size is 8KB
     # + return - Body parts as a byte stream
     public isolated function getBodyPartsAsStream(int arraySize = 8196) returns @tainted stream<byte[], io:Error>|ParserError {
         var value = externGetBodyPartsAsStream(self);

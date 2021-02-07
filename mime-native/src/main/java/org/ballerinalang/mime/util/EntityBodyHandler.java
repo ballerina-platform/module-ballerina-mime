@@ -58,6 +58,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.ballerinalang.mime.util.MimeConstants.BODY_PARTS;
 import static org.ballerinalang.mime.util.MimeConstants.CHARSET;
@@ -326,7 +328,7 @@ public class EntityBodyHandler {
      */
     public static boolean checkEntityBodyAvailability(BObject entityObj) {
         return entityObj.getNativeData(ENTITY_BYTE_CHANNEL) != null || getMessageDataSource(entityObj) != null
-                || entityObj.getNativeData(BODY_PARTS) != null;
+                || entityObj.getNativeData(BODY_PARTS) != null || entityObj.getNativeData(ENTITY_BYTE_STREAM) != null ;
     }
 
     /**
@@ -375,8 +377,7 @@ public class EntityBodyHandler {
      * @param messageOutputStream Represent the outputstream that the message should be written to
      * @throws IOException When an error occurs while writing inputstream to outputstream
      */
-    public static void writeByteChannelToOutputStream(BObject entityObj,
-                                                      OutputStream messageOutputStream)
+    public static void writeByteChannelToOutputStream(BObject entityObj, OutputStream messageOutputStream)
             throws IOException {
         Channel byteChannel = EntityBodyHandler.getByteChannel(entityObj);
         if (byteChannel != null) {
@@ -388,46 +389,52 @@ public class EntityBodyHandler {
     }
 
     /**
-     * Write byte stream directly into output-stream without converting it to a data source.
+     * Write byte stream directly to the output-stream without converting it to a data source.
      *
-     * @param entityObj           Represent a ballerina entity
-     * @param messageOutputStream Represent the output-stream that the message should be written to
+     * @param env    the environment of the resource invoked
+     * @param entity       Represent a ballerina entity
+     * @param outputStream Represent the output-stream that the message should be written to
      */
-    public static void writeByteStreamToOutputStream(Environment env, BObject entityObj,
-                                                     OutputStream messageOutputStream) {
-        BStream byteStream = EntityBodyHandler.getByteStream(entityObj);
-        if (byteStream ==  null) {
-            throw ErrorCreator.createError(StringUtils.fromString("Payload is not available as byte stream"));
+    public static void writeByteStreamToOutputStream(Environment env, BObject entity, OutputStream outputStream) {
+        BStream byteStream = EntityBodyHandler.getByteStream(entity);
+        if (byteStream != null) {
+            BObject iteratorObj = byteStream.getIteratorObj();
+            CountDownLatch latch = new CountDownLatch(1);
+            writeContent(env, entity, outputStream, iteratorObj, latch);
+            try {
+                latch.await(2, TimeUnit.MINUTES);
+            } catch (InterruptedException e) {
+                log.warn("Interrupted before completing the content write");
+            }
         }
-        BObject iteratorObj = byteStream.getIteratorObj();
-        writeContent(env, entityObj, messageOutputStream, iteratorObj);
     }
 
-    private static void writeContent(Environment env, BObject entityObj, OutputStream messageOutputStream,
-                                     BObject iteratorObj) {
+    private static void writeContent(Environment env, BObject entity, OutputStream outputStream,
+                                     BObject iteratorObj, CountDownLatch latch) {
         env.getRuntime().invokeMethodAsync(iteratorObj, "next", null, null, new Callback() {
             @Override
-            public void notifySuccess(Object recordValue) {
-                if (recordValue == null) {
-                    //Set the byte stream to null, once it is consumed
-                    entityObj.addNativeData(ENTITY_BYTE_STREAM, null);
+            public void notifySuccess(Object result) {
+                if (result == null) {
+                    entity.addNativeData(ENTITY_BYTE_STREAM, null);
+                    latch.countDown();
                     return;
                 }
-
-                BArray arrayValue = ((BMap) recordValue).getArrayValue(FIELD_VALUE);
+                BArray arrayValue = ((BMap) result).getArrayValue(FIELD_VALUE);
                 byte[] bytes = arrayValue.getBytes();
                 try (ByteArrayInputStream str = new ByteArrayInputStream(bytes)) {
-                    MimeUtil.writeInputToOutputStream(str, messageOutputStream);
+                    MimeUtil.writeInputToOutputStream(str, outputStream);
                 } catch (IOException e) {
                     throw ErrorCreator.createError(StringUtils.fromString(
                             "Error occurred while writing content parts to outputstream: " + e.getMessage()));
                 }
-                writeContent(env, entityObj, messageOutputStream, iteratorObj);
+                writeContent(env, entity, outputStream, iteratorObj, latch);
             }
 
             @Override
             public void notifyFailure(BError bError) {
-                //TODO byte API, handle error
+                latch.countDown();
+                throw ErrorCreator.createError(StringUtils.fromString(
+                        "Error occurred while streaming content: " + bError.getMessage()));
             }
         });
     }
