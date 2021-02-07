@@ -262,7 +262,7 @@ public class Entity {
     # mimeEntity.setBody("body string");
     # ```
     #
-    # + entityBody - Entity body can be of the type `string`,`xml`,`json`,`byte[]`, or `Entity[]`.
+    # + entityBody - Entity body can be of the type `string`,`xml`,`json`,`byte[]`,`Entity[]`, or `stream<byte[], io:Error>`
     public isolated function setBody(@untainted string|xml|json|byte[]|Entity[]|stream<byte[], io:Error> entityBody) {
         if (entityBody is string) {
             self.setText(entityBody);
@@ -442,7 +442,7 @@ public class Entity {
     # Gets the body parts as a byte stream from a given entity.
     #
     # + return - Body parts as a byte stream
-    isolated function getBodyPartsAsStream(int arraySize = 8196) returns @tainted stream<byte[], io:Error>|ParserError {
+    public isolated function getBodyPartsAsStream(int arraySize = 8196) returns @tainted stream<byte[], io:Error>|ParserError {
         var value = externGetBodyPartsAsStream(self);
         if (value is ()) {
             ByteStream byteStream  = new(self, arraySize);

@@ -314,42 +314,42 @@ public function testSetFileAsEntityBody() {
     assertByteArray(entity.getByteArray(), content);
 }
 
-//TODO: Enable with new byteStream API
-// //Set byte channel as entity body and get the content back as a byte array
-// @test:Config {}
-// public function testSetByteChannel() {
-//     string content = "Hello Ballerina!";
-//     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
-//     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-//     Entity entity = new;
-//     entity.setByteChannel(byteChannel);
-//     assertByteArray(entity.getByteArray(), content);
-// }
 
-//TODO: Enable with new byteStream API
-// //Set byte channel as entity body and get that channel back
-// @test:Config {}
-// public function testGetByteChannel() {
-//     string content = "Hello Ballerina!";
-//     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
-//     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-//     Entity entity = new;
-//     entity.setByteChannel(byteChannel);
-//     var result = entity.getByteChannel();
-//     if (result is io:ReadableByteChannel) {
-//         io:ReadableCharacterChannel characterChannel = new io:ReadableCharacterChannel(result, "utf-8");
-//         var returnValue = characterChannel.read(30);
-//         if (returnValue is string) {
-//             test:assertEquals(returnValue, content, msg = "Found unexpected output");
-//         } else {
-//             test:assertFail(msg = "Found unexpected output type");
-//         }
-//     } else {
-//         test:assertFail(msg = "Found unexpected output type");
-//     }
-// }
+//Set byte channel as entity body and get the content back as a byte array. API setByteChannel() is hidden but have 
+//used internally
+@test:Config {}
+public function testSetByteChannel() {
+    string content = "Hello Ballerina!";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+    assertByteArray(entity.getByteArray(), content);
+}
 
-//Set byte channel as entity body and get that channel back
+//Set byte channel as entity body and get that channel back. (to test internal channel functionality)
+@test:Config {}
+public function testGetByteChannel() {
+    string content = "Hello Ballerina!";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+    var result = entity.getByteChannel();
+    if (result is io:ReadableByteChannel) {
+        io:ReadableCharacterChannel characterChannel = new io:ReadableCharacterChannel(result, "utf-8");
+        var returnValue = characterChannel.read(30);
+        if (returnValue is string) {
+            test:assertEquals(returnValue, content, msg = "Found unexpected output");
+        } else {
+            test:assertFail(msg = "Found unexpected output type");
+        }
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+}
+
+//Set byte channel as entity body and get the content as byte stream
 @test:Config {}
 public function testSetByteChannelAndGetByteStream() {
     string content = "Hello Ballerina!";
@@ -358,8 +358,32 @@ public function testSetByteChannelAndGetByteStream() {
     Entity entity = new;
     entity.setByteChannel(byteChannel);
 
-    var str = entity.getByteStream(arraySize = 8);
+    var str = entity.getByteStream();
+    if (str is stream<byte[], io:Error>) {
+        record {|byte[] value;|}|io:Error? arr1 = str.next();
+        if (arr1 is record {|byte[] value;|}) {
+            string name = checkpanic strings:fromBytes(arr1.value);
+            test:assertEquals(name, content, msg = "Found unexpected output");
+            
+            record {|byte[] value;|}|io:Error? arr2 = str.next();
+            test:assertTrue(arr2 is (), msg = "Found unexpected output");
+        } else {
+            test:assertFail(msg = "Found unexpected arr1 output type");
+        }
+    } else {
+       test:assertFail(msg = "Found unexpected str output type" + str.message());
+    }
+}
 
+@test:Config {}
+public function testSetByteChannelAndGetByteStreamOf8ByteSizedArray() {
+    string content = "Hello Ballerina!";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+
+    var str = entity.getByteStream(arraySize = 8);
     if (str is stream<byte[], io:Error>) {
         record {|byte[] value;|}|io:Error? arr1 = str.next();
         if (arr1 is record {|byte[] value;|}) {
@@ -383,33 +407,7 @@ public function testSetByteChannelAndGetByteStream() {
 }
 
 @test:Config {}
-public function testSetByteChannelAndGetByteStream8k() {
-    string content = "Hello Ballerina!";
-    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
-    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-    Entity entity = new;
-    entity.setByteChannel(byteChannel);
-
-    var str = entity.getByteStream();
-
-    if (str is stream<byte[], io:Error>) {
-        record {|byte[] value;|}|io:Error? arr1 = str.next();
-        if (arr1 is record {|byte[] value;|}) {
-            string name = checkpanic strings:fromBytes(arr1.value);
-            test:assertEquals(name, content, msg = "Found unexpected output");
-            
-            record {|byte[] value;|}|io:Error? arr2 = str.next();
-            test:assertTrue(arr2 is (), msg = "Found unexpected output");
-        } else {
-            test:assertFail(msg = "Found unexpected arr1 output type");
-        }
-    } else {
-       test:assertFail(msg = "Found unexpected str output type" + str.message());
-    }
-}
-
-@test:Config {}
-public function testSetByteChannelAndGetByteStream10() {
+public function testSetByteChannelAndGetByteStreamOf10ByteSizedArray() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -417,7 +415,6 @@ public function testSetByteChannelAndGetByteStream10() {
     entity.setByteChannel(byteChannel);
 
     var str = entity.getByteStream(arraySize = 10);
-
     if (str is stream<byte[], io:Error>) {
         record {|byte[] value;|}|io:Error? arr1 = str.next();
         if (arr1 is record {|byte[] value;|}) {
@@ -440,31 +437,55 @@ public function testSetByteChannelAndGetByteStream10() {
     }
 }
 
-//TODO: Enable with new byteStream API
-// //Set entity body as a byte channel get the content back as a string
-// @test:Config {}
-// public function testSetEntityBodyMultipleTimes() {
-//     string content = "File Content";
-//     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
-//     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-//     Entity entity = new;
-//     entity.setText("Hello Ballerina!");
-//     entity.setByteChannel(byteChannel);
-//     var result = entity.getByteChannel();
-//     if (result is io:ReadableByteChannel) {
-//         io:ReadableCharacterChannel characterChannel = new io:ReadableCharacterChannel(result, "utf-8");
-//         var returnValue = characterChannel.read(30);
-//         if (returnValue is string) {
-//             test:assertEquals(returnValue, content, msg = "Found unexpected output");
-//         } else {
-//             test:assertFail(msg = "Found unexpected output type");
-//         }
-//     } else {
-//         test:assertFail(msg = "Found unexpected output type");
-//     }
-// }
 
-//An EntityError should be returned from 'getByteChannel()', in case the payload is in data source form
+//Set entity body as a byte channel get the content back as a string (to test internal channel functionality)
+@test:Config {}
+public function testSetEntityBodyMultipleTimes() {
+    string content = "File Content";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setText("Hello Ballerina!");
+    entity.setByteChannel(byteChannel);
+    var result = entity.getByteChannel();
+    if (result is io:ReadableByteChannel) {
+        io:ReadableCharacterChannel characterChannel = new io:ReadableCharacterChannel(result, "utf-8");
+        var returnValue = characterChannel.read(30);
+        if (returnValue is string) {
+            test:assertEquals(returnValue, content, msg = "Found unexpected output");
+        } else {
+            test:assertFail(msg = "Found unexpected output type");
+        }
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+}
+
+@test:Config {}
+public function testSetEntityBodyMultipleTimesInDifferentTypes() {
+    string fileContent = "File Content";
+    byte[][] content = [fileContent.toBytes()];
+    stream<byte[], io:Error> byteStream = content.toStream();
+    Entity entity = new;
+    entity.setText("Hello Ballerina!");
+    entity.setByteStream(byteStream);
+
+    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error>) {
+        record {|byte[] value;|}|io:Error? arr1 = str.next();
+        if (arr1 is record {|byte[] value;|}) {
+            string name = checkpanic strings:fromBytes(arr1.value);
+            test:assertEquals(name, fileContent, msg = "Found unexpected output");
+        } else {
+            test:assertFail(msg = "Found unexpected arr1 output type");
+        }
+    } else {
+       test:assertFail(msg = "Found unexpected str output type" + str.message());
+    }
+}
+
+//An EntityError should be returned from 'getByteChannel()', in case the payload is in data source form 
+// (to test internal channel functionality)
 @test:Config {}
 public function testByteChannelWhenPayloadInDataSource() {
     Entity entity = new;
@@ -478,57 +499,201 @@ public function testByteChannelWhenPayloadInDataSource() {
     }
 }
 
-//TODO: Enable with new byteStream API
-// //Once the byte channel is consumed by the user, check whether the content retrieved as a text data source is empty
-// @test:Config {}
-// public function testGetTextDataSource() {
-//     string content = "{'code':'123'}";
-//     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
-//     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-//     Entity entity = new;
-//     entity.setByteChannel(byteChannel);
-//     entity.setHeader("content-type", "text/plain");
-//     //Consume byte channel externally
-//     var result = entity.getByteChannel();
-//     if (result is io:ReadableByteChannel) {
-//         consumeChannel(result);
-//     } else {
-//         log:printError("error in reading byte channel", err = result);
-//     }
-//     assertTextPayload(entity.getText(), "");
-// }
 
-//TODO: Enable with new byteStream API
-// //Once the byte channel is consumed, check whether the content retrieved as a json data source return an error
-// @test:Config {}
-// public function testGetJsonDataSource() {
-//     string content = "Hello Ballerina!";
-//     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
-//     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-//     Entity entity = new;
-//     entity.setByteChannel(byteChannel);
-//     entity.setHeader("content-type", "application/json");
-//     //Consume byte channel externally
-//     var result = entity.getByteChannel();
-//     if (result is io:ReadableByteChannel) {
-//         consumeChannel(result);
-//     } else {
-//         log:printError("error in reading byte channel", err = result);
-//     }
+//An EntityError should be returned from 'getByteStream()', in case the payload is in data source form
+@test:Config {}
+public function testByteStreamWhenPayloadInDataSource() {
+    Entity entity = new;
+    entity.setJson({code:123});
+    var result = entity.getByteStream();
+    if (result is error) {
+        test:assertEquals(result.message(), "Byte stream is not available but payload can be obtain either as " +
+                          "xml, json, string or byte[] type", msg = "Found unexpected output");
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+}
 
-//     var payload = entity.getJson();
-//     if payload is json {
-//         test:assertEquals(payload, "", msg = "Found unexpected output");
-//     } else {
-//         test:assertTrue(strings:includes(payload.message(),
-//             "Error occurred while extracting json data from entity"), msg = "Found unexpected output");
-//         var err = payload.cause();
-//         if (err is error) {
-//             test:assertTrue(strings:includes(err.message(), "empty JSON document"),
-//                 msg = "Found unexpected output");
-//         }
-//     }
-// }
+//Once the byte channel is consumed by the user, check whether the content retrieved as a text data source is empty
+//(to test internal channel functionality)
+@test:Config {}
+public function testGetTextDataSource() {
+    string content = "{'code':'123'}";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+    entity.setHeader("content-type", "text/plain");
+    //Consume byte channel externally
+    var result = entity.getByteChannel();
+    if (result is io:ReadableByteChannel) {
+        consumeChannel(result);
+    } else {
+        log:printError("error in reading byte channel", err = result);
+    }
+    assertTextPayload(entity.getText(), "");
+}
+
+//Once the byte stream is consumed by the user, check whether the content retrieved as a text data source is empty
+@test:Config {}
+public function testGetTextDataSourceOncetheStreamIsConsumed() {
+    string content = "{'code':'123'}";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+    entity.setHeader("content-type", "text/plain");
+    //Consume byte stream externally
+    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error>) {
+        consumeStream(str);
+    } else {
+        log:printError("error in reading byte stream", err = str);
+    }
+    var payload = entity.getText();
+    if payload is error {
+        test:assertTrue(strings:includes(payload.toString(), "String payload is null"), 
+                msg = "Found unexpected output");
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+}
+
+
+//Once the byte channel is consumed, check whether the content retrieved as a json data source return an error
+//(to test internal channel funcassertTextPayloadtionality)
+@test:Config {}
+public function testGetJsonDataSource() {
+    string content = "Hello Ballerina!";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+    entity.setHeader("content-type", "application/json");
+    //Consume byte channel externally
+    var result = entity.getByteChannel();
+    if (result is io:ReadableByteChannel) {
+        consumeChannel(result);
+    } else {
+        log:printError("error in reading byte channel", err = result);
+    }
+
+    var payload = entity.getJson();
+    if payload is json {
+        test:assertEquals(payload, "", msg = "Found unexpected output");
+    } else {
+        test:assertTrue(strings:includes(payload.message(),
+            "Error occurred while extracting json data from entity"), msg = "Found unexpected output");
+        var err = payload.cause();
+        if (err is error) {
+            test:assertTrue(strings:includes(err.message(), "empty JSON document"),
+                msg = "Found unexpected output");
+        }
+    }
+}
+
+//Once the byte stream is consumed, check whether the content retrieved as a json data source return an error
+@test:Config {}
+public function testGetJsonDataSourceOnceTheByteStreamIsConsumed() {
+    string content = "Hello Ballerina!";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+    entity.setHeader("content-type", "application/json");
+    //Consume byte stream externally
+    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error>) {
+        consumeStream(str);
+    } else {
+        log:printError("error in reading byte stream", err = str);
+    }
+
+    var payload = entity.getJson();
+    if payload is json {
+        test:assertTrue(payload is (), msg = "Found unexpected output");
+    } else {
+        test:assertTrue(strings:includes(payload.message(),
+            "Error occurred while extracting json data from entity"), msg = "Found unexpected output");
+        var err = payload.cause();
+        if (err is error) {
+            test:assertTrue(strings:includes(err.message(), "empty JSON document"),
+                msg = "Found unexpected output");
+        }
+    }
+}
+
+@test:Config {}
+public function testSetByteStreamAndGetJson() {
+    string content = "Hello Ballerina!";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    stream<io:Block, io:Error> blockStream = checkpanic byteChannel.blockStream(8196);
+    Entity entity = new;
+    entity.setByteStream(blockStream);
+    entity.setHeader("content-type", "application/json");
+
+    var payload = entity.getJson();
+    if payload is json {
+        test:assertFail(msg = "Found unexpected output type");
+    } else {
+        test:assertTrue(strings:includes(payload.message(),
+            "Error occurred while extracting json data from entity"), msg = "Found unexpected output");
+        var err = payload.cause();
+        if (err is error) {
+            test:assertTrue(strings:includes(err.message(), "empty JSON document"),
+                msg = "Found unexpected output");
+        }
+    }
+}
+
+@test:Config {}
+public function testSetByteStreamAndGetText() {
+    string content = "Hello Ballerina!";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    stream<io:Block, io:Error> blockStream = checkpanic byteChannel.blockStream(8196);
+    Entity entity = new;
+    entity.setByteStream(blockStream);
+    entity.setHeader("content-type", "text/plain");
+
+    var payload = entity.getText();
+    if payload is string {
+        test:assertFail(msg = "Found unexpected output type");
+    } else {
+        test:assertTrue(strings:includes(payload.message(),
+            "Error occurred while extracting text data from entity"), msg = "Found unexpected output");
+        var err = payload.cause();
+        if (err is error) {
+            test:assertTrue(strings:includes(err.message(), "String payload is null"),
+                msg = "Found unexpected output");
+        }
+    }
+}
+
+@test:Config {}
+public function testSetByteStreamAndGetXml() {
+    string content = "Hello Ballerina!";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    stream<io:Block, io:Error> blockStream = checkpanic byteChannel.blockStream(8196);
+    Entity entity = new;
+    entity.setByteStream(blockStream);
+    entity.setHeader("content-type", "application/xml");
+
+    var payload = entity.getXml();
+    if payload is xml {
+        test:assertFail(msg = "Found unexpected output type");
+    } else {
+        test:assertTrue(strings:includes(payload.message(),
+            "Error occurred while extracting xml data from entity"), msg = "Found unexpected output");
+        var err = payload.cause();
+        if (err is error) {
+            test:assertTrue(strings:includes(err.message(), "Empty xml payload"),
+                msg = "Found unexpected output");
+        }
+    }
+}
 
 @test:Config {}
 public function testGetXmlWithSuffix() {
@@ -609,8 +774,8 @@ public function testSetBodyAndGetByteArray() {
     assertByteArray(entity.getByteArray(), content);
 }
 
-//TODO: Enable with new byteStream API
-// @test:Config {}
+// SetBody() does not accept io:ReadableByteChannel. Keeping the test until the I/O revamp
+// @test:Config {enable:false}
 // public function testSetBodyAndGetByteChannel() {
 //     string content = "Hello Ballerina!";
 //     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
@@ -630,6 +795,28 @@ public function testSetBodyAndGetByteArray() {
 //         test:assertFail(msg = "Found unexpected output type");
 //     }
 // }
+
+@test:Config {}
+public function testSetBodyAndGetByteStream() {
+    string content = "Hello Ballerina!";
+    byte[][] byteContent = [content.toBytes()];
+    stream<byte[], io:Error> byteStream = byteContent.toStream();
+    Entity entity = new;
+    entity.setBody(byteStream);
+
+    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error>) {
+        record {|byte[] value;|}|io:Error? arr1 = str.next();
+        if (arr1 is record {|byte[] value;|}) {
+            string name = checkpanic strings:fromBytes(arr1.value);
+            test:assertEquals(name, content, msg = "Found unexpected output");
+        } else {
+            test:assertFail(msg = "Found unexpected arr1 output type");
+        }
+    } else {
+       test:assertFail(msg = "Found unexpected str output type" + str.message());
+    }
+}
 
 @test:Config {}
 public function testSetMediaTypeToEntity() {
@@ -710,50 +897,50 @@ public function testSetContentIdAndGetValueAsHeader() {
     test:assertEquals(entity.getHeader(CONTENT_ID), "test-id", msg = "Found unexpected output");
 }
 
-//TODO: Enable with new byteStream API
-// @test:Config {}
-// public function testGetAnyStreamAsString() {
-//     string content = "{'code':'123'}";
-//     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
-//     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-//     Entity entity = new;
-//     entity.setByteChannel(byteChannel, "application/json");
-//     assertTextPayload(entity.getText(), content);
-// }
+//API setByteChannel() is hidden but have used internally
+@test:Config {}
+public function testGetAnyStreamAsString() {
+    string content = "{'code':'123'}";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel, "application/json");
+    assertTextPayload(entity.getText(), content);
+}
 
-//TODO: Enable with new byteStream API
-// //Once an entity body has been constructed as json, get the body as a byte[]
-// @test:Config {}
-// public function testByteArrayWithContentType() {
-//     string content = "{'code':'123'}";
-//     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
-//     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-//     Entity entity = new;
-//     entity.setByteChannel(byteChannel, "application/json");
-//     //First time the json will be constructed from the byte channel
-//     json firstTime = checkpanic entity.getJson();
-//     //Then get the body as byte[]
-//     assertByteArray(entity.getByteArray(), "{\"code\":\"123\"}");
-// }
+//Once an entity body has been constructed as json, get the body as a byte[]. API setByteChannel() is hidden but 
+//have used internally
+@test:Config {}
+public function testByteArrayWithContentType() {
+    string content = "{'code':'123'}";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel, "application/json");
+    //First time the json will be constructed from the byte channel
+    json firstTime = checkpanic entity.getJson();
+    //Then get the body as byte[]
+    assertByteArray(entity.getByteArray(), "{\"code\":\"123\"}");
+}
 
-//TODO: Enable with new byteStream API
-// //Once the entity body is constructed as json and a charset value is included in the content-type, get body as a byte[]
-// //Due to windows test failure : https://github.com/ballerina-platform/module-ballerina-mime/issues/19
-// @test:Config {enable:false}
-// public function testByteArrayWithCharset() {
-//     string content = "{\"test\":\"菜鸟驿站\"}";
-//     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
-//     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-//     Entity entity = new;
-//     entity.setByteChannel(byteChannel, "application/json; charset=utf8");
-//     //First time the json will be constructed from the byte channel
-//     json firstTime = checkpanic entity.getJson();
-//     //Then get the body as byte[]
-//     assertByteArray(entity.getByteArray(), content);
-// }
+
+//Once the entity body is constructed as json and a charset value is included in the content-type, get body as a byte[]
+//Due to windows test failure : https://github.com/ballerina-platform/module-ballerina-mime/issues/19
+@test:Config {enable:false}
+public function testByteArrayWithCharset() {
+    string content = "{\"test\":\"菜鸟驿站\"}";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel, "application/json; charset=utf8");
+    //First time the json will be constructed from the byte channel
+    json firstTime = checkpanic entity.getJson();
+    //Then get the body as byte[]
+    assertByteArray(entity.getByteArray(), content);
+}
 
 //Test whether the body parts in a multipart entity can be retrieved as a byte channel
-@test:Config {enable:false}
+@test:Config {}
 public function testGetBodyPartsAsChannel() {
     //Create a body part with json content.
     Entity bodyPart1 = new;
@@ -779,6 +966,47 @@ public function testGetBodyPartsAsChannel() {
 
     //return multipartEntity.getBodyPartsAsChannel();
     assertGetBodyPartsAsChannel(checkpanic multipartEntity.getBodyPartsAsChannel());
+}
+
+@test:Config {}
+public function testGetBodyPartsAsStream() {
+    //Create a body part with json content.
+    Entity bodyPart1 = new;
+    bodyPart1.setJson({ "bodyPart": "jsonPart" });
+
+    //Create another body part with a xml file.
+    Entity bodyPart2 = new;
+    bodyPart2.setFileAsEntityBody("tests/resources/datafiles/file.xml", TEXT_XML);
+
+    //Create a text body part.
+    Entity bodyPart3 = new;
+    bodyPart3.setText("Ballerina text body part");
+
+    //Create another body part with a text file.
+    Entity bodyPart4 = new;
+    bodyPart4.setFileAsEntityBody("tests/resources/datafiles/test.tmp");
+
+    //Create an array to hold all the body parts.
+    Entity[] bodyParts = [bodyPart1, bodyPart2, bodyPart3, bodyPart4];
+    Entity multipartEntity = new;
+    string contentType = MULTIPART_MIXED + "; boundary=e3a0b9ad7b4e7cdt";
+    multipartEntity.setBodyParts(bodyParts, contentType);
+
+    stream<byte[], io:Error>|ParserError str = multipartEntity.getBodyPartsAsStream();
+    if (str is stream<byte[], io:Error>) {
+        record {|byte[] value;|}|io:Error? arr1 = str.next();
+        if (arr1 is record {|byte[] value;|}) {
+            string name = checkpanic strings:fromBytes(arr1.value);
+            test:assertTrue(strings:includes(name, "{\"bodyPart\":\"jsonPart\"}"), msg = "Found unexpected output");
+            test:assertTrue(strings:includes(name, "<name>Ballerina xml file part</name>"), msg = "Found unexpected output");
+            test:assertTrue(strings:includes(name, "Ballerina text body part"), msg = "Found unexpected output");
+            test:assertTrue(strings:includes(name, "Ballerina binary file part"), msg = "Found unexpected output");
+        } else {
+            test:assertFail(msg = "Found unexpected arr1 output type");
+        }
+    } else {
+       test:assertFail(msg = "Found unexpected str output type" + str.message());
+    }
 }
 
 //Test whether an error is returned when trying to extract body parts from entity that has discrete media type content
@@ -809,6 +1037,18 @@ public function getChannelFromParts() {
     }
 }
 
+@test:Config {}
+public function getStreamFromParts() {
+    Entity entity = new;
+    entity.setJson({ "bodyPart": "jsonPart" });
+    var result = entity.getBodyPartsAsStream();
+    if (result is error) {
+        test:assertEquals(result.message(), "Entity doesn't contain body parts", msg = "Found unexpected output");
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+}
+
 //Test whether an error is returned when trying to retrieve a byte channel from a multipart entity
 @test:Config {}
 public function getChannelFromMultipartEntity() {
@@ -831,31 +1071,29 @@ public function getChannelFromMultipartEntity() {
     }
 }
 
-// TODO: Enable with new byteStream API
-// //Test whether the string body is retrieved from the cache
-// @test:Config {}
-// public function getAnyStreamAsStringFromCache() {
-//     string content = "{'code':'123'}";
-//     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
-//     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-//     Entity entity = new;
-//     entity.setByteChannel(byteChannel, "application/json");
-//     string returnContent;
-//     returnContent = checkpanic entity.getText();
-//     //String body should be retrieved from the cache the second time this is called
-//     returnContent = returnContent + checkpanic entity.getText();
-//     test:assertEquals(returnContent, "{'code':'123'}{'code':'123'}", msg = "Found unexpected output");
-// }
+//Test whether the string body is retrieved from the cache. API setByteChannel() is hidden but have used internally
+@test:Config {}
+public function getAnyStreamAsStringFromCache() {
+    string content = "{'code':'123'}";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel, "application/json");
+    string returnContent;
+    returnContent = checkpanic entity.getText();
+    //String body should be retrieved from the cache the second time this is called
+    returnContent = returnContent + checkpanic entity.getText();
+    test:assertEquals(returnContent, "{'code':'123'}{'code':'123'}", msg = "Found unexpected output");
+}
 
 @test:Config {}
-public function testseStreamAndGetStream() {
+public function testSeStreamAndGetStream() {
     byte[][] content = ["ballerina".toBytes(), "language".toBytes()];
     stream<byte[], io:Error> byteStream = content.toStream();
-
     Entity entity = new;
     entity.setByteStream(byteStream);
-    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
 
+    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
     if (str is stream<byte[], io:Error>) {
         record {|byte[] value;|}|io:Error? arr1 = str.next();
         if (arr1 is record {|byte[] value;|}) {
@@ -878,36 +1116,189 @@ public function testseStreamAndGetStream() {
     }
 }
 
-//TODO: Enable with new byteStream API
-// //Test whether the xml content can be constructed properly once the body has been retrieved as a byte array first
-// @test:Config {}
-// public function testXmlWithByteArrayContent() {
-//     xml content = xml `<name>Ballerina xml content</name>`;
-//     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", "<name>Ballerina xml content</name>");
-//     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-//     Entity entity = new;
-//     entity.setByteChannel(byteChannel, "application/xml; charset=utf8");
-//     byte[] binaryPayload = checkpanic entity.getByteArray();
-//     assertXmlPayload(entity.getXml(), content);
-// }
+//TODO check Stream.close()
+@test:Config {enable:false}
+public function testStreamClose() {
+    byte[][] content = ["ballerina".toBytes(), "language".toBytes()];
+    stream<byte[], io:Error> byteStream = content.toStream();
+    Entity entity = new;
+    entity.setByteStream(byteStream);
 
-//TODO: Enable with new byteStream API
-// //Test whether an error is returned when trying to construct body parts from an invalid channel
-// @test:Config {}
-// public function getPartsFromInvalidChannel() {
-//     string content = "test file";
-//     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
-//     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-//     Entity entity = new;
-//     entity.setByteChannel(byteChannel, "multipart/form-data");
-//     var result = entity.getBodyParts();
-//     if (result is error) {
-//         test:assertEquals(result.message(), "Error occurred while extracting body parts from entity: Missing start " +
-//                           "boundary", msg = "Found unexpected output");
-//     } else {
-//         test:assertFail(msg = "Found unexpected output type");
-//     }
-// }
+    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error>) {
+        record {|byte[] value;|}|io:Error? arr1 = str.next();
+        if (arr1 is record {|byte[] value;|}) {
+            string name = checkpanic strings:fromBytes(arr1.value);
+            test:assertEquals(name, "ballerina", msg = "Found unexpected output");
+            io:Error? arr2 = str.close();
+            test:assertTrue(arr2 is (), msg = "Found unexpected output");
+            record {|byte[] value;|}|io:Error? arr3 = str.next();
+            // test:assertTrue(arr3 is (), msg = "Found unexpected output");
+            if (arr3 is io:Error) {
+                test:assertEquals(arr3.message(), "dwudb", msg = "Found unexpected str output type");
+            } else if (arr3 is ()){
+                io:println("is null");
+                // test:assertEquals(arr3.message(), "dwudb", msg = "Found unexpected str output type");
+            } else {
+                io:println("is record");
+                name = checkpanic strings:fromBytes(arr3.value);
+                test:assertEquals(name, "ballerina", msg = "Found unexpected output");
+            }
+        } else {
+            test:assertFail(msg = "Found unexpected arr1 output type");
+        }
+    } else {
+       test:assertFail(msg = "Found unexpected str output type" + str.message());
+    }
+}
+
+//TODO check stream.close()
+@test:Config {enable:false}
+public function testStreamMultipleClose() {
+    byte[][] content = ["ballerina".toBytes()];
+    stream<byte[], io:Error> byteStream = content.toStream();
+    Entity entity = new;
+    entity.setByteStream(byteStream);
+
+    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error>) {
+        record {|byte[] value;|}|io:Error? arr1 = str.next();
+        if (arr1 is record {|byte[] value;|}) {
+            string name = checkpanic strings:fromBytes(arr1.value);
+            test:assertEquals(name, "ballerina", msg = "Found unexpected output");
+            io:Error? arr2 = str.close();
+            test:assertTrue(arr2 is (), msg = "Found unexpected output");
+            record {|byte[] value;|}|io:Error? arr3 = str.next();
+            test:assertTrue(arr3 is (), msg = "Found unexpected output");
+        } else {
+            test:assertFail(msg = "Found unexpected arr1 output type");
+        }
+    } else {
+       test:assertFail(msg = "Found unexpected str output type" + str.message());
+    }
+}
+
+@test:Config {}
+public function testStreamCloseWithSetByteChannel() {
+    string content = "Hello Ballerina!";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+
+    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error>) {
+        io:Error? arr1 = str.close();
+        test:assertTrue(arr1 is (), msg = "Found unexpected output");
+        record {|byte[] value;|}|io:Error? arr2 = str.next();
+        test:assertTrue(arr2 is (), msg = "Found unexpected output");
+    } else {
+       test:assertFail(msg = "Found unexpected str output type" + str.message());
+    }
+}
+
+@test:Config {}
+public function testStreamMultipleCloseWithSetByteChannel() {
+    string content = "Hello Ballerina!";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+
+    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error>) {
+        record {|byte[] value;|}|io:Error? arr1 = str.next();
+        if (arr1 is record {|byte[] value;|}) {
+            string name = checkpanic strings:fromBytes(arr1.value);
+            test:assertEquals(name, content, msg = "Found unexpected output");
+            io:Error? arr2 = str.close();
+            test:assertTrue(arr2 is (), msg = "Found unexpected output");
+            record {|byte[] value;|}|io:Error? arr3 = str.next();
+            test:assertTrue(arr3 is (), msg = "Found unexpected output");
+        } else {
+            test:assertFail(msg = "Found unexpected arr1 output type");
+        }
+    } else {
+       test:assertFail(msg = "Found unexpected str output type" + str.message());
+    }
+}
+
+//Set byte channel as entity body and get the content as byte stream
+@test:Config {}
+public function testSetByteStreamFromChannelAndGetByteStream() {
+    string content = "Hello Ballerina!";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    stream<io:Block, io:Error> blockStream = checkpanic byteChannel.blockStream(8196);
+    Entity entity = new;
+    entity.setByteStream(blockStream);
+
+    var str = entity.getByteStream();
+    if (str is stream<byte[], io:Error>) {
+        record {|byte[] value;|}|io:Error? arr1 = str.next();
+        if (arr1 is record {|byte[] value;|}) {
+            string name = checkpanic strings:fromBytes(arr1.value);
+            test:assertEquals(name, content, msg = "Found unexpected output");
+            record {|byte[] value;|}|io:Error? arr2 = str.next();
+            test:assertTrue(arr2 is (), msg = "Found unexpected output");
+        } else {
+            test:assertFail(msg = "Found unexpected arr1 output type");
+        }
+    } else {
+       test:assertFail(msg = "Found unexpected str output type" + str.message());
+    }
+}
+
+@test:Config {}
+public function testSeStreamAndForeachTheStream() {
+    byte[][] content = ["ballerina".toBytes(), "language".toBytes()];
+    stream<byte[], io:Error> byteStream = content.toStream();
+    Entity entity = new;
+    entity.setByteStream(byteStream);
+
+    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error>) {
+        int i = 0;
+        error? e = str.forEach(function (byte[] student) {
+            string name = checkpanic strings:fromBytes(student);
+            test:assertEquals(name, checkpanic strings:fromBytes(content[i]), msg = "Found unexpected output");
+            i = i + 1;
+        });
+    } else {
+       test:assertFail(msg = "Found unexpected str output type" + str.message());
+    }
+}
+
+//Test whether the xml content can be constructed properly once the body has been retrieved as a byte array first
+//API setByteChannel() is hidden but have used internally
+@test:Config {}
+public function testXmlWithByteArrayContent() {
+    xml content = xml `<name>Ballerina xml content</name>`;
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", "<name>Ballerina xml content</name>");
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel, "application/xml; charset=utf8");
+    byte[] binaryPayload = checkpanic entity.getByteArray();
+    assertXmlPayload(entity.getXml(), content);
+}
+
+//Test whether an error is returned when trying to construct body parts from an invalid channel
+//API setByteChannel() is hidden but have used internally
+@test:Config {}
+public function getPartsFromInvalidChannel() {
+    string content = "test file";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel, "multipart/form-data");
+    var result = entity.getBodyParts();
+    if (result is error) {
+        test:assertEquals(result.message(), "Error occurred while extracting body parts from entity: Missing start " +
+                          "boundary", msg = "Found unexpected output");
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+}
 
 function assertByteArray(byte[]|error returnResult, string expectValue) {
     if returnResult is byte[] {
@@ -924,6 +1315,18 @@ function assertByteArray(byte[]|error returnResult, string expectValue) {
 
 function consumeChannel(io:ReadableByteChannel byteChannel) {
     var result = byteChannel.read(1000000);
+}
+
+function consumeStream(stream<byte[], io:Error> byteStream) {
+    record {|byte[] value;|}|io:Error? arr = byteStream.next();
+    if (arr is record {|byte[] value;|}) {
+        consumeStream(byteStream);
+    } else if (arr is io:Error) {
+        test:assertFail(msg = "Found unexpected arr1 output type");
+        return;
+    } else {
+        return;
+    }
 }
 
 function assertXmlPayload(xml|error payload, xml expectValue) {

@@ -187,7 +187,6 @@ public class MimeEntityBody {
         if (byteStream != null) {
             return byteStream;
         }
-
         Channel byteChannel = EntityBodyHandler.getByteChannel(entityObj);
         if (byteChannel != null) {
             // Return value implies the absence of previously set byte stream, but to return new iterator to
@@ -218,13 +217,13 @@ public class MimeEntityBody {
             InputStream inputStream = byteChannel.getInputStream();
             try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
                 byte[] buffer = new byte[arraySizeInt];
-                int len = inputStream.read(buffer, 0, arraySizeInt);
-                if (len == -1) {
+                int readCount = inputStream.read(buffer, 0, arraySizeInt);
+                if (readCount == -1) {
                     EntityBodyHandler.closeByteChannel(byteChannel);
                     entityObj.addNativeData(ENTITY_BYTE_CHANNEL, null);
                     return null;
                 }
-                output.write(buffer, 0, len);
+                output.write(buffer, 0, readCount);
                 bytes = output.toByteArray();
             }
         } catch (IOException ex) {
@@ -242,6 +241,7 @@ public class MimeEntityBody {
         if (byteChannel != null) {
             try {
                 byteChannel.close();
+                entityObj.addNativeData(ENTITY_BYTE_CHANNEL, null);
             } catch (IOException e) {
                 return IOUtils.createError(e);
             }
@@ -283,7 +283,6 @@ public class MimeEntityBody {
         //Clear message data source/byteChannel when the user set a byte stream to entity
         entityObj.addNativeData(ENTITY_BYTE_CHANNEL, null);
         entityObj.addNativeData(MESSAGE_DATA_SOURCE, null);
-
         MimeUtil.setMediaTypeToEntity(entityObj, contentType != null ? contentType.getValue() : OCTET_STREAM);
     }
 
