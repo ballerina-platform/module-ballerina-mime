@@ -185,6 +185,7 @@ public class MimeConstants {
     // Stream entry record
     public static final String STREAM_ENTRY_RECORD = "StreamEntry";
     public static final BString FIELD_VALUE = StringUtils.fromString("value");
+    public static final String BYTE_STREAM_NEXT_FUNC = "next";
 
     /**
      * Describes the format of the body part.

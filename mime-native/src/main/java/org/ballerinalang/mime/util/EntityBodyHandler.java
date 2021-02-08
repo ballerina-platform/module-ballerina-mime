@@ -62,6 +62,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.ballerinalang.mime.util.MimeConstants.BODY_PARTS;
+import static org.ballerinalang.mime.util.MimeConstants.BYTE_STREAM_NEXT_FUNC;
 import static org.ballerinalang.mime.util.MimeConstants.CHARSET;
 import static org.ballerinalang.mime.util.MimeConstants.CONTENT_TYPE;
 import static org.ballerinalang.mime.util.MimeConstants.ENTITY;
@@ -320,7 +321,7 @@ public class EntityBodyHandler {
     }
 
     /**
-     * Check whether the entity body is present. Entity body can either be a byte channel, fully constructed
+     * Check whether the entity body is present. Entity body can either be a byte channel/stream, fully constructed
      * message data source or a set of body parts.
      *
      * @param entityObj Represent an 'Entity'
@@ -328,7 +329,7 @@ public class EntityBodyHandler {
      */
     public static boolean checkEntityBodyAvailability(BObject entityObj) {
         return entityObj.getNativeData(ENTITY_BYTE_CHANNEL) != null || getMessageDataSource(entityObj) != null
-                || entityObj.getNativeData(BODY_PARTS) != null || entityObj.getNativeData(ENTITY_BYTE_STREAM) != null ;
+                || entityObj.getNativeData(BODY_PARTS) != null || entityObj.getNativeData(ENTITY_BYTE_STREAM) != null;
     }
 
     /**
@@ -402,7 +403,12 @@ public class EntityBodyHandler {
             CountDownLatch latch = new CountDownLatch(1);
             writeContent(env, entity, outputStream, iteratorObj, latch);
             try {
-                latch.await(2, TimeUnit.MINUTES);
+                int timeout = 120;
+                boolean countDownReached = latch.await(timeout, TimeUnit.SECONDS);
+                if (!countDownReached) {
+                    throw ErrorCreator.createError(StringUtils.fromString(
+                            "Could not complete byte stream serialization within " + timeout + " seconds"));
+                }
             } catch (InterruptedException e) {
                 log.warn("Interrupted before completing the content write");
             }
@@ -411,7 +417,7 @@ public class EntityBodyHandler {
 
     private static void writeContent(Environment env, BObject entity, OutputStream outputStream,
                                      BObject iteratorObj, CountDownLatch latch) {
-        env.getRuntime().invokeMethodAsync(iteratorObj, "next", null, null, new Callback() {
+        env.getRuntime().invokeMethodAsync(iteratorObj, BYTE_STREAM_NEXT_FUNC, null, null, new Callback() {
             @Override
             public void notifySuccess(Object result) {
                 if (result == null) {
