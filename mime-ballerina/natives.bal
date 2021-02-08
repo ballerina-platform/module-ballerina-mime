@@ -262,8 +262,8 @@ public class Entity {
     # mimeEntity.setBody("body string");
     # ```
     #
-    # + entityBody - Entity body can be of the type `string`,`xml`,`json`,`byte[]`, or `Entity[]`.
-    public isolated function setBody(@untainted string|xml|json|byte[]|Entity[] entityBody) {
+    # + entityBody - Entity body can be of the type `string`,`xml`,`json`,`byte[]`,`Entity[]`, or `stream<byte[], io:Error>`
+    public isolated function setBody(@untainted string|xml|json|byte[]|Entity[]|stream<byte[], io:Error> entityBody) {
         if (entityBody is string) {
             self.setText(entityBody);
         } else if (entityBody is xml) {
@@ -272,6 +272,8 @@ public class Entity {
             self.setByteArray(entityBody);
         } else if (entityBody is json) {
             self.setJson(entityBody);
+        } else if (entityBody is stream<byte[], io:Error>) {
+            self.setByteStream(entityBody);
         } else {
             self.setBodyParts(entityBody);
         }
@@ -369,7 +371,7 @@ public class Entity {
     }
 
     # Gets the entity body as a `byte[]` from a given entity. If the entity size is considerably large, consider
-    # using the getByteChannel() method instead.
+    # using the getByteStream() method instead.
     #
     # + return - `byte[]` data extracted from the the entity body or else a `mime:ParserError` in case of
     #            errors
@@ -389,11 +391,37 @@ public class Entity {
         return externSetByteChannel(self, byteChannel, contentType);
     }
 
+    # Sets the entity body with the given byte stream content. This method overrides any existing content-type headers
+    # with the default content-type, which is `application/octet-stream`. This default value
+    # can be overridden by passing the content-type as an optional parameter.
+    #
+    # + byteStream - Byte stream, which needs to be set to the entity
+    # + contentType - Content-type to be used with the payload. This is an optional parameter.
+    #                 The `application/octet-stream` is the default value
+    public isolated function setByteStream(stream<byte[], io:Error> byteStream,
+                                   @untainted string contentType = "application/octet-stream") {
+        return externSetByteStream(self, byteStream, contentType);
+    }
+
     # Gets the entity body as a byte channel from a given entity.
     #
     # + return - An `io:ReadableByteChannel` or else a `mime:ParserError` record will be returned in case of errors
     isolated function getByteChannel() returns @tainted io:ReadableByteChannel|ParserError {
         return externGetByteChannel(self);
+    }
+
+    # Gets the entity body as a stream of byte[] from a given entity.
+    #
+    # + arraySize - A defaultable paramerter to state the size of the byte array. Default size is 8KB
+    # + return - A byte stream from which the payload can be read or `mime:ParserError` in case of errors
+    public isolated function getByteStream(int arraySize = 8196) returns @tainted stream<byte[], io:Error>|ParserError {
+        var value = externGetByteStream(self);
+        if (value is ()) {
+            ByteStream byteStream  = new(self, arraySize);
+            return new stream<byte[], io:Error>(byteStream);
+        } else {
+            return value;
+        }
     }
 
     # Gets the body parts from a given entity.
@@ -409,6 +437,20 @@ public class Entity {
     # + return - Body parts as a byte channel
     isolated function getBodyPartsAsChannel() returns @tainted io:ReadableByteChannel|ParserError {
         return externGetBodyPartsAsChannel(self);
+    }
+
+    # Gets the body parts as a byte stream from a given entity.
+    #
+    # + arraySize - A defaultable paramerter to state the size of the byte array. Default size is 8KB
+    # + return - Body parts as a byte stream
+    public isolated function getBodyPartsAsStream(int arraySize = 8196) returns @tainted stream<byte[], io:Error>|ParserError {
+        var value = externGetBodyPartsAsStream(self);
+        if (value is ()) {
+            ByteStream byteStream  = new(self, arraySize);
+            return new stream<byte[], io:Error>(byteStream);
+        } else {
+            return value;
+        }
     }
 
     # Sets body parts to entity. This method overrides any existing `content-type` headers
@@ -585,9 +627,19 @@ isolated function externSetByteChannel(Entity entity, io:ReadableByteChannel byt
     name: "setByteChannel"
 } external;
 
+isolated function externSetByteStream(Entity entity, stream<byte[], io:Error> byteStream, string contentType) = @java:Method {
+    'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
+    name: "setByteStream"
+} external;
+
 isolated function externGetByteChannel(Entity entity) returns @tainted io:ReadableByteChannel|ParserError = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "getByteChannel"
+} external;
+
+isolated function externGetByteStream(Entity entity) returns @tainted stream<byte[], io:Error>|ParserError? = @java:Method {
+    'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
+    name: "getByteStream"
 } external;
 
 isolated function externSetBodyParts(Entity entity, Entity[] bodyParts, string contentType) = @java:Method {
@@ -603,6 +655,11 @@ isolated function externGetBodyParts(Entity entity) returns Entity[]|ParserError
 isolated function externGetBodyPartsAsChannel(Entity entity) returns @tainted io:ReadableByteChannel|ParserError = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "getBodyPartsAsChannel"
+} external;
+
+isolated function externGetBodyPartsAsStream(Entity entity) returns @tainted ParserError? = @java:Method {
+    'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
+    name: "getBodyPartsAsStream"
 } external;
 
 # **Deprecated API**. Encodes a given input with MIME specific Base64 encoding scheme.

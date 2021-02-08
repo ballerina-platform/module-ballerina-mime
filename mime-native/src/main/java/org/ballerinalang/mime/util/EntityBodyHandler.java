@@ -18,6 +18,8 @@
 
 package org.ballerinalang.mime.util;
 
+import io.ballerina.runtime.api.Environment;
+import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
@@ -28,7 +30,10 @@ import io.ballerina.runtime.api.utils.JsonUtils;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.XmlUtils;
 import io.ballerina.runtime.api.values.BArray;
+import io.ballerina.runtime.api.values.BError;
+import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BStream;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BXml;
 import org.ballerinalang.stdlib.io.channels.TempFileIOChannel;
@@ -53,12 +58,17 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.ballerinalang.mime.util.MimeConstants.BODY_PARTS;
+import static org.ballerinalang.mime.util.MimeConstants.BYTE_STREAM_NEXT_FUNC;
 import static org.ballerinalang.mime.util.MimeConstants.CHARSET;
 import static org.ballerinalang.mime.util.MimeConstants.CONTENT_TYPE;
 import static org.ballerinalang.mime.util.MimeConstants.ENTITY;
 import static org.ballerinalang.mime.util.MimeConstants.ENTITY_BYTE_CHANNEL;
+import static org.ballerinalang.mime.util.MimeConstants.ENTITY_BYTE_STREAM;
+import static org.ballerinalang.mime.util.MimeConstants.FIELD_VALUE;
 import static org.ballerinalang.mime.util.MimeConstants.FIRST_BODY_PART_INDEX;
 import static org.ballerinalang.mime.util.MimeConstants.MESSAGE_DATA_SOURCE;
 import static org.ballerinalang.mime.util.MimeConstants.MULTIPART_AS_PRIMARY_TYPE;
@@ -190,7 +200,7 @@ public class EntityBodyHandler {
     public static Object constructJsonDataSource(BObject entityObj) {
         Channel byteChannel = getByteChannel(entityObj);
         if (byteChannel == null) {
-            return null;
+            throw ErrorCreator.createError(StringUtils.fromString("empty JSON document"));
         }
         try {
             return constructJsonDataSource(entityObj, byteChannel.getInputStream());
@@ -311,7 +321,7 @@ public class EntityBodyHandler {
     }
 
     /**
-     * Check whether the entity body is present. Entity body can either be a byte channel, fully constructed
+     * Check whether the entity body is present. Entity body can either be a byte channel/stream, fully constructed
      * message data source or a set of body parts.
      *
      * @param entityObj Represent an 'Entity'
@@ -319,7 +329,7 @@ public class EntityBodyHandler {
      */
     public static boolean checkEntityBodyAvailability(BObject entityObj) {
         return entityObj.getNativeData(ENTITY_BYTE_CHANNEL) != null || getMessageDataSource(entityObj) != null
-                || entityObj.getNativeData(BODY_PARTS) != null;
+                || entityObj.getNativeData(BODY_PARTS) != null || entityObj.getNativeData(ENTITY_BYTE_STREAM) != null;
     }
 
     /**
@@ -368,8 +378,7 @@ public class EntityBodyHandler {
      * @param messageOutputStream Represent the outputstream that the message should be written to
      * @throws IOException When an error occurs while writing inputstream to outputstream
      */
-    public static void writeByteChannelToOutputStream(BObject entityObj,
-                                                      OutputStream messageOutputStream)
+    public static void writeByteChannelToOutputStream(BObject entityObj, OutputStream messageOutputStream)
             throws IOException {
         Channel byteChannel = EntityBodyHandler.getByteChannel(entityObj);
         if (byteChannel != null) {
@@ -378,6 +387,62 @@ public class EntityBodyHandler {
             //Set the byte channel to null, once it is consumed
             entityObj.addNativeData(ENTITY_BYTE_CHANNEL, null);
         }
+    }
+
+    /**
+     * Write byte stream directly to the output-stream without converting it to a data source.
+     *
+     * @param env    the environment of the resource invoked
+     * @param entity       Represent a ballerina entity
+     * @param outputStream Represent the output-stream that the message should be written to
+     */
+    public static void writeByteStreamToOutputStream(Environment env, BObject entity, OutputStream outputStream) {
+        BStream byteStream = EntityBodyHandler.getByteStream(entity);
+        if (byteStream != null) {
+            BObject iteratorObj = byteStream.getIteratorObj();
+            CountDownLatch latch = new CountDownLatch(1);
+            writeContent(env, entity, outputStream, iteratorObj, latch);
+            try {
+                int timeout = 120;
+                boolean countDownReached = latch.await(timeout, TimeUnit.SECONDS);
+                if (!countDownReached) {
+                    throw ErrorCreator.createError(StringUtils.fromString(
+                            "Could not complete byte stream serialization within " + timeout + " seconds"));
+                }
+            } catch (InterruptedException e) {
+                log.warn("Interrupted before completing the content write");
+            }
+        }
+    }
+
+    private static void writeContent(Environment env, BObject entity, OutputStream outputStream,
+                                     BObject iteratorObj, CountDownLatch latch) {
+        env.getRuntime().invokeMethodAsync(iteratorObj, BYTE_STREAM_NEXT_FUNC, null, null, new Callback() {
+            @Override
+            public void notifySuccess(Object result) {
+                if (result == null) {
+                    entity.addNativeData(ENTITY_BYTE_STREAM, null);
+                    latch.countDown();
+                    return;
+                }
+                BArray arrayValue = ((BMap) result).getArrayValue(FIELD_VALUE);
+                byte[] bytes = arrayValue.getBytes();
+                try (ByteArrayInputStream str = new ByteArrayInputStream(bytes)) {
+                    MimeUtil.writeInputToOutputStream(str, outputStream);
+                } catch (IOException e) {
+                    throw ErrorCreator.createError(StringUtils.fromString(
+                            "Error occurred while writing content parts to outputstream: " + e.getMessage()));
+                }
+                writeContent(env, entity, outputStream, iteratorObj, latch);
+            }
+
+            @Override
+            public void notifyFailure(BError bError) {
+                latch.countDown();
+                throw ErrorCreator.createError(StringUtils.fromString(
+                        "Error occurred while streaming content: " + bError.getMessage()));
+            }
+        });
     }
 
     /**
@@ -415,7 +480,12 @@ public class EntityBodyHandler {
                 (ENTITY_BYTE_CHANNEL) : null;
     }
 
-    private static void closeByteChannel(Channel byteChannel) {
+    public static BStream getByteStream(BObject entityObj) {
+        return entityObj.getNativeData(ENTITY_BYTE_STREAM) != null ? (BStream) entityObj.getNativeData
+                (ENTITY_BYTE_STREAM) : null;
+    }
+
+    public static void closeByteChannel(Channel byteChannel) {
         try {
             byteChannel.close();
         } catch (IOException e) {

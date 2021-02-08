@@ -120,6 +120,7 @@ public class MimeConstants {
     public static final String MESSAGE_DATA_SOURCE = "message_datasource";
     public static final String IS_BODY_BYTE_CHANNEL_ALREADY_SET = "is_byte_channel_set";
     public static final String ENTITY_BYTE_CHANNEL = "entity_byte_channel";
+    public static final String ENTITY_BYTE_STREAM = "entity_byte_stream";
     public static final String MULTIPART_ENCODER = "MultipartEncoder";
     public static final String BODY_PARTS = "body_parts";
     public static final String TRANSPORT_MESSAGE = "transport_message";
@@ -180,6 +181,11 @@ public class MimeConstants {
     public static final String FAILED_TO_PARSE = "failed to parse: ";
     public static final String CONTENT_DISPOSITION_FILE_NAME = "filename";
     public static final String CONTENT_DISPOSITION_NAME = "name";
+
+    // Stream entry record
+    public static final String STREAM_ENTRY_RECORD = "StreamEntry";
+    public static final BString FIELD_VALUE = StringUtils.fromString("value");
+    public static final String BYTE_STREAM_NEXT_FUNC = "next";
 
     /**
      * Describes the format of the body part.
