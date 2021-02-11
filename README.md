@@ -5,19 +5,19 @@ Ballerina MIME Library
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-mime.svg)](https://github.com/ballerina-platform/module-ballerina-mime/commits/master)
   [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-The MIME library is one of the standard library modules of the<a target="_blank" href="https://ballerina.io/"> Ballerina</a> language.
+The MIME library is one of the standard library packages of the<a target="_blank" href="https://ballerina.io/"> Ballerina</a> language.
 
 It encapsulate multiple body parts such as attachments into a single message. The communication of such messages follow the MIME (Multipurpose Internet Mail Extensions) specification as specified in the [RFC 2045 standard](https://www.ietf.org/rfc/rfc2045.txt)
 
-For more information go to [The MIME Module](https://ballerina.io/swan-lake/learn/api-docs/ballerina/mime/).
+For more information go to [The MIME Package](https://ballerina.io/learn/api-docs/ballerina/mime/).
 
-For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/swan-lake/learn/by-example/).
+For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/learn/by-example/).
 
 ## Issues and Projects 
 
 Issues and Projects tabs are disabled for this repository as this is part of the Ballerina Standard Library. To report bugs, request new features, start new discussions, view project boards, etc. please visit Ballerina Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library). 
 
-This repository only contains the source code for the module.
+This repository only contains the source code for the package.
 
 ## Building from the Source
 
@@ -43,7 +43,7 @@ Execute the commands below to build from source.
 
         ./gradlew clean test
 
-3. To build the module without the tests:
+3. To build the package without the tests:
 
         ./gradlew clean build -x test
 
