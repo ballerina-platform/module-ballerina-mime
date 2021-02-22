@@ -98,10 +98,10 @@ release {
     buildTasks = ['build']
     failOnSnapshotDependencies = true
     versionPropertyFile = 'gradle.properties'
-    tagTemplate = 'v${version}-central'
+    tagTemplate = 'v$version'
 
     git {
-        requireBranch = null
+        requireBranch = "release-${moduleVersion}"
         pushToRemote = 'origin'
     }
 }
