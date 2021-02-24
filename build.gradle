@@ -110,20 +110,30 @@ task build {
     dependsOn('mime-ballerina:build')
 }
 
-task codeCoverageReport(type: JacocoReport) {
-    executionData fileTree(project.rootDir.absolutePath).include("**/build/coverage-reports/*.exec")
+def classFilesArray = []
 
-    subprojects.each {
-        sourceSets it.sourceSets.main
+task copyClassFilePaths {
+    dependsOn('mime-ballerina:extractBallerinaClassFiles')
+
+    subprojects.forEach { subproject -> 
+        fileTree("${subproject.buildDir}/classes").matching {
+            exclude '**/test/*'
+            exclude '**/module-info.class'
+            include '**/*.class'
+        }.each { file -> classFilesArray.push(file) }
     }
+}
+
+task codeCoverageReport(type: JacocoReport) {
+    dependsOn(copyClassFilePaths)
+    executionData fileTree(project.rootDir.absolutePath).include("**/coverage/*.exec")
+    additionalClassDirs files(classFilesArray)
 
     reports {
         xml.enabled = true
         html.enabled = true
-        csv.enabled = true
         xml.destination = new File("${buildDir}/reports/jacoco/report.xml")
         html.destination = new File("${buildDir}/reports/jacoco/report.html")
-        csv.destination = new File("${buildDir}/reports/jacoco/report.csv")
     }
 
     onlyIf = {

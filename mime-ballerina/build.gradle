@@ -290,6 +290,20 @@ publishing {
     }
 }
 
+task extractBallerinaClassFiles(type: Copy) {
+    def jars = fileTree(artifactTestableJar).findAll {
+        it.name.endsWith("-testable.jar")
+    }
+
+    jars.forEach { file ->
+        from zipTree(file).matching {
+            exclude '**/tests/*'
+            include '**/*.class'
+        }
+        into "${buildDir}/classes"
+    }
+}
+
 unpackJballerinaTools.dependsOn copyToLib
 unpackStdLibs.dependsOn unpackJballerinaTools
 copyStdlibs.dependsOn unpackStdLibs
