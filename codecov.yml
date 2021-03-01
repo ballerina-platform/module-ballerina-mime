@@ -3,4 +3,4 @@ fixes:
 
 ignore:
   - "**/test"
-  
+
