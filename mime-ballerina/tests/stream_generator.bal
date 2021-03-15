@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+import ballerina/io;
+
 class ByteStreamFromStringsGenerator {
     string[] strArr = [];
     int i = 0;
