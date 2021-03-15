@@ -20,6 +20,8 @@ import ballerina/lang.'string as strings;
 import ballerina/log;
 import ballerina/test;
 
+const string TEMP_DIR = "build/";
+
 function getMediaTypeTestObj() returns MediaType {
     MediaType mediaType = new;
     mediaType.primaryType = "application";
@@ -462,10 +464,11 @@ public function testSetEntityBodyMultipleTimes() {
 }
 
 @test:Config {}
-public function testSetEntityBodyMultipleTimesInDifferentTypes() {
+public function testSetEntityBodyMultipleTimesInDifferentTypes() returns error? {
     string fileContent = "File Content";
-    byte[][] content = [fileContent.toBytes()];
-    stream<byte[], io:Error> byteStream = content.toStream();
+    string resourcePath = TEMP_DIR + "byteContent1.txt";
+    check io:fileWriteString(resourcePath, fileContent);
+    stream<byte[], io:Error> byteStream = check io:fileReadBlocksAsStream(resourcePath);
     Entity entity = new;
     entity.setText("Hello Ballerina!");
     entity.setByteStream(byteStream);
@@ -797,10 +800,11 @@ public function testSetBodyAndGetByteArray() {
 // }
 
 @test:Config {}
-public function testSetBodyAndGetByteStream() {
+public function testSetBodyAndGetByteStream() returns error? {
     string content = "Hello Ballerina!";
-    byte[][] byteContent = [content.toBytes()];
-    stream<byte[], io:Error> byteStream = byteContent.toStream();
+    string resourcePath = TEMP_DIR + "byteContent2.txt";
+    check io:fileWriteString(resourcePath, content);
+    stream<byte[], io:Error> byteStream = check io:fileReadBlocksAsStream(resourcePath);
     Entity entity = new;
     entity.setBody(byteStream);
 
@@ -1087,9 +1091,9 @@ public function getAnyStreamAsStringFromCache() {
 }
 
 @test:Config {}
-public function testSeStreamAndGetStream() {
-    byte[][] content = ["ballerina".toBytes(), "language".toBytes()];
-    stream<byte[], io:Error> byteStream = content.toStream();
+public function testSeStreamAndGetStream() returns error? {
+    string[] expectedContent = ["ballerina", "language"];
+    stream<byte[], io:Error> byteStream = new(new ByteStreamFromStringsGenerator(expectedContent));
     Entity entity = new;
     entity.setByteStream(byteStream);
 
@@ -1118,9 +1122,11 @@ public function testSeStreamAndGetStream() {
 
 //TODO check Stream.close(), I think we need to use custom stream here rather the default
 @test:Config {enable:false}
-public function testStreamClose() {
-    byte[][] content = ["ballerina".toBytes(), "language".toBytes()];
-    stream<byte[], io:Error> byteStream = content.toStream();
+public function testStreamClose() returns error? {
+    string content = "ballerinalanguage";
+    string resourcePath = TEMP_DIR + "byteContent4.txt";
+    check io:fileWriteString(resourcePath, content);
+    stream<byte[], io:Error> byteStream = check io:fileReadBlocksAsStream(resourcePath);
     Entity entity = new;
     entity.setByteStream(byteStream);
 
@@ -1154,9 +1160,11 @@ public function testStreamClose() {
 
 //TODO check stream.close()
 @test:Config {enable:false}
-public function testStreamMultipleClose() {
-    byte[][] content = ["ballerina".toBytes()];
-    stream<byte[], io:Error> byteStream = content.toStream();
+public function testStreamMultipleClose() returns error? {
+    string content = "ballerina";
+    string resourcePath = TEMP_DIR + "byteContent3.txt";
+    check io:fileWriteString(resourcePath, content);
+    stream<byte[], io:Error> byteStream = check io:fileReadBlocksAsStream(resourcePath);
     Entity entity = new;
     entity.setByteStream(byteStream);
 
@@ -1250,9 +1258,9 @@ public function testSetByteStreamFromChannelAndGetByteStream() {
 }
 
 @test:Config {}
-public function testSeStreamAndForeachTheStream() {
-    byte[][] content = ["ballerina".toBytes(), "language".toBytes()];
-    stream<byte[], io:Error> byteStream = content.toStream();
+public function testSeStreamAndForeachTheStream() returns error? {
+    string[] expectedContent = ["ballerina", "language"];
+    stream<byte[], io:Error> byteStream = new(new ByteStreamFromStringsGenerator(expectedContent));
     Entity entity = new;
     entity.setByteStream(byteStream);
 
@@ -1261,7 +1269,7 @@ public function testSeStreamAndForeachTheStream() {
         int i = 0;
         error? e = str.forEach(function (byte[] student) {
             string name = checkpanic strings:fromBytes(student);
-            test:assertEquals(name, checkpanic strings:fromBytes(content[i]), msg = "Found unexpected output");
+            test:assertEquals(name, expectedContent[i], msg = "Found unexpected output");
             i = i + 1;
         });
     } else {
