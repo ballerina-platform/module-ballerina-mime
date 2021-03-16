@@ -453,25 +453,25 @@ public class MimeUtil {
      * Create mime specific error with the error message.
      *
      * @param errorTypeName The error type
-     * @param errMsg  The actual error message
+     * @param errMsg        The actual error message
      * @return Ballerina error value
      */
     public static BError createError(String errorTypeName, String errMsg) {
-        return ErrorCreator.createDistinctError(errorTypeName, MimeUtil.getMimePackage(),
-                                                 StringUtils.fromString(errMsg));
+        return ErrorCreator.createError(MimeUtil.getMimePackage(), errorTypeName,
+                                        StringUtils.fromString(errMsg), null, null);
     }
 
     /**
      * Create mime specific error with the error message and cause.
      *
      * @param errorTypeName The error type
-     * @param errMsg  The actual error message
-     * @param errorValue  The error cause
+     * @param errMsg        The actual error message
+     * @param errorValue    The error cause
      * @return Ballerina error value
      */
     public static BError createError(String errorTypeName, String errMsg, BError errorValue) {
-        return ErrorCreator.createDistinctError(errorTypeName, MimeUtil.getMimePackage(),
-                                                 StringUtils.fromString(errMsg), errorValue);
+        return ErrorCreator.createError(MimeUtil.getMimePackage(), errorTypeName,
+                                        StringUtils.fromString(errMsg), errorValue, null);
     }
 
     public static boolean isJSONCompatible(io.ballerina.runtime.api.types.Type type) {

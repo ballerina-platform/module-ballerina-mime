@@ -55,7 +55,8 @@ public function testGetMediaTypeFunction() {
 public function getMediaTypeWithIncorrectContentType() {
     MediaType|error returnVal = getMediaType("testContentType");
     if returnVal is error {
-        test:assertEquals(returnVal.message(), "error(\"Unable to find a sub type.\")", msg = "Found unexpected output");
+        test:assertEquals(returnVal.message(), "error InvalidContentTypeError (\"Unable to find a sub type.\")",
+                            msg = "Found unexpected output");
     } else {
         test:assertFail(msg = "Found unexpected output type");
     }
