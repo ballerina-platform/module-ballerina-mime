@@ -1,6 +1,0 @@
-fixes:
-  - "ballerina/mime/*/::mime-ballerina/"
-
-ignore:
-  - "**/test"
-
