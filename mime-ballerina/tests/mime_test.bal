@@ -1323,7 +1323,7 @@ function assertByteArray(byte[]|error returnResult, string expectValue) {
 }
 
 function consumeChannel(io:ReadableByteChannel byteChannel) {
-    var result = byteChannel.read(1000000);
+    byte[]|error result = byteChannel.read(1000000);
 }
 
 function consumeStream(stream<byte[], io:Error> byteStream) {
