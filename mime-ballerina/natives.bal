@@ -262,8 +262,8 @@ public class Entity {
     # mimeEntity.setBody("body string");
     # ```
     #
-    # + entityBody - Entity body can be of the type `string`,`xml`,`json`,`byte[]`,`Entity[]`, or `stream<byte[], io:Error>`
-    public isolated function setBody(@untainted string|xml|json|byte[]|Entity[]|stream<byte[], io:Error> entityBody) {
+    # + entityBody - Entity body can be of the type `string`,`xml`,`json`,`byte[]`,`Entity[]`, or `stream<byte[], io:Error?>`
+    public isolated function setBody(@untainted string|xml|json|byte[]|Entity[]|stream<byte[], io:Error?> entityBody) {
         if (entityBody is string) {
             self.setText(entityBody);
         } else if (entityBody is xml) {
@@ -272,7 +272,7 @@ public class Entity {
             self.setByteArray(entityBody);
         } else if (entityBody is json) {
             self.setJson(entityBody);
-        } else if (entityBody is stream<byte[], io:Error>) {
+        } else if (entityBody is stream<byte[], io:Error?>) {
             self.setByteStream(entityBody);
         } else {
             self.setBodyParts(entityBody);
@@ -399,7 +399,7 @@ public class Entity {
     # + byteStream - Byte stream, which needs to be set to the entity
     # + contentType - Content-type to be used with the payload. This is an optional parameter.
     #                 The `application/octet-stream` is the default value
-    public isolated function setByteStream(stream<byte[], io:Error> byteStream,
+    public isolated function setByteStream(stream<byte[], io:Error?> byteStream,
                                    @untainted string contentType = "application/octet-stream") {
         return externSetByteStream(self, byteStream, contentType);
     }
@@ -415,11 +415,11 @@ public class Entity {
     #
     # + arraySize - A defaultable paramerter to state the size of the byte array. Default size is 8KB
     # + return - A byte stream from which the payload can be read or `mime:ParserError` in case of errors
-    public isolated function getByteStream(int arraySize = 8196) returns @tainted stream<byte[], io:Error>|ParserError {
+    public isolated function getByteStream(int arraySize = 8196) returns @tainted stream<byte[], io:Error?>|ParserError {
         var value = externGetByteStream(self);
         if (value is ()) {
             ByteStream byteStream  = new(self, arraySize);
-            return new stream<byte[], io:Error>(byteStream);
+            return new stream<byte[], io:Error?>(byteStream);
         } else {
             return value;
         }
@@ -444,11 +444,11 @@ public class Entity {
     #
     # + arraySize - A defaultable paramerter to state the size of the byte array. Default size is 8KB
     # + return - Body parts as a byte stream
-    public isolated function getBodyPartsAsStream(int arraySize = 8196) returns @tainted stream<byte[], io:Error>|ParserError {
+    public isolated function getBodyPartsAsStream(int arraySize = 8196) returns @tainted stream<byte[], io:Error?>|ParserError {
         var value = externGetBodyPartsAsStream(self);
         if (value is ()) {
             ByteStream byteStream  = new(self, arraySize);
-            return new stream<byte[], io:Error>(byteStream);
+            return new stream<byte[], io:Error?>(byteStream);
         } else {
             return value;
         }
@@ -628,7 +628,7 @@ isolated function externSetByteChannel(Entity entity, io:ReadableByteChannel byt
     name: "setByteChannel"
 } external;
 
-isolated function externSetByteStream(Entity entity, stream<byte[], io:Error> byteStream, string contentType) = @java:Method {
+isolated function externSetByteStream(Entity entity, stream<byte[], io:Error?> byteStream, string contentType) = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "setByteStream"
 } external;
@@ -638,7 +638,7 @@ isolated function externGetByteChannel(Entity entity) returns @tainted io:Readab
     name: "getByteChannel"
 } external;
 
-isolated function externGetByteStream(Entity entity) returns @tainted stream<byte[], io:Error>|ParserError? = @java:Method {
+isolated function externGetByteStream(Entity entity) returns @tainted stream<byte[], io:Error?>|ParserError? = @java:Method {
     'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
     name: "getByteStream"
 } external;
