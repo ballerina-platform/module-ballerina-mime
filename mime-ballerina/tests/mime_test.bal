@@ -362,7 +362,7 @@ public function testSetByteChannelAndGetByteStream() {
     entity.setByteChannel(byteChannel);
 
     var str = entity.getByteStream();
-    if (str is stream<byte[], io:Error>) {
+    if (str is stream<byte[], io:Error?>) {
         record {|byte[] value;|}|io:Error? arr1 = str.next();
         if (arr1 is record {|byte[] value;|}) {
             string name = checkpanic strings:fromBytes(arr1.value);
@@ -387,7 +387,7 @@ public function testSetByteChannelAndGetByteStreamOf8ByteSizedArray() {
     entity.setByteChannel(byteChannel);
 
     var str = entity.getByteStream(arraySize = 8);
-    if (str is stream<byte[], io:Error>) {
+    if (str is stream<byte[], io:Error?>) {
         record {|byte[] value;|}|io:Error? arr1 = str.next();
         if (arr1 is record {|byte[] value;|}) {
             string name = checkpanic strings:fromBytes(arr1.value);
@@ -418,7 +418,7 @@ public function testSetByteChannelAndGetByteStreamOf10ByteSizedArray() {
     entity.setByteChannel(byteChannel);
 
     var str = entity.getByteStream(arraySize = 10);
-    if (str is stream<byte[], io:Error>) {
+    if (str is stream<byte[], io:Error?>) {
         record {|byte[] value;|}|io:Error? arr1 = str.next();
         if (arr1 is record {|byte[] value;|}) {
             string name = checkpanic strings:fromBytes(arr1.value);
@@ -469,13 +469,13 @@ public function testSetEntityBodyMultipleTimesInDifferentTypes() returns error? 
     string fileContent = "File Content";
     string resourcePath = TEMP_DIR + "byteContent1.txt";
     check io:fileWriteString(resourcePath, fileContent);
-    stream<byte[], io:Error> byteStream = check io:fileReadBlocksAsStream(resourcePath);
+    stream<byte[], io:Error?> byteStream = check io:fileReadBlocksAsStream(resourcePath);
     Entity entity = new;
     entity.setText("Hello Ballerina!");
     entity.setByteStream(byteStream);
 
-    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
-    if (str is stream<byte[], io:Error>) {
+    stream<byte[], io:Error?>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error?>) {
         record {|byte[] value;|}|io:Error? arr1 = str.next();
         if (arr1 is record {|byte[] value;|}) {
             string name = checkpanic strings:fromBytes(arr1.value);
@@ -548,8 +548,8 @@ public function testGetTextDataSourceOncetheStreamIsConsumed() {
     entity.setByteChannel(byteChannel);
     entity.setHeader("content-type", "text/plain");
     //Consume byte stream externally
-    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
-    if (str is stream<byte[], io:Error>) {
+    stream<byte[], io:Error?>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error?>) {
         consumeStream(str);
     } else {
         log:printError("error in reading byte stream", 'error = str);
@@ -606,8 +606,8 @@ public function testGetJsonDataSourceOnceTheByteStreamIsConsumed() {
     entity.setByteChannel(byteChannel);
     entity.setHeader("content-type", "application/json");
     //Consume byte stream externally
-    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
-    if (str is stream<byte[], io:Error>) {
+    stream<byte[], io:Error?>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error?>) {
         consumeStream(str);
     } else {
         log:printError("error in reading byte stream", 'error = str);
@@ -632,7 +632,7 @@ public function testSetByteStreamAndGetJson() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-    stream<io:Block, io:Error> blockStream = checkpanic byteChannel.blockStream(8196);
+    stream<io:Block, io:Error?> blockStream = checkpanic byteChannel.blockStream(8196);
     Entity entity = new;
     entity.setByteStream(blockStream);
     entity.setHeader("content-type", "application/json");
@@ -656,7 +656,7 @@ public function testSetByteStreamAndGetText() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-    stream<io:Block, io:Error> blockStream = checkpanic byteChannel.blockStream(8196);
+    stream<io:Block, io:Error?> blockStream = checkpanic byteChannel.blockStream(8196);
     Entity entity = new;
     entity.setByteStream(blockStream);
     entity.setHeader("content-type", "text/plain");
@@ -680,7 +680,7 @@ public function testSetByteStreamAndGetXml() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-    stream<io:Block, io:Error> blockStream = checkpanic byteChannel.blockStream(8196);
+    stream<io:Block, io:Error?> blockStream = checkpanic byteChannel.blockStream(8196);
     Entity entity = new;
     entity.setByteStream(blockStream);
     entity.setHeader("content-type", "application/xml");
@@ -805,12 +805,12 @@ public function testSetBodyAndGetByteStream() returns error? {
     string content = "Hello Ballerina!";
     string resourcePath = TEMP_DIR + "byteContent2.txt";
     check io:fileWriteString(resourcePath, content);
-    stream<byte[], io:Error> byteStream = check io:fileReadBlocksAsStream(resourcePath);
+    stream<byte[], io:Error?> byteStream = check io:fileReadBlocksAsStream(resourcePath);
     Entity entity = new;
     entity.setBody(byteStream);
 
-    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
-    if (str is stream<byte[], io:Error>) {
+    stream<byte[], io:Error?>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error?>) {
         record {|byte[] value;|}|io:Error? arr1 = str.next();
         if (arr1 is record {|byte[] value;|}) {
             string name = checkpanic strings:fromBytes(arr1.value);
@@ -997,8 +997,8 @@ public function testGetBodyPartsAsStream() {
     string contentType = MULTIPART_MIXED + "; boundary=e3a0b9ad7b4e7cdt";
     multipartEntity.setBodyParts(bodyParts, contentType);
 
-    stream<byte[], io:Error>|ParserError str = multipartEntity.getBodyPartsAsStream();
-    if (str is stream<byte[], io:Error>) {
+    stream<byte[], io:Error?>|ParserError str = multipartEntity.getBodyPartsAsStream();
+    if (str is stream<byte[], io:Error?>) {
         record {|byte[] value;|}|io:Error? arr1 = str.next();
         if (arr1 is record {|byte[] value;|}) {
             string name = checkpanic strings:fromBytes(arr1.value);
@@ -1094,12 +1094,12 @@ public function getAnyStreamAsStringFromCache() {
 @test:Config {}
 public function testSeStreamAndGetStream() returns error? {
     string[] expectedContent = ["ballerina", "language"];
-    stream<byte[], io:Error> byteStream = new(new ByteStreamFromStringsGenerator(expectedContent));
+    stream<byte[], io:Error?> byteStream = new(new ByteStreamFromStringsGenerator(expectedContent));
     Entity entity = new;
     entity.setByteStream(byteStream);
 
-    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
-    if (str is stream<byte[], io:Error>) {
+    stream<byte[], io:Error?>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error?>) {
         record {|byte[] value;|}|io:Error? arr1 = str.next();
         if (arr1 is record {|byte[] value;|}) {
             string name = checkpanic strings:fromBytes(arr1.value);
@@ -1127,12 +1127,12 @@ public function testStreamClose() returns error? {
     string content = "ballerinalanguage";
     string resourcePath = TEMP_DIR + "byteContent4.txt";
     check io:fileWriteString(resourcePath, content);
-    stream<byte[], io:Error> byteStream = check io:fileReadBlocksAsStream(resourcePath);
+    stream<byte[], io:Error?> byteStream = check io:fileReadBlocksAsStream(resourcePath);
     Entity entity = new;
     entity.setByteStream(byteStream);
 
-    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
-    if (str is stream<byte[], io:Error>) {
+    stream<byte[], io:Error?>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error?>) {
         record {|byte[] value;|}|io:Error? arr1 = str.next();
         if (arr1 is record {|byte[] value;|}) {
             string name = checkpanic strings:fromBytes(arr1.value);
@@ -1165,12 +1165,12 @@ public function testStreamMultipleClose() returns error? {
     string content = "ballerina";
     string resourcePath = TEMP_DIR + "byteContent3.txt";
     check io:fileWriteString(resourcePath, content);
-    stream<byte[], io:Error> byteStream = check io:fileReadBlocksAsStream(resourcePath);
+    stream<byte[], io:Error?> byteStream = check io:fileReadBlocksAsStream(resourcePath);
     Entity entity = new;
     entity.setByteStream(byteStream);
 
-    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
-    if (str is stream<byte[], io:Error>) {
+    stream<byte[], io:Error?>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error?>) {
         record {|byte[] value;|}|io:Error? arr1 = str.next();
         if (arr1 is record {|byte[] value;|}) {
             string name = checkpanic strings:fromBytes(arr1.value);
@@ -1195,8 +1195,8 @@ public function testStreamCloseWithSetByteChannel() {
     Entity entity = new;
     entity.setByteChannel(byteChannel);
 
-    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
-    if (str is stream<byte[], io:Error>) {
+    stream<byte[], io:Error?>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error?>) {
         io:Error? arr1 = str.close();
         test:assertTrue(arr1 is (), msg = "Found unexpected output");
         record {|byte[] value;|}|io:Error? arr2 = str.next();
@@ -1214,8 +1214,8 @@ public function testStreamMultipleCloseWithSetByteChannel() {
     Entity entity = new;
     entity.setByteChannel(byteChannel);
 
-    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
-    if (str is stream<byte[], io:Error>) {
+    stream<byte[], io:Error?>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error?>) {
         record {|byte[] value;|}|io:Error? arr1 = str.next();
         if (arr1 is record {|byte[] value;|}) {
             string name = checkpanic strings:fromBytes(arr1.value);
@@ -1238,12 +1238,12 @@ public function testSetByteStreamFromChannelAndGetByteStream() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-    stream<io:Block, io:Error> blockStream = checkpanic byteChannel.blockStream(8196);
+    stream<io:Block, io:Error?> blockStream = checkpanic byteChannel.blockStream(8196);
     Entity entity = new;
     entity.setByteStream(blockStream);
 
     var str = entity.getByteStream();
-    if (str is stream<byte[], io:Error>) {
+    if (str is stream<byte[], io:Error?>) {
         record {|byte[] value;|}|io:Error? arr1 = str.next();
         if (arr1 is record {|byte[] value;|}) {
             string name = checkpanic strings:fromBytes(arr1.value);
@@ -1261,12 +1261,12 @@ public function testSetByteStreamFromChannelAndGetByteStream() {
 @test:Config {}
 public function testSeStreamAndForeachTheStream() returns error? {
     string[] expectedContent = ["ballerina", "language"];
-    stream<byte[], io:Error> byteStream = new(new ByteStreamFromStringsGenerator(expectedContent));
+    stream<byte[], io:Error?> byteStream = new(new ByteStreamFromStringsGenerator(expectedContent));
     Entity entity = new;
     entity.setByteStream(byteStream);
 
-    stream<byte[], io:Error>|ParserError str = entity.getByteStream();
-    if (str is stream<byte[], io:Error>) {
+    stream<byte[], io:Error?>|ParserError str = entity.getByteStream();
+    if (str is stream<byte[], io:Error?>) {
         int i = 0;
         error? e = str.forEach(function (byte[] student) {
             string name = checkpanic strings:fromBytes(student);
@@ -1323,10 +1323,10 @@ function assertByteArray(byte[]|error returnResult, string expectValue) {
 }
 
 function consumeChannel(io:ReadableByteChannel byteChannel) {
-    var result = byteChannel.read(1000000);
+    byte[]|error result = byteChannel.read(1000000);
 }
 
-function consumeStream(stream<byte[], io:Error> byteStream) {
+function consumeStream(stream<byte[], io:Error?> byteStream) {
     record {|byte[] value;|}|io:Error? arr = byteStream.next();
     if (arr is record {|byte[] value;|}) {
         consumeStream(byteStream);
