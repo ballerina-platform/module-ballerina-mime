@@ -64,6 +64,7 @@ dependencies {
     externalJars (group: 'com.sun.activation', name: 'jakarta.activation', version: "${jakartaActivationVersion}") {
         transitive = false
     }
+    externalJars(group: 'org.testng', name: 'testng', version: "${testngVersion}")
 }
 
 clean {
@@ -121,11 +122,13 @@ task updateTomlVersions {
         def stdlibDependentLogVersion = stripBallerinaExtensionVersion(project.stdlibLogVersion)
         def stdlibDependentMimepullVersion = project.mimepullVersion
         def stdlibDependentJakartaActivationVersion = project.jakartaActivationVersion
+        def stdlibDependentTestNgVersion = project.testngVersion
 
         def newConfig = ballerinaConfigFile.text.replace("@project.version@", project.version)
         newConfig = newConfig.replace("@toml.version@", tomlVersion)
         newConfig = newConfig.replace("@mimepull.version@", stdlibDependentMimepullVersion)
         newConfig = newConfig.replace("@jakarta.activation.version@", stdlibDependentJakartaActivationVersion)
+        newConfig = newConfig.replace("@testng.version@", stdlibDependentTestNgVersion)
         ballerinaConfigFile.text = newConfig
 
         def newDependencyConfig = ballerinaDependencyFile.text.replace("@stdlib.io.version@", stdlibDependentIoVersion)
