@@ -22,3 +22,9 @@ path = "./lib/jakarta.activation-@jakarta.activation.version@.jar"
 groupId = "com.sun.activation"
 artifactId = "jakarta.activation"
 version = "@jakarta.activation.version@"
+
+[[platform.java11.dependency]]
+path = "./lib/testng-@testng.version@.jar"
+groupId = "org.testng"
+artifactId = "org.testng"
+version = "@testng.version@"
