@@ -22,7 +22,6 @@ description = 'Ballerina - Mime Ballerina Generator'
 def packageName = "mime"
 def packageOrg = "ballerina"
 def platform = "java11"
-def snapshotVersion = "-SNAPSHOT"
 def tomlVersion = stripBallerinaExtensionVersion("${project.version}")
 def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
 def ballerinaDependencyFile = new File("$project.projectDir/Dependencies.toml")
@@ -32,6 +31,7 @@ def artifactLibParent = file("$project.projectDir/build/lib_parent/")
 def ballerinaCentralAccessToken = System.getenv('BALLERINA_CENTRAL_ACCESS_TOKEN')
 def originalConfig = ballerinaConfigFile.text
 def originalDependencies = ballerinaDependencyFile.text
+def testCoverageParam = "--code-coverage --includes=org.ballerinalang.mime.*:ballerina.*"
 def distributionBinPath = project.projectDir.absolutePath + "/build/target/extracted-distributions/jballerina-tools-zip/jballerina-tools-${ballerinaLangVersion}/bin"
 
 def stripBallerinaExtensionVersion(String extVersion) {
@@ -187,7 +187,7 @@ task initializeVariables {
         }
 
         if (graph.hasTask(":${packageName}-ballerina:test")) {
-            testParams = "--code-coverage --includes=*"
+            testParams = "${testCoverageParam}"
         } else {
             testParams = "--skip-tests"
         }
@@ -204,10 +204,10 @@ task ballerinaBuild {
                 environment "JAVA_OPTS", "-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
                 if (Os.isFamily(Os.FAMILY_WINDOWS)) {
                     commandLine 'cmd', '/c', "${balJavaDebugParam} ${distributionBinPath}/bal.bat test " +
-                            "${testCoverageParam} ${testParams} ${debugParams} && exit %%ERRORLEVEL%%"
+                            "${testCoverageParam} ${groupParams} ${disableGroups} ${debugParams} && exit %%ERRORLEVEL%%"
                 } else {
-                    commandLine 'sh', '-c', "${balJavaDebugParam} ${distributionBinPath}/bal test -c ${testParams} " +
-                            "${debugParams}"
+                    commandLine 'sh', '-c', "${balJavaDebugParam} ${distributionBinPath}/bal test -c " +
+                            "${testCoverageParam} ${groupParams} ${disableGroups} ${debugParams}"
                 }
             }
         } else if (needBuildWithTest) {
