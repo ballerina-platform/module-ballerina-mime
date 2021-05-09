@@ -184,4 +184,6 @@ public abstract class MimeDataSourceBuilder {
     protected static String getErrorMsg(Throwable err) {
         return err instanceof BError ? err.toString() : err.getMessage();
     }
+
+    private MimeDataSourceBuilder() {}
 }

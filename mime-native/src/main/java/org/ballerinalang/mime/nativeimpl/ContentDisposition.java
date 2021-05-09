@@ -43,13 +43,13 @@ public class ContentDisposition {
 
     public static BString convertContentDispositionToString(BObject contentDispositionObj) {
         StringBuilder dispositionBuilder = new StringBuilder();
-        if (contentDispositionObj != null) {
-            String disposition = String.valueOf(contentDispositionObj.get(DISPOSITION_FIELD));
-            if (!disposition.isEmpty()) {
-                dispositionBuilder.append(disposition);
-                MimeUtil.convertDispositionObjectToString(dispositionBuilder, contentDispositionObj);
-            }
+        String disposition = String.valueOf(contentDispositionObj.get(DISPOSITION_FIELD));
+        if (!disposition.isEmpty()) {
+            dispositionBuilder.append(disposition);
+            MimeUtil.convertDispositionObjectToString(dispositionBuilder, contentDispositionObj);
         }
         return StringUtils.fromString(dispositionBuilder.toString());
     }
+
+    private ContentDisposition() {}
 }

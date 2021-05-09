@@ -563,4 +563,6 @@ public class MimeUtil {
     public static Module getMimePackage() {
         return ModuleUtils.getModule();
     }
+
+    private MimeUtil() {}
 }

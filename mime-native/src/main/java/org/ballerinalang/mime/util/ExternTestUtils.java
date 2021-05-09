@@ -30,8 +30,10 @@ import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BXml;
 import org.ballerinalang.core.model.values.BError;
 import org.ballerinalang.core.model.values.BValue;
+import org.ballerinalang.stdlib.io.channels.TempFileIOChannel;
 import org.ballerinalang.stdlib.io.channels.base.Channel;
 import org.ballerinalang.stdlib.io.utils.IOConstants;
+import org.ballerinalang.stdlib.io.utils.IOUtils;
 import org.jvnet.mimepull.MIMEPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,10 +46,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.activation.MimeTypeParseException;
 
@@ -104,7 +114,7 @@ public class ExternTestUtils {
         try {
             File file = getTemporaryFile("test", ".txt", "Ballerina text as a file part");
             BObject bodyPart = createEntityObject();
-            bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, EntityBodyHandler.getByteChannelForTempFile(
+            bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, getByteChannelForTempFile(
                     file.getAbsolutePath()));
             MimeUtil.setContentType(createMediaTypeObject(), bodyPart, TEXT_PLAIN);
             return bodyPart;
@@ -126,7 +136,7 @@ public class ExternTestUtils {
         try {
             File file = getTemporaryFile("test", ".txt", message);
             BObject bodyPart = createEntityObject();
-            bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, EntityBodyHandler.getByteChannelForTempFile(
+            bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, getByteChannelForTempFile(
                     file.getAbsolutePath()));
             MimeUtil.setContentType(createMediaTypeObject(), bodyPart, TEXT_PLAIN);
             HeaderUtil.setHeaderToEntity(bodyPart, MimeConstants.CONTENT_TRANSFER_ENCODING, contentTransferEncoding);
@@ -163,7 +173,7 @@ public class ExternTestUtils {
         try {
             File file = getTemporaryFile("test", ".json", "{'name':'wso2'}");
             BObject bodyPart = createEntityObject();
-            bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, EntityBodyHandler.getByteChannelForTempFile(
+            bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, getByteChannelForTempFile(
                     file.getAbsolutePath()));
             MimeUtil.setContentType(createMediaTypeObject(), bodyPart, APPLICATION_JSON);
             return bodyPart;
@@ -198,7 +208,7 @@ public class ExternTestUtils {
         try {
             File file = getTemporaryFile("test", ".xml", "<name>Ballerina xml file part</name>");
             BObject bodyPart = createEntityObject();
-            bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, EntityBodyHandler.getByteChannelForTempFile(
+            bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, getByteChannelForTempFile(
                     file.getAbsolutePath()));
             MimeUtil.setContentType(createMediaTypeObject(), bodyPart, APPLICATION_XML);
             return bodyPart;
@@ -231,7 +241,7 @@ public class ExternTestUtils {
         try {
             File file = getTemporaryFile("test", ".tmp", "Ballerina binary file part");
             BObject bodyPart = createEntityObject();
-            bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, EntityBodyHandler.getByteChannelForTempFile(
+            bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, getByteChannelForTempFile(
                     file.getAbsolutePath()));
             MimeUtil.setContentType(createMediaTypeObject(), bodyPart, OCTET_STREAM);
             return bodyPart;
@@ -308,6 +318,28 @@ public class ExternTestUtils {
 
     public static BObject getContentDispositionStruct() {
         return ValueCreator.createObjectValue(MimeUtil.getMimePackage(), CONTENT_DISPOSITION_STRUCT);
+    }
+
+
+
+    /**
+     * Given a temp file location, create a byte channel.
+     *
+     * @param temporaryFilePath Temporary file path
+     * @return ByteChannel which represent the file channel
+     */
+    static TempFileIOChannel getByteChannelForTempFile(String temporaryFilePath) {
+        FileChannel fileChannel;
+        Set<OpenOption> options = new HashSet<>();
+        options.add(StandardOpenOption.READ);
+        Path path = Paths.get(temporaryFilePath);
+        try {
+            fileChannel = (FileChannel) Files.newByteChannel(path, options);
+        } catch (IOException e) {
+            throw IOUtils.createError(IOConstants.ErrorCode.GenericError,
+                                      "Error occurred while creating a file channel from a temporary file");
+        }
+        return new TempFileIOChannel(fileChannel, temporaryFilePath);
     }
 
     public static File getTemporaryFile(String fileName, String fileType, String valueTobeWritten) throws IOException {
@@ -387,4 +419,6 @@ public class ExternTestUtils {
             Assert.assertEquals(bBytes[i], jBytes[i], "Invalid byte value returned.");
         }
     }
+
+    private ExternTestUtils() {}
 }

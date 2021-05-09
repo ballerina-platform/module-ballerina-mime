@@ -156,6 +156,22 @@ public function testRemoveHeaderError() {
     }
 }
 
+@test:Config {}
+public function testRemoveAllHeaderError() {
+    Entity entity = new;
+    entity.addHeader("heAder1", "value1");
+    entity.addHeader("header1", "value2");
+    entity.addHeader("header1", "value3");
+    entity.addHeader("hEader2", "value3");
+    entity.addHeader("headeR2", "value4");
+    entity.setHeader("HeADEr2", "totally different value");
+    entity.removeAllHeaders();
+    var result = entity.getHeaders("header1");
+    if (result is error) {
+        test:assertEquals(result.message(), "Http header does not exist", msg = "Found unexpected output");
+    }
+}
+
 //Test getting a value out of a non existence header
 @test:Config {}
 public function testForNonExistenceHeader() {

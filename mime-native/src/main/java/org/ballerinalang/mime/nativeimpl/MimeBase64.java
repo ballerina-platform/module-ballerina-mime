@@ -19,9 +19,10 @@
 package org.ballerinalang.mime.nativeimpl;
 
 import io.ballerina.runtime.api.values.BString;
+import org.ballerinalang.mime.util.MimeUtil;
 import org.ballerinalang.stdlib.io.utils.Utils;
 
-import static org.ballerinalang.mime.util.MimeConstants.UTF_8;
+import static org.ballerinalang.mime.util.MimeConstants.DECODE_ERROR;
 
 /**
  * Utilities related to MIME base64.
@@ -31,10 +32,16 @@ import static org.ballerinalang.mime.util.MimeConstants.UTF_8;
 public class MimeBase64 {
 
     public static Object base64Decode(Object contentToBeDecoded, BString charset) {
-        return Utils.decode(contentToBeDecoded, charset != null ? charset.getValue() : UTF_8, true);
+        try {
+            return Utils.decode(contentToBeDecoded, charset.getValue(), true);
+        } catch (Exception ex) {
+            return MimeUtil.createError(DECODE_ERROR, ex.getMessage());
+        }
     }
 
     public static Object base64Encode(Object contentToBeDecoded, BString charset) {
-        return Utils.encode(contentToBeDecoded, charset != null ? charset.getValue() : UTF_8, true);
+        return Utils.encode(contentToBeDecoded, charset.getValue(), true);
     }
+
+    private MimeBase64() {}
 }
