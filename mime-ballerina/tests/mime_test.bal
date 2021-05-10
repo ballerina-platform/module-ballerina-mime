@@ -1101,6 +1101,51 @@ public function testGetBodyPartsAsChannel() {
 }
 
 @test:Config {}
+public function testGetBodyPartsAsItIs() {
+    //Create a body part with json content.
+    Entity bodyPart1 = new;
+    bodyPart1.setJson({ "bodyPart": "jsonPart" });
+
+    //Create another body part with a xml file.
+    Entity bodyPart2 = new;
+    bodyPart2.setFileAsEntityBody("tests/resources/datafiles/file.xml", TEXT_XML);
+
+    //Create a text body part.
+    Entity bodyPart3 = new;
+    bodyPart3.setText("Ballerina text body part");
+
+    //Create another body part with a text file.
+    Entity bodyPart4 = new;
+    bodyPart4.setFileAsEntityBody("tests/resources/datafiles/test.tmp");
+
+    //Create an array to hold all the body parts.
+    Entity[] bodyParts = [bodyPart1, bodyPart2, bodyPart3, bodyPart4];
+    Entity multipartEntity = new;
+    string contentType = MULTIPART_MIXED + "; boundary=e3a0b9ad7b4e7cdt";
+    multipartEntity.setBodyParts(bodyParts, contentType);
+
+    var result = multipartEntity.getBodyParts();
+    if (result is Entity[]) {
+        assertJsonPayload(result[0].getJson(), { "bodyPart": "jsonPart" });
+    }
+}
+
+@test:Config {}
+public function testGetBodyPartsFromByteChannel() {
+    Entity bodyPart1 = new;
+    bodyPart1.setFileAsEntityBody("tests/resources/datafiles/multipart.txt",
+            MULTIPART_MIXED + "; boundary=bd7547c98465dae2");
+
+    var result = bodyPart1.getBodyParts();
+    if (result is Entity[]) {
+        test:assertEquals(result[0].getContentType(), "application/xml");
+    } else {
+        test:assertEquals(result.message(), "Entity body is not a type of composite media type. " +
+                            "Received content-type : application/json", msg = "Found unexpected output");
+    }
+}
+
+@test:Config {}
 public function testGetBodyPartsAsStream() {
     //Create a body part with json content.
     Entity bodyPart1 = new;
@@ -1485,7 +1530,7 @@ function assertJsonPayload(json|error payload, json expectValue) {
     if payload is json {
         test:assertEquals(payload, expectValue, msg = "Found unexpected output");
     } else {
-        test:assertFail(msg = "Found unexpected output type");
+        test:assertFail(msg = "Found unexpected output type" + payload.message());
     }
 }
 

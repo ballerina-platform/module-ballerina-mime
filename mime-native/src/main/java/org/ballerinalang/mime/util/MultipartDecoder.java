@@ -167,4 +167,6 @@ public class MultipartDecoder {
             MimeUtil.setContentLength(partStruct, NO_CONTENT_LENGTH_FOUND);
         }
     }
+
+    private MultipartDecoder() {}
 }

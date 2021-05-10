@@ -1,0 +1,14 @@
+--bd7547c98465dae2
+content-disposition: form-data;name="json part"
+content-type: application/json
+content-id: 0
+{"name":"wso2"}
+--bd7547c98465dae2
+content-disposition: form-data;name="xml file part"
+content-type: application/xml
+content-id: 1
+<ballerinalang>
+    <version>0.963</version>
+    <test>test xml file to be used as a file part</test>
+</ballerinalang>
+--bd7547c98465dae2--

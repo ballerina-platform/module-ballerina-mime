@@ -185,4 +185,6 @@ public class HeaderUtil {
     private static BMap<BString, Object> getEmptyMap() {
         return ValueCreator.createMapValue(stringMapType);
     }
+
+    private HeaderUtil() {}
 }
