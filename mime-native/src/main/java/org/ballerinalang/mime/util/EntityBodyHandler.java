@@ -36,10 +36,7 @@ import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BStream;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BXml;
-import org.ballerinalang.stdlib.io.channels.TempFileIOChannel;
 import org.ballerinalang.stdlib.io.channels.base.Channel;
-import org.ballerinalang.stdlib.io.utils.IOConstants;
-import org.ballerinalang.stdlib.io.utils.IOUtils;
 import org.jvnet.mimepull.MIMEPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,16 +45,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -95,26 +84,6 @@ public class EntityBodyHandler {
     public static EntityWrapper getEntityWrapper(String textPayload) {
         return new EntityWrapper(new EntityBodyChannel(new ByteArrayInputStream(
                 textPayload.getBytes(StandardCharsets.UTF_8))));
-    }
-
-    /**
-     * Given a temp file location, create a byte channel.
-     *
-     * @param temporaryFilePath Temporary file path
-     * @return ByteChannel which represent the file channel
-     */
-    public static TempFileIOChannel getByteChannelForTempFile(String temporaryFilePath) {
-        FileChannel fileChannel;
-        Set<OpenOption> options = new HashSet<>();
-        options.add(StandardOpenOption.READ);
-        Path path = Paths.get(temporaryFilePath);
-        try {
-            fileChannel = (FileChannel) Files.newByteChannel(path, options);
-        } catch (IOException e) {
-            throw IOUtils.createError(IOConstants.ErrorCode.GenericError,
-                                              "Error occurred while creating a file channel from a temporary file");
-        }
-        return new TempFileIOChannel(fileChannel, temporaryFilePath);
     }
 
     /**
@@ -492,4 +461,6 @@ public class EntityBodyHandler {
             log.error("Error occurred while closing byte channel", e);
         }
     }
+
+    private EntityBodyHandler() {}
 }

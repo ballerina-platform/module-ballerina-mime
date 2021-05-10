@@ -63,18 +63,3 @@ public type IdleTimeoutTriggeredError distinct Error;
 # Represents a `NoContentError` with the message and the cause.
 public type NoContentError distinct Error;
 
-# Constructs an `EncodeError` with the given details.
-#
-# + detail - Error details
-# + return - An `EncodeError` with the given details set to the message
-public isolated function prepareEncodingErrorWithDetail(string detail) returns EncodeError {
-    return error EncodeError(detail);
-}
-
-# Constructs a `DecodeError` with the given details.
-#
-# + detail - Error details
-# + return - `DecodeError` with the given details set to the message
-public isolated function prepareDecodingErrorWithDetail(string detail) returns DecodeError {
-    return error DecodeError(detail);
-}

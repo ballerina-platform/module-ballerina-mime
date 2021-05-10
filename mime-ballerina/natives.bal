@@ -715,14 +715,6 @@ public isolated function base64DecodeBlob(byte[] valueToBeDecoded) returns byte[
     }
 }
 
-# Gets the encoding value from a given MediaType.
-#
-# + contentType - A MediaType struct
-# + return - The encoding value as a `string`
-isolated function getEncoding(MediaType contentType) returns string? {
-    return contentType.parameters[CHARSET];
-}
-
 isolated function getCaseSensitiveHeaderName(string[] headerNames, string headerName) returns string? {
     foreach string name in headerNames {
         if (name.toLowerAscii() == headerName.toLowerAscii()) {

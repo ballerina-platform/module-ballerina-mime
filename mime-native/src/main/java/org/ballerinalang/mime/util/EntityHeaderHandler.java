@@ -134,4 +134,6 @@ public class EntityHeaderHandler {
     private static BArray getNewHeaderNamesArray() {
         return (BArray) ValueCreator.createArrayValue(new BString[0]);
     }
+
+    private EntityHeaderHandler() {}
 }

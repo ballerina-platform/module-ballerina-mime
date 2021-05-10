@@ -20,8 +20,6 @@ package org.ballerinalang.mime.nativeimpl;
 
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Module;
-import io.ballerina.runtime.api.utils.StringUtils;
-import io.ballerina.runtime.api.values.BString;
 
 /**
  * This class will hold module related utility functions.
@@ -36,10 +34,6 @@ public class ModuleUtils {
 
     public static void setModule(Environment env) {
         mimeModule = env.getCurrentModule();
-    }
-
-    public static BString getModuleIdentifier() {
-        return StringUtils.fromString(mimeModule.toString());
     }
 
     public static Module getModule() {

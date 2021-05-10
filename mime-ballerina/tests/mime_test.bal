@@ -538,6 +538,17 @@ public function testGetTextDataSource() {
     assertTextPayload(entity.getText(), "");
 }
 
+@test:Config {}
+public function testGetTextDataSourceWithCharset() {
+    string content = "ballerina";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+    entity.setHeader("content-type", "text/plain; charset=UTF-8");
+    assertTextPayload(entity.getText(), content);
+}
+
 //Once the byte stream is consumed by the user, check whether the content retrieved as a text data source is empty
 @test:Config {}
 public function testGetTextDataSourceOncetheStreamIsConsumed() {
@@ -778,6 +789,112 @@ public function testSetBodyAndGetByteArray() {
     assertByteArray(entity.getByteArray(), content);
 }
 
+@test:Config {}
+public function testSetJsonAndGetAlreadyBuiltByteArray() {
+    json jsonContent = {code:123};
+    Entity entity = new;
+    entity.setJson(jsonContent);
+    entity.setHeader(CONTENT_TYPE, "application/json; charset=UTF-8");
+    json firstTime = checkpanic entity.getJson();
+    assertByteArray(entity.getByteArray(), "{\"code\":123}");
+}
+
+@test:Config {}
+public function testSetTextAndGetAlreadyBuiltJson() {
+    string content = "{\"code\":123}";
+    Entity entity = new;
+    entity.setText(content);
+    string firstTime = checkpanic entity.getText();
+    assertJsonPayload(entity.getJson(), {code:123});
+}
+
+@test:Config {}
+public function testXmlNotBuiltDataSource() {
+    xml content = xml `<name>Ballerina xml content</name>`;
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", "<name>Ballerina xml content</name>");
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel, "application/xml; charset=utf8");
+    assertXmlPayload(entity.getXml(), content);
+}
+
+@test:Config {}
+public function testGetXmlDataSourceWithOutCharset() {
+    xml content = xml `<name>Ballerina xml content</name>`;
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", "<name>Ballerina xml content</name>");
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+    entity.setHeader("content-type", "application/xml;");
+    assertXmlPayload(entity.getXml(), content);
+}
+
+@test:Config {}
+public function testBase64DecodeByteArray() {
+    string content = "ballerina123";
+    byte[] bytes = content.toBytes();
+    var res = base64Decode(bytes);
+    if (res is byte[]) {
+        assertByteArray(res, "m�ez��k]�");
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+}
+
+@test:Config {}
+public function testBase64EncodeByteArray() {
+    string content = "ballerina123";
+    byte[] bytes = content.toBytes();
+    var res = base64Encode(bytes);
+    if (res is byte[]) {
+        assertByteArray(res, "YmFsbGVyaW5hMTIz");
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+}
+
+@test:Config {}
+public function testBase64DecodeBlob() {
+    string content = "ballerina123";
+    byte[] bytes = content.toBytes();
+    var res = base64DecodeBlob(bytes);
+    if (res is byte[]) {
+        assertByteArray(res, "m�ez��k]�");
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+}
+
+@test:Config {}
+public function testBase64DecodeBlobError() {
+    string content = "ballerina";
+    byte[] bytes = content.toBytes();
+    var res = base64DecodeBlob(bytes);
+    if (res is DecodeError) {
+        test:assertEquals(res.message(), "Last unit does not have enough valid bits", msg = "Found unexpected output");
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+}
+
+@test:Config {}
+public function testBase64EncodeBlob() {
+    string content = "ballerina123";
+    byte[] bytes = content.toBytes();
+    var res = base64EncodeBlob(bytes);
+    if (res is byte[]) {
+        assertByteArray(res, "YmFsbGVyaW5hMTIz");
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+}
+
+@test:Config {}
+public function testEmptyContentDisposition() {
+    ContentDisposition disposition = new;
+    assertTextPayload(disposition.toString(), "");
+}
+
 // SetBody() does not accept io:ReadableByteChannel. Keeping the test until the I/O revamp
 // @test:Config {enable:false}
 // public function testSetBodyAndGetByteChannel() {
@@ -928,6 +1045,16 @@ public function testByteArrayWithContentType() {
     assertByteArray(entity.getByteArray(), "{\"code\":\"123\"}");
 }
 
+@test:Config {}
+public function testGetJsonDataSourceWithCharset() {
+    string content = "{'code':'123'}";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+    entity.setHeader("content-type", "application/json; charset=UTF-8");
+    assertJsonPayload(entity.getJson(), {code:"123"});
+}
 
 //Once the entity body is constructed as json and a charset value is included in the content-type, get body as a byte[]
 //Due to windows test failure : https://github.com/ballerina-platform/module-ballerina-mime/issues/19
@@ -1065,7 +1192,7 @@ public function getChannelFromMultipartEntity() {
 
     Entity[] bodyParts = [bodyPart1, bodyPart2];
     Entity multipartEntity = new;
-    multipartEntity.setBodyParts(bodyParts);
+    multipartEntity.setBody(bodyParts);
 
     var result = multipartEntity.getByteChannel();
     if (result is error) {

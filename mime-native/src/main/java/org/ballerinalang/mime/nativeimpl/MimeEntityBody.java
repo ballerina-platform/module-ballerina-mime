@@ -302,4 +302,6 @@ public class MimeEntityBody {
         EntityBodyHandler.addMessageDataSource(entityObj, xmlContent);
         MimeUtil.setMediaTypeToEntity(entityObj, contentType != null ? contentType.getValue() : APPLICATION_XML);
     }
+
+    private MimeEntityBody() {}
 }

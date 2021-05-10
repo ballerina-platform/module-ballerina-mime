@@ -1,3 +1,6 @@
+ignore:
+    - "mime-native/src/main/java/org/ballerinalang/mime/util/ExternTestUtils"
+
 coverage:
   precision: 2
   round: down
