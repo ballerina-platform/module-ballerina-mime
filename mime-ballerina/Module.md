@@ -1,6 +1,6 @@
 ## Overview
 
-This module provides functions to encapsulate multiple body parts such as attachments into a single message. 
+This module provides APIs to encapsulate multiple body parts such as attachments into a single message. 
 
 The communication of such messages follow the MIME (Multipurpose Internet Mail Extensions) specification as specified in 
 the [RFC 2045 standard](https://www.ietf.org/rfc/rfc2045.txt).
