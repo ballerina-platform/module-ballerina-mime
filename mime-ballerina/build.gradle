@@ -14,9 +14,6 @@
  * limitations under the License.
  *
  */
-
-import org.apache.tools.ant.taskdefs.condition.Os
-
 buildscript {
     repositories {
         maven {
@@ -44,7 +41,7 @@ def originalDependencies = ballerinaDependencyFile.text
 
 def stripBallerinaExtensionVersion(String extVersion) {
     if (extVersion.matches(project.ext.timestampedVersionRegex)) {
-        def splitVersion = extVersion.split('-');
+        def splitVersion = extVersion.split('-')
         if (splitVersion.length > 3) {
             def strippedValues = splitVersion[0..-4]
             return strippedValues.join('-')
@@ -61,10 +58,10 @@ configurations {
 }
 
 dependencies {
-    externalJars (group: 'org.jvnet.mimepull', name: 'mimepull', version: "${mimepullVersion}") {
+    externalJars(group: 'org.jvnet.mimepull', name: 'mimepull', version: "${mimepullVersion}") {
         transitive = false
     }
-    externalJars (group: 'com.sun.activation', name: 'jakarta.activation', version: "${jakartaActivationVersion}") {
+    externalJars(group: 'com.sun.activation', name: 'jakarta.activation', version: "${jakartaActivationVersion}") {
         transitive = false
     }
     externalJars(group: 'org.testng', name: 'testng', version: "${testngVersion}")
@@ -72,7 +69,7 @@ dependencies {
 
 apply plugin: 'io.ballerina.plugin'
 
-ballerina{
+ballerina {
     module = packageName
     langVersion = ballerinaLangVersion
     testCoverageParam = "--code-coverage --jacoco-xml --includes=org.ballerinalang.mime.*:ballerina.mime.*"
