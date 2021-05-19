@@ -377,7 +377,7 @@ public class Entity {
     # entity.setByteArray(content.toBytes());
     # ```
     #
-    # + blobContent - byte[] content that needs to be set to the entity
+    # + blobContent - `byte[]` content that needs to be set to the entity
     # + contentType - Content type to be used with the payload. This is an optional parameter.
     #                 The default value is `application/octet-stream`
     public isolated function setByteArray(@untainted byte[] blobContent,
@@ -386,7 +386,7 @@ public class Entity {
     }
 
     # Gets the entity body as a `byte[]` from a given entity. If the entity size is considerably large, consider
-    # using the getByteStream() method instead.
+    # using the `getByteStream()` method instead.
     # ```ballerina
     # byte[]|mime:ParserError result = entity.getByteArray();
     # ```
@@ -437,12 +437,12 @@ public class Entity {
         return externGetByteChannel(self);
     }
 
-    # Gets the entity body as a stream of byte[] from a given entity.
+    # Gets the entity body as a stream of `byte[]` from a given entity.
     # ```ballerina
     # stream<byte[], io:Error?>|mime:ParserError str = entity.getByteStream();
     # ```
     #
-    # + arraySize - A defaultable paramerter to state the size of the byte array. Default size is 8KB
+    # + arraySize - A defaultable parameter to state the size of the byte array. The default size is 8KB
     # + return - A byte stream from which the payload can be read or `mime:ParserError` in case of errors
     public isolated function getByteStream(int arraySize = 8196) returns @tainted stream<byte[], io:Error?>|ParserError {
         var value = externGetByteStream(self);
@@ -492,14 +492,14 @@ public class Entity {
         }
     }
 
-    # Sets body parts to entity. This method overrides any existing `content-type` headers
+    # Sets the body parts to the entity. This method overrides any existing `content-type` headers
     # with the default `multipart/form-data` content-type. The default `multipart/form-data` value can be overridden
     # by passing the content type as an optional parameter.
     # ```ballerina
     # multipartEntity.setBodyParts(bodyParts, contentType);
     # ```
     #
-    # + bodyParts - Body parts, which needs to be set to the entity
+    # + bodyParts - Body parts, which need to be set to the entity
     # + contentType - Content-type to be used with the payload. This is an optional parameter.
     #                The default value is `multipart/form-data`.
     public isolated function setBodyParts(@untainted Entity[] bodyParts,
@@ -786,7 +786,7 @@ public isolated function getMediaType(string contentType) returns MediaType|Inva
     name: "getMediaType"
 } external;
 
-# Given the Content-Disposition as a string, gets the ContentDisposition object with it.
+# Given the Content-Disposition as a string, gets the `ContentDisposition` object with it.
 # ```ballerina
 # mime:ContentDisposition cDisposition = getContentDispositionObject("form-data; name=filepart; filename=file-01.txt");
 # ```
