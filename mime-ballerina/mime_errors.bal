@@ -62,4 +62,3 @@ public type IdleTimeoutTriggeredError distinct Error;
 
 # Represents a `NoContentError` with the message and the cause.
 public type NoContentError distinct Error;
-

@@ -109,7 +109,6 @@ public class MediaType {
     # + return - Content type with parameters as a `string`
     public isolated function toString() returns string {
         string contentType = self.getBaseType();
-        // map<string> parameters = self.parameters;
         string[] arrKeys = self.parameters.keys();
         int size = arrKeys.length();
         if (size > 0) {
@@ -245,6 +244,9 @@ public class Entity {
     }
 
     # Gets the content disposition of the entity.
+    # ```ballerina
+    # mime:ContentDisposition contentDisposition = mimeEntity.getContentDisposition();
+    # ```
     #
     # + return - A `ContentDisposition` object
     public isolated function getContentDisposition() returns ContentDisposition {
@@ -310,6 +312,9 @@ public class Entity {
     }
 
     # Extracts the JSON body from the entity.
+    # ```ballerina
+    # json|mime:ParserError result = entity.getJson();
+    # ```
     #
     # + return - `json` data extracted from the entity body or else an `mime:ParserError` if the entity body is not a JSON
     public isolated function getJson() returns @tainted json|ParserError {
@@ -331,6 +336,9 @@ public class Entity {
     }
 
     # Extracts the `xml` body from the entity.
+    # ```ballerina
+    # xml|mime:ParserError result = entity.getXml();
+    # ```
     #
     # + return - `xml` data extracted from the entity body or else an `mime:ParserError` if the entity body is not an XML
     public isolated function getXml() returns @tainted xml|ParserError {
@@ -352,6 +360,9 @@ public class Entity {
     }
 
     # Extracts the text body from the entity. If the entity body is not text compatible, an error is returned.
+    # ```ballerina
+    # string|mime:ParserError result = entity.getText();
+    # ```
     #
     # + return - `string` data extracted from the the entity body or else an `mime:ParserError` if the entity body is not
     #            text compatible
@@ -362,8 +373,11 @@ public class Entity {
     # Sets the entity body with the given byte[] content. This method overrides any existing `content-type` headers
     # with the default content-type, which is `application/octet-stream`. This default value
     # can be overridden by passing the content type as an optional parameter.
+    # ```ballerina
+    # entity.setByteArray(content.toBytes());
+    # ```
     #
-    # + blobContent - byte[] content that needs to be set to the entity
+    # + blobContent - `byte[]` content that needs to be set to the entity
     # + contentType - Content type to be used with the payload. This is an optional parameter.
     #                 The default value is `application/octet-stream`
     public isolated function setByteArray(@untainted byte[] blobContent,
@@ -372,7 +386,10 @@ public class Entity {
     }
 
     # Gets the entity body as a `byte[]` from a given entity. If the entity size is considerably large, consider
-    # using the getByteStream() method instead.
+    # using the `getByteStream()` method instead.
+    # ```ballerina
+    # byte[]|mime:ParserError result = entity.getByteArray();
+    # ```
     #
     # + return - `byte[]` data extracted from the the entity body or else a `mime:ParserError` in case of
     #            errors
@@ -383,6 +400,9 @@ public class Entity {
     # Sets the entity body with the given byte channel content. This method overrides any existing content-type headers
     # with the default content-type, which is `application/octet-stream`. This default value
     # can be overridden by passing the content-type as an optional parameter.
+    # ```ballerina
+    # entity.setByteChannel(byteChannel);
+    # ```
     #
     # + byteChannel - Byte channel, which needs to be set to the entity
     # + contentType - Content-type to be used with the payload. This is an optional parameter.
@@ -395,6 +415,9 @@ public class Entity {
     # Sets the entity body with the given byte stream content. This method overrides any existing content-type headers
     # with the default content-type, which is `application/octet-stream`. This default value
     # can be overridden by passing the content-type as an optional parameter.
+    # ```ballerina
+    # entity.setByteStream(byteStream);
+    # ```
     #
     # + byteStream - Byte stream, which needs to be set to the entity
     # + contentType - Content-type to be used with the payload. This is an optional parameter.
@@ -405,15 +428,21 @@ public class Entity {
     }
 
     # Gets the entity body as a byte channel from a given entity.
+    # ```ballerina
+    # io:ReadableByteChannel|mime:ParserError result = entity.getByteChannel();
+    # ```
     #
     # + return - An `io:ReadableByteChannel` or else a `mime:ParserError` record will be returned in case of errors
     isolated function getByteChannel() returns @tainted io:ReadableByteChannel|ParserError {
         return externGetByteChannel(self);
     }
 
-    # Gets the entity body as a stream of byte[] from a given entity.
+    # Gets the entity body as a stream of `byte[]` from a given entity.
+    # ```ballerina
+    # stream<byte[], io:Error?>|mime:ParserError str = entity.getByteStream();
+    # ```
     #
-    # + arraySize - A defaultable paramerter to state the size of the byte array. Default size is 8KB
+    # + arraySize - A defaultable parameter to state the size of the byte array. The default size is 8KB
     # + return - A byte stream from which the payload can be read or `mime:ParserError` in case of errors
     public isolated function getByteStream(int arraySize = 8196) returns @tainted stream<byte[], io:Error?>|ParserError {
         var value = externGetByteStream(self);
@@ -426,6 +455,9 @@ public class Entity {
     }
 
     # Gets the body parts from a given entity.
+    # ```ballerina
+    # mime:Entity[]|mime:ParserError result = multipartEntity.getBodyParts();
+    # ```
     #
     # + return - An array of body parts(`Entity[]`) extracted from the entity body or else a `mime:ParserError` if the
     #            entity body is not a set of the body parts
@@ -434,6 +466,9 @@ public class Entity {
     }
 
     # Gets the body parts as a byte channel from a given entity.
+    # ```ballerina
+    # io:ReadableByteChannel|mime:ParserError result = multipartEntity.getBodyPartsAsChannel();
+    # ```
     #
     # + return - Body parts as a byte channel
     isolated function getBodyPartsAsChannel() returns @tainted io:ReadableByteChannel|ParserError {
@@ -441,6 +476,9 @@ public class Entity {
     }
 
     # Gets the body parts as a byte stream from a given entity.
+    # ```ballerina
+    # stream<byte[], io:Error?>|mime:ParserError str = multipartEntity.getBodyPartsAsStream();
+    # ```
     #
     # + arraySize - A defaultable paramerter to state the size of the byte array. Default size is 8KB
     # + return - Body parts as a byte stream
@@ -454,11 +492,14 @@ public class Entity {
         }
     }
 
-    # Sets body parts to entity. This method overrides any existing `content-type` headers
+    # Sets the body parts to the entity. This method overrides any existing `content-type` headers
     # with the default `multipart/form-data` content-type. The default `multipart/form-data` value can be overridden
     # by passing the content type as an optional parameter.
+    # ```ballerina
+    # multipartEntity.setBodyParts(bodyParts, contentType);
+    # ```
     #
-    # + bodyParts - Body parts, which needs to be set to the entity
+    # + bodyParts - Body parts, which need to be set to the entity
     # + contentType - Content-type to be used with the payload. This is an optional parameter.
     #                The default value is `multipart/form-data`.
     public isolated function setBodyParts(@untainted Entity[] bodyParts,
@@ -549,6 +590,9 @@ public class Entity {
     }
 
     # Removes the given header from the entity.
+    # ```ballerina
+    # mimeEntity.removeHeader("custom-header");
+    # ```
     #
     # + headerName - Header name
     public isolated function removeHeader(@untainted string headerName) {
@@ -569,12 +613,18 @@ public class Entity {
     }
 
     # Removes all headers associated with the entity.
+    # ```ballerina
+    # mimeEntity.removeAllHeaders();
+    # ```
     public isolated function removeAllHeaders() {
         self.headerMap = {};
         self.headerNames.removeAll();
     }
 
     # Checks whether the requested header key exists in the header map.
+    # ```ballerina
+    # boolean res = mimeEntity.hasHeader("custom-header");
+    # ```
     #
     # + headerName - Header name
     # + return - `true` if the specified header key exists
@@ -725,6 +775,9 @@ isolated function getCaseSensitiveHeaderName(string[] headerNames, string header
 }
 
 # Gets the `MediaType` object populated with it when the `Content-Type` is in string.
+# ```ballerina
+# mime:MediaType|mime:InvalidContentTypeError returnVal = getMediaType("custom-header");
+# ```
 #
 # + contentType - Content-Type in string
 # + return - `MediaType` object or else a `mime:InvalidContentTypeError` in case of an invalid content-type
@@ -733,7 +786,10 @@ public isolated function getMediaType(string contentType) returns MediaType|Inva
     name: "getMediaType"
 } external;
 
-# Given the Content-Disposition as a string, gets the ContentDisposition object with it.
+# Given the Content-Disposition as a string, gets the `ContentDisposition` object with it.
+# ```ballerina
+# mime:ContentDisposition cDisposition = getContentDispositionObject("form-data; name=filepart; filename=file-01.txt");
+# ```
 #
 # + contentDisposition - Content disposition string
 # + return - A `ContentDisposition` object

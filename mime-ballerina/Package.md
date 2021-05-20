@@ -1,12 +1,17 @@
 ## Package Overview
 
-This package provides functions to encapsulate multiple body parts such as attachments into a single message. The
- communication of such messages follow the MIME (Multipurpose Internet Mail Extensions) specification as specified in
-  the [RFC 2045 standard](https://www.ietf.org/rfc/rfc2045.txt).
+The `mime` library is one of the standard library packages of the<a target="_blank" href="https://ballerina.io/"> Ballerina</a> language.
 
-> Entity refers to the header fields and the content of a message or a part of the body in a multipart entity. 
+It provides a set of APIs to work with messages, which follow the Multipurpose Internet Mail Extensions
+(MIME) specification as specified in the [RFC 2045 standard](https://www.ietf.org/rfc/rfc2045.txt)
 
-### Modify and retrieve the data in an entity
-This package provides functions to set and get an entity body from different kinds of message types such as XML, text, JSON, byte[], and body parts. Headers can be modified through functions such as `addHeader()`, `setHeader()`, `removeHeader()`, etc. 
+## Report Issues
 
-For information on the operations, which you can perform with this package, see the below **Functions**. For examples on the usage of the operations, see the [Request with multiparts Example](https://ballerina.io/learn/by-example/request-with-multiparts.html) and [Response with multiparts Example](https://ballerina.io/learn/by-example/response-with-multiparts.html).
+To report bugs, request new features, start new discussions, view project boards, etc., go to the [Ballerina 
+Standard Library parent repository](https://github.com/ballerina-platform/ballerina-standard-library).
+
+## Useful Links
+
+* Discuss code changes of the Ballerina project in [ballerina-dev@googlegroups.com](mailto:ballerina-dev@googlegroups.com).
+* Chat live with us via our [Slack channel](https://ballerina.io/community/slack/).
+* Post all technical questions on Stack Overflow with the [#ballerina](https://stackoverflow.com/questions/tagged/ballerina) tag.
