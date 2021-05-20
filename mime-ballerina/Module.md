@@ -1,7 +1,7 @@
 ## Overview
 
-This module provides a set of APIs to work with messages which follow the Multipurpose Internet Mail Extensions 
-(MIME) specification as specified in the [RFC 2045 standard](https://www.ietf.org/rfc/rfc2045.txt)
+This module provides a set of APIs to work with messages, which follow the Multipurpose Internet Mail Extensions 
+(MIME) specification as specified in the [RFC 2045 standard](https://www.ietf.org/rfc/rfc2045.txt).
 
 > Entity refers to the header fields and the content of a message or a part of the body in a multipart entity. 
 
@@ -19,4 +19,4 @@ JSON, byte[], and body parts. Headers can be modified through functions such as 
 ### Handling large files
 
 The entity object method `setFileAsEntityBody()` can be used to set large files as the entity body and 
-able to read it as a stream using the `getByteStream()` function.
+is able to read it as a stream using the `getByteStream()` function.

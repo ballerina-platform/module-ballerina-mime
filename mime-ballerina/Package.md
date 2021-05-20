@@ -1,14 +1,14 @@
 ## Package Overview
 
-The MIME library is one of the standard library packages of the<a target="_blank" href="https://ballerina.io/"> Ballerina</a> language.
+The `mime` library is one of the standard library packages of the<a target="_blank" href="https://ballerina.io/"> Ballerina</a> language.
 
-It provides a set of APIs to work with messages which follow the Multipurpose Internet Mail Extensions
+It provides a set of APIs to work with messages, which follow the Multipurpose Internet Mail Extensions
 (MIME) specification as specified in the [RFC 2045 standard](https://www.ietf.org/rfc/rfc2045.txt)
 
 ## Report Issues
 
-To report bugs, request new features, start new discussions, view project boards, etc. please visit Ballerina 
-Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library).
+To report bugs, request new features, start new discussions, view project boards, etc., go to the [Ballerina 
+Standard Library parent repository](https://github.com/ballerina-platform/ballerina-standard-library).
 
 ## Useful Links
 

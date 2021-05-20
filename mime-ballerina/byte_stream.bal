@@ -49,18 +49,18 @@ class ByteStream {
     # record {|byte[] value;|}|io:Error? data = streamer.next();
     # ```
     #
-    # + return - A `byte[]` when the stream is avaliable, nil if the stream has reached the end, or else an `io:Error`
+    # + return - A `byte[]` when the stream is avaliable, `()` if the stream has reached the end, or else an `io:Error`
     public isolated function next() returns record {|byte[] value;|}|io:Error? {
         return externGetStreamEntryRecord(self.entity, self.arraySize);
     }
 
-    # Close the stream. The primary usage of this function is to close the stream without reaching the end.
-    # If the stream reaches the end, the byteStream.next() will automatically close the stream.
+    # Closes the stream. The primary usage of this function is to close the stream without reaching the end.
+    # If the stream reaches the end, the `byteStream.next()` will automatically close the stream.
     # ```ballerina
     # io:Error? result = streamer.close();
     # ```
     #
-    # + return - A nil when the closing was successful or an `io:Error`
+    # + return - `()` when the closing was successful or an `io:Error`
     public isolated function close() returns io:Error? {
         if (!self.isClosed) {   
             var closeResult = externCloseInputStream(self.entity);
