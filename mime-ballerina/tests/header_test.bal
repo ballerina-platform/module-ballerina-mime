@@ -27,14 +27,14 @@ public function testGetHeaderAsIs() {
 }
 
 //Test whether the empty http header value is returned when the header exist
-@test:Config {}
-public function testGetEmptyHeaderValue() {
-    string headerName = "X-Empty-Header";
-    string headerValue = "";
-    string headerNameToBeUsedForRetrieval = "X-Empty-Header";
-    string returnVal = testAddHeader(headerName, headerValue, headerNameToBeUsedForRetrieval);
-    test:assertEquals(returnVal, headerValue, msg = "Found unexpected output");
-}
+// @test:Config {}
+// public function testGetEmptyHeaderValue() {
+//     string headerName = "X-Empty-Header";
+//     string headerValue = "";
+//     string headerNameToBeUsedForRetrieval = "X-Empty-Header";
+//     string returnVal = testAddHeader(headerName, headerValue, headerNameToBeUsedForRetrieval);
+//     test:assertEquals(returnVal, headerValue, msg = "Found unexpected output");
+// }
 
 //Test whether the case is ignored when dealing with http headers
 @test:Config {}
