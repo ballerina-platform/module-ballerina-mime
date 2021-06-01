@@ -23,6 +23,7 @@ import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MapType;
 import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BString;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -34,9 +35,9 @@ public class HeaderUtilTest {
     @Test
     public void testGetParamMapWithOutSemiColon() {
         String headerValue = "application/json";
-        BMap returnVal = HeaderUtil.getParamMap(headerValue);
+        BMap<BString, Object> returnVal = HeaderUtil.getParamMap(headerValue);
         MapType stringMapType = TypeCreator.createMapType(PredefinedTypes.TYPE_STRING);
-        BMap actual = ValueCreator.createMapValue(stringMapType);
+        BMap<BString, Object> actual = ValueCreator.createMapValue(stringMapType);
         Assert.assertEquals(returnVal, actual);
     }
 
