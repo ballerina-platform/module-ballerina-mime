@@ -55,4 +55,20 @@ public class MimeUtilTest {
         Assert.assertNull(returnVal);
     }
 
+    @Test
+    public void testGenerateAsJSONWithBStreamingJsonInstance() {
+        Object value = TestUtils.getNullBStreamingJson();
+        BObject entity = TestUtils.getNullBObject();
+        boolean returnVal = MimeUtil.generateAsJSON(value, entity);
+        Assert.assertFalse(returnVal);
+    }
+
+    @Test
+    public void testGenerateAsJSONWithNullEntity() {
+        Object value = new Object();
+        BObject entity = TestUtils.getNullBObject();
+        boolean returnVal = MimeUtil.generateAsJSON(value, entity);
+        Assert.assertFalse(returnVal);
+    }
+
 }
