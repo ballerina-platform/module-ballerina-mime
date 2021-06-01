@@ -21,9 +21,10 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="Mime test suite" parallel="false">
 
-    <test name="Ballerina Mime native Tests" parallel="false">
+    <test name="Ballerina Mime util Tests" parallel="false">
         <classes>
             <class name="org.ballerinalang.mime.util.MimeUtilTest"/>
+            <class name="org.ballerinalang.mime.util.EntityHeaderHandlerTest"/>
         </classes>
     </test>
 
