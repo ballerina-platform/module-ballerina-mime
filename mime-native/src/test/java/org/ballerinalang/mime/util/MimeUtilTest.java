@@ -22,8 +22,6 @@ import io.ballerina.runtime.api.values.BObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import static org.ballerinalang.mime.util.MimeConstants.MEDIA_TYPE_FIELD;
-
 /**
  * A unit test class for Mime module MimeUtil class functions.
  */
