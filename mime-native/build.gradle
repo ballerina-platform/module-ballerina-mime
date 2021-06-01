@@ -21,6 +21,10 @@ plugins {
     id 'com.github.spotbugs'
 }
 
+jacoco {
+    toolVersion = "0.8.6"
+}
+
 description = 'Ballerina - Mime Java Utils'
 
 dependencies {
@@ -37,6 +41,33 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-jdk14', version: "${slf4jVersion}"
     compile group: 'org.testng', name: 'testng', version: "${testngVersion}"
 }
+
+test {
+    useTestNG() {
+        suites 'src/test/resources/testng.xml'
+    }
+    testLogging.showStandardStreams = true
+    testLogging {
+        events "PASSED", "FAILED", "SKIPPED"
+        afterSuite { desc, result ->
+            if (!desc.parent) { // will match the outermost suite
+                def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)"
+                def startItem = '|  ', endItem = '  |'
+                def repeatLength = startItem.length() + output.length() + endItem.length()
+                println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
+            }
+        }
+    }
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.enabled true
+    }
+}
+
 
 checkstyle {
     toolVersion '7.8.2'
