@@ -85,6 +85,16 @@ public function testToStringOnMediaTypeFunc() {
     test:assertEquals(result, "application/test+xml; charset=utf-8", msg = "Found unexpected output");
 }
 
+@test:Config {}
+public function testToStringOnMediaTypeFuncWithMultipleParameters() {
+    MediaType mediaType = new;
+    mediaType.primaryType = "application";
+    mediaType.subType = "test+xml";
+    mediaType.parameters = {"charset": "utf-8", "version": "1"};
+    string result = mediaType.toString();
+    test:assertEquals(result, "application/test+xml; charset=utf-8;version=1", msg = "Found unexpected output");
+}
+
 //Test 'getContentDispositionObject' function in ballerina/mime package
 @test:Config {}
 public function testGetContentDispositionObject() {
