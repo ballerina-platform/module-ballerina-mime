@@ -18,7 +18,9 @@
 
 package org.ballerinalang.mime.util;
 
+import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BString;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -33,6 +35,14 @@ public class EntityHeaderHandlerTest {
         String headerName = "testHeaderName";
         String returnVal = EntityHeaderHandler.getHeaderValue(entity, headerName);
         Assert.assertNull(returnVal);
+    }
+
+    @Test
+    public void testGetEntityHeaderMapWithNullEntity() {
+        BObject entity = TestUtils.getNullBObject();
+        BMap<BString, Object> returnVal = EntityHeaderHandler.getEntityHeaderMap(entity);
+        BMap<BString, Object> actualHttpHeaders = EntityHeaderHandler.getNewHeaderMap();
+        Assert.assertEquals(returnVal, actualHttpHeaders);
     }
 
 }
