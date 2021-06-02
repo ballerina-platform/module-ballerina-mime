@@ -23,12 +23,15 @@ import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MapType;
 import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import javax.activation.MimeTypeParseException;
+
 /**
- * A unit test class for Mime module EntityBodyHandler class functions.
+ * A unit test class for Mime module HeaderUtil class functions.
  */
 public class HeaderUtilTest {
 
@@ -39,6 +42,13 @@ public class HeaderUtilTest {
         MapType stringMapType = TypeCreator.createMapType(PredefinedTypes.TYPE_STRING);
         BMap<BString, Object> actual = ValueCreator.createMapValue(stringMapType);
         Assert.assertEquals(returnVal, actual);
+    }
+
+    @Test
+    public void testGetBaseTypeWithNullEntityStruct() throws MimeTypeParseException {
+        BObject entityStruct = TestUtils.getNullBObject();
+        String returnVal = HeaderUtil.getBaseType(entityStruct);
+        Assert.assertNull(returnVal);
     }
 
 }
