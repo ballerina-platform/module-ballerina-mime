@@ -25,6 +25,7 @@ import io.ballerina.runtime.api.types.MapType;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
+import org.mockito.Mockito;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -46,7 +47,7 @@ public class HeaderUtilTest {
 
     @Test
     public void testGetBaseTypeWithNullEntityStruct() throws MimeTypeParseException {
-        BObject entityStruct = TestUtils.getNullBObject();
+        BObject entityStruct = Mockito.mock(BObject.class);
         String returnVal = HeaderUtil.getBaseType(entityStruct);
         Assert.assertNull(returnVal);
     }
