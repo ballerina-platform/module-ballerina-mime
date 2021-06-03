@@ -29,24 +29,24 @@ import java.nio.channels.WritableByteChannel;
  */
 public class EntityWrapperTest {
 
-    @Test
+    EntityBodyChannel channel = Mockito.mock(EntityBodyChannel.class);
+    EntityWrapper entityWrapper = new EntityWrapper(channel);
+
+    @Test (expectedExceptions = UnsupportedOperationException.class)
     public void testTransfer() {
-        EntityWrapper entityWrapper = Mockito.mock(EntityWrapper.class);
         int position = 0;
         int count = 10;
         WritableByteChannel dstChannel = Mockito.mock(WritableByteChannel.class);
         entityWrapper.transfer(position, count, dstChannel);
     }
 
-    @Test
+    @Test (expectedExceptions = UnsupportedOperationException.class)
     public void testGetChannel() {
-        EntityWrapper entityWrapper = Mockito.mock(EntityWrapper.class);
         entityWrapper.getChannel();
     }
 
     @Test
     public void testRemaining() {
-        EntityWrapper entityWrapper = Mockito.mock(EntityWrapper.class);
         boolean returnValue = entityWrapper.remaining();
         Assert.assertFalse(returnValue);
     }
