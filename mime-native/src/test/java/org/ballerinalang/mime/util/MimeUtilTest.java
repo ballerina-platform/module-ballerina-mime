@@ -22,9 +22,12 @@ import io.ballerina.runtime.api.TypeTags;
 import io.ballerina.runtime.api.types.ArrayType;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BStreamingJson;
 import org.mockito.Mockito;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+//import java.awt.datatransfer.MimeTypeParseException;
 
 import static org.ballerinalang.mime.util.MimeConstants.MEDIA_TYPE_FIELD;
 import static org.ballerinalang.mime.util.MimeConstants.PRIMARY_TYPE_FIELD;
@@ -52,30 +55,30 @@ public class MimeUtilTest {
 
     @Test
     public void testGetBaseTypeWithNullEntity() {
-        BObject entity = TestUtils.getNullBObject();
+        BObject entity = Mockito.mock(BObject.class);
         String returnVal = MimeUtil.getBaseType(entity);
         Assert.assertNull(returnVal);
     }
 
     @Test
     public void testGetContentTypeWithParametersWithNullEntity() {
-        BObject entity = TestUtils.getNullBObject();
+        BObject entity = Mockito.mock(BObject.class);
         String returnVal = MimeUtil.getContentTypeWithParameters(entity);
         Assert.assertNull(returnVal);
     }
 
     @Test
     public void testGenerateAsJSONWithBStreamingJsonInstance() {
-        Object value = TestUtils.getNullBStreamingJson();
-        BObject entity = TestUtils.getNullBObject();
+        Object value = Mockito.mock(BStreamingJson.class);
+        BObject entity = Mockito.mock(BObject.class);
         boolean returnVal = MimeUtil.generateAsJSON(value, entity);
         Assert.assertFalse(returnVal);
     }
 
     @Test
     public void testGenerateAsJSONWithNullEntity() {
-        Object value = new Object();
-        BObject entity = TestUtils.getNullBObject();
+        Object value = Mockito.mock(Object.class);
+        BObject entity = Mockito.mock(BObject.class);
         boolean returnVal = MimeUtil.generateAsJSON(value, entity);
         Assert.assertFalse(returnVal);
     }
@@ -125,5 +128,12 @@ public class MimeUtilTest {
         returnVal = MimeUtil.isJSONCompatible(arrayType);
         Assert.assertFalse(returnVal);
     }
+
+//    @Test(expectedExceptions = MimeTypeParseException.class)
+//    public void testGetContentTypeParamValueWithIncorrectContentType() {
+//        String contentType = "testContentType";
+//        String parameterName = "charset";
+//        MimeUtil.getContentTypeParamValue(contentType, parameterName);
+//    }
 
 }
