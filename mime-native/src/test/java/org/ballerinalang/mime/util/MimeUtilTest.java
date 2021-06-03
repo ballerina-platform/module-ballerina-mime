@@ -18,6 +18,8 @@
 
 package org.ballerinalang.mime.util;
 
+import io.ballerina.runtime.api.TypeTags;
+import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.values.BObject;
 import org.mockito.Mockito;
 import org.testng.Assert;
@@ -93,6 +95,14 @@ public class MimeUtilTest {
         when(mediaType.get(SUBTYPE_FIELD)).thenReturn(field);
         when(bodyPart.get(MEDIA_TYPE_FIELD)).thenReturn(mediaType);
         boolean returnVal = MimeUtil.isNestedPartsAvailable(bodyPart);
+        Assert.assertFalse(returnVal);
+    }
+
+    @Test
+    public void testIsJsonCompatibleWithInCompatibleTag() {
+        Type type = Mockito.mock(Type.class);
+        when(type.getTag()).thenReturn(TypeTags.BYTE_TAG);
+        boolean returnVal = MimeUtil.isJSONCompatible(type);
         Assert.assertFalse(returnVal);
     }
 
