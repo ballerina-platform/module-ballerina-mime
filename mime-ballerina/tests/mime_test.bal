@@ -37,6 +37,13 @@ function getDispositionTestObj() returns ContentDisposition {
     return disposition;
 }
 
+function getDispositionWithoutParamsTestObj() returns ContentDisposition {
+    ContentDisposition disposition = new;
+    disposition.disposition = "inline";
+    return disposition;
+}
+
+
 //Test 'getMediaType' function in ballerina/mime package
 @test:Config {}
 public function testGetMediaTypeFunction() {
@@ -982,6 +989,15 @@ public function testSetContentDispositionToEntity() {
     test:assertEquals(disposition.toString(), "inline;name=\"test\";filename=\"test_file.xml\"",
                       msg = "Found unexpected output");
 }
+
+@test:Config {}
+public function testSetContentDispositionToEntityWithoutParams() {
+    Entity entity = new;
+    entity.setContentDisposition(getDispositionWithoutParamsTestObj());
+    ContentDisposition disposition = entity.getContentDisposition();
+    test:assertEquals(disposition.toString(), "inline", msg = "Found unexpected output");
+}
+
 
 @test:Config {}
 public function testSetContentDispositionAndGetValueAsHeader() {
