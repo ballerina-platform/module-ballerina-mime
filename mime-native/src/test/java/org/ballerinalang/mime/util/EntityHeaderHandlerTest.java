@@ -32,7 +32,7 @@ public class EntityHeaderHandlerTest {
 
     @Test
     public void testGetHeaderValueWithNullEntity() {
-        BObject entity = TestUtils.getNullBObject();
+        BObject entity = Mockito.mock(BObject.class);
         String headerName = "testHeaderName";
         String returnVal = EntityHeaderHandler.getHeaderValue(entity, headerName);
         Assert.assertNull(returnVal);
@@ -40,7 +40,7 @@ public class EntityHeaderHandlerTest {
 
     @Test
     public void testGetEntityHeaderMapWithNullEntity() {
-        BObject entity = TestUtils.getNullBObject();
+        BObject entity = Mockito.mock(BObject.class);
         BMap<BString, Object> returnVal = EntityHeaderHandler.getEntityHeaderMap(entity);
         BMap<BString, Object> actualHttpHeaders = EntityHeaderHandler.getNewHeaderMap();
         Assert.assertEquals(returnVal, actualHttpHeaders);
