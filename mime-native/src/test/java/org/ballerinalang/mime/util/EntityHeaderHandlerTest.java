@@ -21,6 +21,7 @@ package org.ballerinalang.mime.util;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
+import org.mockito.Mockito;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -43,6 +44,15 @@ public class EntityHeaderHandlerTest {
         BMap<BString, Object> returnVal = EntityHeaderHandler.getEntityHeaderMap(entity);
         BMap<BString, Object> actualHttpHeaders = EntityHeaderHandler.getNewHeaderMap();
         Assert.assertEquals(returnVal, actualHttpHeaders);
+    }
+
+    @Test
+    public void testAddHeaderWithNullEntity() {
+        BObject entity = Mockito.mock(BObject.class);
+        BMap<BString, Object> headers = Mockito.mock(BMap.class);
+        String key = "testKey";
+        String value = "testValue";
+        EntityHeaderHandler.addHeader(entity, headers, key, value);
     }
 
 }
