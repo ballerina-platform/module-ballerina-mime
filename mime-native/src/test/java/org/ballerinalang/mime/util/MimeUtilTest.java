@@ -19,6 +19,7 @@
 package org.ballerinalang.mime.util;
 
 import io.ballerina.runtime.api.TypeTags;
+import io.ballerina.runtime.api.types.ArrayType;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.values.BObject;
 import org.mockito.Mockito;
@@ -103,6 +104,25 @@ public class MimeUtilTest {
         Type type = Mockito.mock(Type.class);
         when(type.getTag()).thenReturn(TypeTags.BYTE_TAG);
         boolean returnVal = MimeUtil.isJSONCompatible(type);
+        Assert.assertFalse(returnVal);
+    }
+
+    @Test
+    public void testIsJsonCompatibleWithArrayTag() {
+        // When Element type is compatible
+        ArrayType arrayType = Mockito.mock(ArrayType.class);
+        Type type = Mockito.mock(Type.class);
+        when(type.getTag()).thenReturn(TypeTags.INT_TAG);
+        when(arrayType.getTag()).thenReturn(TypeTags.ARRAY_TAG);
+        when(arrayType.getElementType()).thenReturn(type);
+        boolean returnVal = MimeUtil.isJSONCompatible(arrayType);
+        Assert.assertTrue(returnVal);
+
+        // When Element type is not compatible
+        when(type.getTag()).thenReturn(TypeTags.BYTE_TAG);
+        when(arrayType.getTag()).thenReturn(TypeTags.ARRAY_TAG);
+        when(arrayType.getElementType()).thenReturn(type);
+        returnVal = MimeUtil.isJSONCompatible(arrayType);
         Assert.assertFalse(returnVal);
     }
 
