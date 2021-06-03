@@ -77,4 +77,11 @@ public class MimeUtilTest {
         Assert.assertNotNull(returnVal);
     }
 
+    @Test
+    public void testIsNestedPartsAvailable() {
+        BObject bodyPart = TestUtils.getNullBObject();
+        Boolean returnVal = MimeUtil.isNestedPartsAvailable(bodyPart);
+        Assert.assertFalse(returnVal);
+    }
+
 }
