@@ -19,8 +19,14 @@
 package org.ballerinalang.mime.util;
 
 import io.ballerina.runtime.api.values.BObject;
+import org.mockito.Mockito;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import static org.ballerinalang.mime.util.MimeConstants.MEDIA_TYPE_FIELD;
+import static org.ballerinalang.mime.util.MimeConstants.PRIMARY_TYPE_FIELD;
+import static org.ballerinalang.mime.util.MimeConstants.SUBTYPE_FIELD;
+import static org.mockito.Mockito.when;
 
 /**
  * A unit test class for Mime module MimeUtil class functions.
@@ -78,9 +84,15 @@ public class MimeUtilTest {
     }
 
     @Test
-    public void testIsNestedPartsAvailable() {
-        BObject bodyPart = TestUtils.getNullBObject();
-        Boolean returnVal = MimeUtil.isNestedPartsAvailable(bodyPart);
+    public void testIsNestedPartsAvailableWithoutBodyParts() {
+        BObject bodyPart = Mockito.mock(BObject.class);
+        BObject mediaType = Mockito.mock(BObject.class);
+        BObject field = Mockito.mock(BObject.class);
+        when(field.toString()).thenReturn("testField");
+        when(mediaType.get(PRIMARY_TYPE_FIELD)).thenReturn(field);
+        when(mediaType.get(SUBTYPE_FIELD)).thenReturn(field);
+        when(bodyPart.get(MEDIA_TYPE_FIELD)).thenReturn(mediaType);
+        boolean returnVal = MimeUtil.isNestedPartsAvailable(bodyPart);
         Assert.assertFalse(returnVal);
     }
 
