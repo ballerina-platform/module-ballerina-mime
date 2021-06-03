@@ -71,4 +71,10 @@ public class MimeUtilTest {
         Assert.assertFalse(returnVal);
     }
 
+    @Test
+    public void testGetNewMultipartDelimiter() {
+        String returnVal = MimeUtil.getNewMultipartDelimiter();
+        Assert.assertNotNull(returnVal);
+    }
+
 }
