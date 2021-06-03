@@ -27,6 +27,7 @@
             <class name="org.ballerinalang.mime.util.EntityHeaderHandlerTest"/>
             <class name="org.ballerinalang.mime.util.HeaderUtilTest"/>
             <class name="org.ballerinalang.mime.util.EntityWrapperTest"/>
+            <class name="org.ballerinalang.mime.util.MultipartDataSourceTest"/>
         </classes>
     </test>
 
