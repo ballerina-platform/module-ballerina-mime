@@ -46,6 +46,13 @@ public class HeaderUtilTest {
     }
 
     @Test
+    public void testGetParamMapWithOptionalParameter() {
+        String headerValue = "application/json; version;";
+        BMap<BString, Object> returnVal = HeaderUtil.getParamMap(headerValue);
+        Assert.assertNull(returnVal.get("version"));
+    }
+
+    @Test
     public void testGetBaseTypeWithNullEntityStruct() throws MimeTypeParseException {
         BObject entityStruct = Mockito.mock(BObject.class);
         String returnVal = HeaderUtil.getBaseType(entityStruct);
