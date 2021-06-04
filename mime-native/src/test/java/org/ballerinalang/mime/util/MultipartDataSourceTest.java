@@ -34,7 +34,6 @@ import java.util.Map;
  */
 public class MultipartDataSourceTest {
 
-
     Environment env = Mockito.mock(Environment.class);
     BObject entityStruct = Mockito.mock(BObject.class);
     String boundaryString = "e3a0b9ad7b4e7cdt";
