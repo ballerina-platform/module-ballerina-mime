@@ -1119,7 +1119,7 @@ public function testGetBodyPartsAsChannel() {
     //Create an array to hold all the body parts.
     Entity[] bodyParts = [bodyPart1, bodyPart2, bodyPart3, bodyPart4];
     Entity multipartEntity = new;
-    string contentType = MULTIPART_MIXED + "; boundary=e3a0b9ad7b4e7cdt; version=1";
+    string contentType = MULTIPART_MIXED + "; boundary=e3a0b9ad7b4e7cdt";
     multipartEntity.setBodyParts(bodyParts, contentType);
 
     //return multipartEntity.getBodyPartsAsChannel();
