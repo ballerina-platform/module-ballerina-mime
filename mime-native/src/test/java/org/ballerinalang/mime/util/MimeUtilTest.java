@@ -27,8 +27,7 @@ import org.mockito.Mockito;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-//import java.awt.datatransfer.MimeTypeParseException;
-
+import static org.ballerinalang.mime.util.MimeConstants.CONTENT_DISPOSITION_FIELD;
 import static org.ballerinalang.mime.util.MimeConstants.MEDIA_TYPE_FIELD;
 import static org.ballerinalang.mime.util.MimeConstants.PRIMARY_TYPE_FIELD;
 import static org.ballerinalang.mime.util.MimeConstants.SUBTYPE_FIELD;
@@ -129,11 +128,26 @@ public class MimeUtilTest {
         Assert.assertFalse(returnVal);
     }
 
-//    @Test(expectedExceptions = MimeTypeParseException.class)
-//    public void testGetContentTypeParamValueWithIncorrectContentType() {
-//        String contentType = "testContentType";
-//        String parameterName = "charset";
-//        MimeUtil.getContentTypeParamValue(contentType, parameterName);
-//    }
+    @Test
+    public void testGetContentDisposition() {
+        BObject entity = Mockito.mock(BObject.class);
+        BObject contentDispositionField = Mockito.mock(BObject.class);
+        when(entity.get(CONTENT_DISPOSITION_FIELD)).thenReturn(contentDispositionField);
+        String returnVal = MimeUtil.getContentDisposition(entity);
+        Assert.assertEquals(returnVal, "");
+    }
+
+    @Test
+    public void testGetContentDispositionWithMultipartFormData() {
+        BObject entity = Mockito.mock(BObject.class);
+        BObject contentDispositionField = Mockito.mock(BObject.class);
+        when(entity.get(CONTENT_DISPOSITION_FIELD)).thenReturn(contentDispositionField);
+        BObject mediaTypeField = Mockito.mock(BObject.class);
+        when(entity.get(MEDIA_TYPE_FIELD)).thenReturn(mediaTypeField);
+        when(mediaTypeField.get(PRIMARY_TYPE_FIELD)).thenReturn("multipart");
+        when(mediaTypeField.get(SUBTYPE_FIELD)).thenReturn("form-data");
+        String returnVal = MimeUtil.getContentDisposition(entity);
+        Assert.assertEquals(returnVal, "form-data");
+    }
 
 }
