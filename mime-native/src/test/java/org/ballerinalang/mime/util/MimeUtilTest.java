@@ -28,6 +28,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import static org.ballerinalang.mime.util.MimeConstants.CONTENT_DISPOSITION_FIELD;
+import static org.ballerinalang.mime.util.MimeConstants.DISPOSITION_FIELD;
 import static org.ballerinalang.mime.util.MimeConstants.MEDIA_TYPE_FIELD;
 import static org.ballerinalang.mime.util.MimeConstants.PRIMARY_TYPE_FIELD;
 import static org.ballerinalang.mime.util.MimeConstants.SUBTYPE_FIELD;
@@ -135,6 +136,10 @@ public class MimeUtilTest {
         when(entity.get(CONTENT_DISPOSITION_FIELD)).thenReturn(contentDispositionField);
         String returnVal = MimeUtil.getContentDisposition(entity);
         Assert.assertEquals(returnVal, "");
+
+        when(contentDispositionField.get(DISPOSITION_FIELD)).thenReturn("disposition");
+        returnVal = MimeUtil.getContentDisposition(entity);
+        Assert.assertEquals(returnVal, "disposition");
     }
 
     @Test
