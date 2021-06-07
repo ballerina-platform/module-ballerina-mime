@@ -18,20 +18,30 @@
 
 package org.ballerinalang.mime.util;
 
+import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.TypeTags;
+import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.types.ArrayType;
 import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BStreamingJson;
-import org.mockito.Mockito;
+import io.ballerina.runtime.api.values.BString;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import static org.ballerinalang.mime.util.MimeConstants.CONTENT_DISPOSITION_FIELD;
+import static org.ballerinalang.mime.util.MimeConstants.DEFAULT_PRIMARY_TYPE;
+import static org.ballerinalang.mime.util.MimeConstants.DEFAULT_SUB_TYPE;
 import static org.ballerinalang.mime.util.MimeConstants.DISPOSITION_FIELD;
 import static org.ballerinalang.mime.util.MimeConstants.MEDIA_TYPE_FIELD;
+import static org.ballerinalang.mime.util.MimeConstants.PARAMETER_MAP_FIELD;
 import static org.ballerinalang.mime.util.MimeConstants.PRIMARY_TYPE_FIELD;
 import static org.ballerinalang.mime.util.MimeConstants.SUBTYPE_FIELD;
+import static org.ballerinalang.mime.util.MimeConstants.SUFFIX_FIELD;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -55,30 +65,30 @@ public class MimeUtilTest {
 
     @Test
     public void testGetBaseTypeWithNullEntity() {
-        BObject entity = Mockito.mock(BObject.class);
+        BObject entity = mock(BObject.class);
         String returnVal = MimeUtil.getBaseType(entity);
         Assert.assertNull(returnVal);
     }
 
     @Test
     public void testGetContentTypeWithParametersWithNullEntity() {
-        BObject entity = Mockito.mock(BObject.class);
+        BObject entity = mock(BObject.class);
         String returnVal = MimeUtil.getContentTypeWithParameters(entity);
         Assert.assertNull(returnVal);
     }
 
     @Test
     public void testGenerateAsJSONWithBStreamingJsonInstance() {
-        Object value = Mockito.mock(BStreamingJson.class);
-        BObject entity = Mockito.mock(BObject.class);
+        Object value = mock(BStreamingJson.class);
+        BObject entity = mock(BObject.class);
         boolean returnVal = MimeUtil.generateAsJSON(value, entity);
         Assert.assertFalse(returnVal);
     }
 
     @Test
     public void testGenerateAsJSONWithNullEntity() {
-        Object value = Mockito.mock(Object.class);
-        BObject entity = Mockito.mock(BObject.class);
+        Object value = mock(Object.class);
+        BObject entity = mock(BObject.class);
         boolean returnVal = MimeUtil.generateAsJSON(value, entity);
         Assert.assertFalse(returnVal);
     }
@@ -91,9 +101,9 @@ public class MimeUtilTest {
 
     @Test
     public void testIsNestedPartsAvailableWithoutBodyParts() {
-        BObject bodyPart = Mockito.mock(BObject.class);
-        BObject mediaType = Mockito.mock(BObject.class);
-        BObject field = Mockito.mock(BObject.class);
+        BObject bodyPart = mock(BObject.class);
+        BObject mediaType = mock(BObject.class);
+        BObject field = mock(BObject.class);
         when(field.toString()).thenReturn("testField");
         when(mediaType.get(PRIMARY_TYPE_FIELD)).thenReturn(field);
         when(mediaType.get(SUBTYPE_FIELD)).thenReturn(field);
@@ -104,7 +114,7 @@ public class MimeUtilTest {
 
     @Test
     public void testIsJsonCompatibleWithInCompatibleTag() {
-        Type type = Mockito.mock(Type.class);
+        Type type = mock(Type.class);
         when(type.getTag()).thenReturn(TypeTags.BYTE_TAG);
         boolean returnVal = MimeUtil.isJSONCompatible(type);
         Assert.assertFalse(returnVal);
@@ -113,8 +123,8 @@ public class MimeUtilTest {
     @Test
     public void testIsJsonCompatibleWithArrayTag() {
         // When Element type is compatible
-        ArrayType arrayType = Mockito.mock(ArrayType.class);
-        Type type = Mockito.mock(Type.class);
+        ArrayType arrayType = mock(ArrayType.class);
+        Type type = mock(Type.class);
         when(type.getTag()).thenReturn(TypeTags.INT_TAG);
         when(arrayType.getTag()).thenReturn(TypeTags.ARRAY_TAG);
         when(arrayType.getElementType()).thenReturn(type);
@@ -131,8 +141,8 @@ public class MimeUtilTest {
 
     @Test
     public void testGetContentDisposition() {
-        BObject entity = Mockito.mock(BObject.class);
-        BObject contentDispositionField = Mockito.mock(BObject.class);
+        BObject entity =  mock(BObject.class);
+        BObject contentDispositionField =  mock(BObject.class);
         when(entity.get(CONTENT_DISPOSITION_FIELD)).thenReturn(contentDispositionField);
         String returnVal = MimeUtil.getContentDisposition(entity);
         Assert.assertEquals(returnVal, "");
@@ -144,15 +154,34 @@ public class MimeUtilTest {
 
     @Test
     public void testGetContentDispositionWithMultipartFormData() {
-        BObject entity = Mockito.mock(BObject.class);
-        BObject contentDispositionField = Mockito.mock(BObject.class);
+        BObject entity = mock(BObject.class);
+        BObject contentDispositionField = mock(BObject.class);
         when(entity.get(CONTENT_DISPOSITION_FIELD)).thenReturn(contentDispositionField);
-        BObject mediaTypeField = Mockito.mock(BObject.class);
+        BObject mediaTypeField = mock(BObject.class);
         when(entity.get(MEDIA_TYPE_FIELD)).thenReturn(mediaTypeField);
         when(mediaTypeField.get(PRIMARY_TYPE_FIELD)).thenReturn("multipart");
         when(mediaTypeField.get(SUBTYPE_FIELD)).thenReturn("form-data");
         String returnVal = MimeUtil.getContentDisposition(entity);
         Assert.assertEquals(returnVal, "form-data");
+    }
+
+    @Test
+    public void testSetContentTypeWithNullObjects() {
+        BObject mediaType = mock(BObject.class);
+        BObject entityStruct = mock(BObject.class);
+        String contentType = null;
+        BMap<BString, Object> parameterMap =
+                io.ballerina.runtime.api.creators.ValueCreator.createMapValue(
+                        TypeCreator.createMapType(PredefinedTypes.TYPE_STRING));
+        BString suffix, primaryType, subType;
+        primaryType = suffix = subType = PredefinedTypes.TYPE_STRING.getZeroValue();
+        MimeUtil.setContentType(mediaType, entityStruct, contentType);
+        verify(mediaType, times(1)).set(PRIMARY_TYPE_FIELD, primaryType);
+        verify(mediaType, times(1)).set(SUBTYPE_FIELD, suffix);
+        verify(mediaType, times(1)).set(SUFFIX_FIELD, subType);
+        verify(mediaType, times(1)).set(PARAMETER_MAP_FIELD, parameterMap);
+        verify(mediaType, times(1)).set(PRIMARY_TYPE_FIELD, DEFAULT_PRIMARY_TYPE);
+        verify(mediaType, times(1)).set(SUBTYPE_FIELD, DEFAULT_SUB_TYPE);
     }
 
 }
