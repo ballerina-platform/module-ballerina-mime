@@ -113,6 +113,21 @@ public function testGetContentDispositionObject() {
 }
 
 @test:Config {}
+public function testGetContentDispositionWithInvalidHeader() {
+    Entity entity = new;
+    entity.setHeader(CONTENT_DISPOSITION, ";");
+    var result = trap entity.getContentDisposition();
+
+    if result is error {
+        test:assertEquals(result.message(), "invalid header value: ;",
+            msg = "Found unexpected output");
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+
+}
+
+@test:Config {}
 public function testToStringOnContentDisposition() {
     ContentDisposition cDisposition = new;
     cDisposition.fileName = "file-01.txt";
