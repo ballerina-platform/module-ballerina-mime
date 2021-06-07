@@ -43,7 +43,6 @@ function getDispositionWithoutParamsTestObj() returns ContentDisposition {
     return disposition;
 }
 
-
 //Test 'getMediaType' function in ballerina/mime package
 @test:Config {}
 public function testGetMediaTypeFunction() {
@@ -124,7 +123,6 @@ public function testGetContentDispositionWithInvalidHeader() {
     } else {
         test:assertFail(msg = "Found unexpected output type");
     }
-
 }
 
 @test:Config {}
@@ -1012,7 +1010,6 @@ public function testSetContentDispositionToEntityWithoutParams() {
     ContentDisposition disposition = entity.getContentDisposition();
     test:assertEquals(disposition.toString(), "inline", msg = "Found unexpected output");
 }
-
 
 @test:Config {}
 public function testSetContentDispositionAndGetValueAsHeader() {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~ Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
   ~ WSO2 Inc. licenses this file to you under the Apache License,
   ~ Version 2.0 (the "License"); you may not use this file except
@@ -20,7 +20,6 @@
 
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="Mime test suite" parallel="false">
-
     <test name="Ballerina Mime util Tests" parallel="false">
         <classes>
             <class name="org.ballerinalang.mime.util.MimeUtilTest"/>
@@ -30,5 +29,4 @@
             <class name="org.ballerinalang.mime.util.MultipartDataSourceTest"/>
         </classes>
     </test>
-
 </suite>
