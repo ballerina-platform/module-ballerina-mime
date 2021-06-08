@@ -137,23 +137,6 @@ public class MimeUtil {
      * @param parameterName Name of the parameter
      * @return Parameter value as a string
      */
-    public static String getContentTypeBParamValue(String contentType, String parameterName) {
-        try {
-            MimeType mimeType = new MimeType(contentType);
-            MimeTypeParameterList parameterList = mimeType.getParameters();
-            return parameterList.get(parameterName);
-        } catch (MimeTypeParseException e) {
-            throw MimeUtil.createError(INVALID_CONTENT_TYPE_ERROR, e.getMessage());
-        }
-    }
-
-    /**
-     * Get parameter value from the content-type header.
-     *
-     * @param contentType   Content-Type value as a string
-     * @param parameterName Name of the parameter
-     * @return Parameter value as a string
-     */
     public static String getContentTypeParamValue(String contentType, String parameterName) {
         try {
             MimeType mimeType = new MimeType(contentType);

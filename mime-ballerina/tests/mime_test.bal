@@ -37,6 +37,12 @@ function getDispositionTestObj() returns ContentDisposition {
     return disposition;
 }
 
+function getDispositionWithoutParamsTestObj() returns ContentDisposition {
+    ContentDisposition disposition = new;
+    disposition.disposition = "inline";
+    return disposition;
+}
+
 //Test 'getMediaType' function in ballerina/mime package
 @test:Config {}
 public function testGetMediaTypeFunction() {
@@ -85,6 +91,16 @@ public function testToStringOnMediaTypeFunc() {
     test:assertEquals(result, "application/test+xml; charset=utf-8", msg = "Found unexpected output");
 }
 
+@test:Config {}
+public function testToStringOnMediaTypeFuncWithMultipleParameters() {
+    MediaType mediaType = new;
+    mediaType.primaryType = "application";
+    mediaType.subType = "test+xml";
+    mediaType.parameters = {"charset": "utf-8", "version": "1"};
+    string result = mediaType.toString();
+    test:assertEquals(result, "application/test+xml; charset=utf-8;version=1", msg = "Found unexpected output");
+}
+
 //Test 'getContentDispositionObject' function in ballerina/mime package
 @test:Config {}
 public function testGetContentDispositionObject() {
@@ -93,6 +109,20 @@ public function testGetContentDispositionObject() {
     test:assertEquals(cDisposition.name, "filepart", msg = "Found unexpected output");
     test:assertEquals(cDisposition.disposition, "form-data", msg = "Found unexpected output");
     test:assertTrue(cDisposition.parameters.length() == 0, msg = "Found unexpected output");
+}
+
+@test:Config {}
+public function testGetContentDispositionWithInvalidHeader() {
+    Entity entity = new;
+    entity.setHeader(CONTENT_DISPOSITION, ";");
+    var result = trap entity.getContentDisposition();
+
+    if result is error {
+        test:assertEquals(result.message(), "invalid header value: ;",
+            msg = "Found unexpected output");
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
 }
 
 @test:Config {}
@@ -974,6 +1004,14 @@ public function testSetContentDispositionToEntity() {
 }
 
 @test:Config {}
+public function testSetContentDispositionToEntityWithoutParams() {
+    Entity entity = new;
+    entity.setContentDisposition(getDispositionWithoutParamsTestObj());
+    ContentDisposition disposition = entity.getContentDisposition();
+    test:assertEquals(disposition.toString(), "inline", msg = "Found unexpected output");
+}
+
+@test:Config {}
 public function testSetContentDispositionAndGetValueAsHeader() {
     Entity entity = new;
     entity.setContentDisposition(getDispositionTestObj());
@@ -1093,7 +1131,7 @@ public function testGetBodyPartsAsChannel() {
     //Create an array to hold all the body parts.
     Entity[] bodyParts = [bodyPart1, bodyPart2, bodyPart3, bodyPart4];
     Entity multipartEntity = new;
-    string contentType = MULTIPART_MIXED + "; boundary=e3a0b9ad7b4e7cdt";
+    string contentType = MULTIPART_MIXED + "; boundary=e3a0b9ad7b4e7cdt; version=1";
     multipartEntity.setBodyParts(bodyParts, contentType);
 
     //return multipartEntity.getBodyPartsAsChannel();
