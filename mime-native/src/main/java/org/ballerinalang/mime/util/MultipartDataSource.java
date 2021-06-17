@@ -210,9 +210,7 @@ public class MultipartDataSource implements BRefValue {
         Object messageDataSource = EntityBodyHandler.getMessageDataSource(bodyPart);
         if (messageDataSource != null) {
             //TODO Recheck following logic
-            if (messageDataSource instanceof String || messageDataSource instanceof Long ||
-                    messageDataSource instanceof Double || messageDataSource instanceof Integer ||
-                    messageDataSource instanceof Boolean) {
+            if (messageDataSource instanceof BString) {
                 outputStream.write(messageDataSource.toString().getBytes(Charset.defaultCharset()));
             } else {
                 ((BRefValue) messageDataSource).serialize(outputStream);

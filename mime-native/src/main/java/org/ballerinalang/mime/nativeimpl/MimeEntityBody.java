@@ -294,7 +294,7 @@ public class MimeEntityBody {
     }
 
     public static void setText(BObject entityObj, BString textContent, BString contentType) {
-        EntityBodyHandler.addMessageDataSource(entityObj, textContent.getValue());
+        EntityBodyHandler.addMessageDataSource(entityObj, textContent);
         MimeUtil.setMediaTypeToEntity(entityObj, contentType != null ? contentType.getValue() : TEXT_PLAIN);
     }
 
