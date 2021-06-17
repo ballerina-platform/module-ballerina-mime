@@ -70,7 +70,6 @@ public abstract class MimeDataSourceBuilder {
         if (messageDataSource instanceof BArray) {
             return messageDataSource;
         }
-
         String contentTypeValue = EntityHeaderHandler.getHeaderValue(entityObj, MimeConstants.CONTENT_TYPE);
         if (isNotNullAndEmpty(contentTypeValue)) {
             String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
