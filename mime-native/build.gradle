@@ -84,8 +84,6 @@ tasks.withType(Checkstyle) {
 
 checkstyleMain.dependsOn(":build-config:checkstyle:downloadMultipleFiles")
 
-checkstyleTest.dependsOn(":build-config:checkstyle:downloadMultipleFiles")
-
 spotbugsMain {
     effort "max"
     reportLevel "low"
