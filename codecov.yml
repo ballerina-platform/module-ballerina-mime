@@ -1,5 +1,5 @@
 ignore:
-    - "mime-native/src/main/java/org/ballerinalang/mime/util/ExternTestUtils"
+    - "native/src/main/java/io/ballerina/stdlib/mime/util/ExternTestUtils"
 
 coverage:
   precision: 2
