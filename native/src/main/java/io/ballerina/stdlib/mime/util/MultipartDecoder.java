@@ -33,6 +33,13 @@ import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 
 import static io.ballerina.stdlib.mime.util.MimeConstants.BOUNDARY;
+import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_DISPOSITION_STRUCT;
+import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_ID_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.ENTITY;
+import static io.ballerina.stdlib.mime.util.MimeConstants.FIRST_ELEMENT;
+import static io.ballerina.stdlib.mime.util.MimeConstants.MAX_THRESHOLD_PERCENTAGE;
+import static io.ballerina.stdlib.mime.util.MimeConstants.MEDIA_TYPE;
+import static io.ballerina.stdlib.mime.util.MimeConstants.NO_CONTENT_LENGTH_FOUND;
 import static io.ballerina.stdlib.mime.util.MimeConstants.PARSER_ERROR;
 
 /**
@@ -94,7 +101,7 @@ public class MultipartDecoder {
      */
     private static Long getMemoryThreshold() {
         Long freeMemorySize = Runtime.getRuntime().freeMemory();
-        Double maxThreshold = freeMemorySize * MimeConstants.MAX_THRESHOLD_PERCENTAGE;
+        Double maxThreshold = freeMemorySize * MAX_THRESHOLD_PERCENTAGE;
         return maxThreshold.longValue();
     }
 
@@ -107,8 +114,8 @@ public class MultipartDecoder {
                                                List<MIMEPart> mimeParts) {
         ArrayList<BObject> bodyParts = new ArrayList<>();
         for (final MIMEPart mimePart : mimeParts) {
-            BObject partStruct = ValueCreator.createObjectValue(MimeUtil.getMimePackage(), MimeConstants.ENTITY);
-            BObject mediaType = ValueCreator.createObjectValue(MimeUtil.getMimePackage(), MimeConstants.MEDIA_TYPE);
+            BObject partStruct = ValueCreator.createObjectValue(MimeUtil.getMimePackage(), ENTITY);
+            BObject mediaType = ValueCreator.createObjectValue(MimeUtil.getMimePackage(), MEDIA_TYPE);
             populateBodyPart(mimePart, partStruct, mediaType);
             bodyParts.add(partStruct);
         }
@@ -131,7 +138,7 @@ public class MultipartDecoder {
         List<String> contentDispositionHeaders = mimePart.getHeader(MimeConstants.CONTENT_DISPOSITION);
         if (HeaderUtil.isHeaderExist(contentDispositionHeaders)) {
             BObject contentDisposition = ValueCreator.createObjectValue(MimeUtil.getMimePackage(),
-                                                                        MimeConstants.CONTENT_DISPOSITION_STRUCT);
+                                                                        CONTENT_DISPOSITION_STRUCT);
             populateContentDisposition(partStruct, contentDispositionHeaders, contentDisposition);
         }
         EntityBodyHandler.populateBodyContent(partStruct, mimePart);
@@ -141,7 +148,7 @@ public class MultipartDecoder {
                                                    List<String> contentDispositionHeaders,
                                                    BObject contentDisposition) {
         MimeUtil.setContentDisposition(contentDisposition, partStruct, contentDispositionHeaders
-                .get(MimeConstants.FIRST_ELEMENT));
+                .get(FIRST_ELEMENT));
     }
 
     private static void populateContentType(MIMEPart mimePart, BObject partStruct, BObject mediaType) {
@@ -149,15 +156,15 @@ public class MultipartDecoder {
     }
 
     private static void populateContentId(MIMEPart mimePart, BObject partStruct) {
-        partStruct.set(MimeConstants.CONTENT_ID_FIELD, StringUtils.fromString(mimePart.getContentId()));
+        partStruct.set(CONTENT_ID_FIELD, StringUtils.fromString(mimePart.getContentId()));
     }
 
     private static void populateContentLength(MIMEPart mimePart, BObject partStruct) {
         List<String> lengthHeaders = mimePart.getHeader(MimeConstants.CONTENT_LENGTH);
         if (HeaderUtil.isHeaderExist(lengthHeaders)) {
-            MimeUtil.setContentLength(partStruct, Integer.parseInt(lengthHeaders.get(MimeConstants.FIRST_ELEMENT)));
+            MimeUtil.setContentLength(partStruct, Integer.parseInt(lengthHeaders.get(FIRST_ELEMENT)));
         } else {
-            MimeUtil.setContentLength(partStruct, MimeConstants.NO_CONTENT_LENGTH_FOUND);
+            MimeUtil.setContentLength(partStruct, NO_CONTENT_LENGTH_FOUND);
         }
     }
 

@@ -39,6 +39,9 @@ import org.wso2.ballerinalang.compiler.util.TypeTags;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
+import static io.ballerina.stdlib.mime.util.MimeConstants.CHARSET;
+import static io.ballerina.stdlib.mime.util.MimeConstants.ENTITY_BYTE_CHANNEL;
+import static io.ballerina.stdlib.mime.util.MimeConstants.PARSER_ERROR;
 import static io.ballerina.stdlib.mime.util.MimeUtil.isNotNullAndEmpty;
 
 /**
@@ -69,7 +72,7 @@ public abstract class MimeDataSourceBuilder {
         }
         String contentTypeValue = EntityHeaderHandler.getHeaderValue(entityObj, MimeConstants.CONTENT_TYPE);
         if (isNotNullAndEmpty(contentTypeValue)) {
-            String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, MimeConstants.CHARSET);
+            String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
             if (isNotNullAndEmpty(charsetValue)) {
                 return ValueCreator.createArrayValue(
                         StringUtils.getJsonString(messageDataSource).getBytes(charsetValue));
@@ -167,15 +170,15 @@ public abstract class MimeDataSourceBuilder {
 
     private static void removeByteChannel(BObject entityObj) {
         //Set byte channel to null, once the message data source has been constructed
-        entityObj.addNativeData(MimeConstants.ENTITY_BYTE_CHANNEL, null);
+        entityObj.addNativeData(ENTITY_BYTE_CHANNEL, null);
     }
 
     protected static Object createError(Exception ex, String type) {
         String message = "Error occurred while extracting " + type + " data from entity";
         if (ex instanceof BError) {
-            return MimeUtil.createError(MimeConstants.PARSER_ERROR, message, (BError) ex);
+            return MimeUtil.createError(PARSER_ERROR, message, (BError) ex);
         }
-        return MimeUtil.createError(MimeConstants.PARSER_ERROR, message + ": " + getErrorMsg(ex), null);
+        return MimeUtil.createError(PARSER_ERROR, message + ": " + getErrorMsg(ex), null);
     }
 
     protected static String getErrorMsg(Throwable err) {

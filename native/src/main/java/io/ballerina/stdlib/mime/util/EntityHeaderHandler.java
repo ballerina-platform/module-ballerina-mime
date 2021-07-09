@@ -32,6 +32,9 @@ import org.jvnet.mimepull.Header;
 import java.util.List;
 import java.util.Locale;
 
+import static io.ballerina.stdlib.mime.util.MimeConstants.HEADERS_MAP_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.HEADER_NAMES_ARRAY_FIELD;
+
 /**
  * Handler to communicate with Entity Header map and Header name array.
  *
@@ -50,19 +53,19 @@ public class EntityHeaderHandler {
      */
     @SuppressWarnings("unchecked")
     public static BMap<BString, Object> getEntityHeaderMap(BObject entity) {
-        BMap<BString, Object> httpHeaders = (BMap<BString, Object>) entity.get(MimeConstants.HEADERS_MAP_FIELD);
+        BMap<BString, Object> httpHeaders = (BMap<BString, Object>) entity.get(HEADERS_MAP_FIELD);
         if (httpHeaders == null) {
             httpHeaders = getNewHeaderMap();
-            entity.set(MimeConstants.HEADERS_MAP_FIELD, httpHeaders);
+            entity.set(HEADERS_MAP_FIELD, httpHeaders);
         }
         return httpHeaders;
     }
 
     private static BArray getEntityHeaderNameArray(BObject entity) {
-        BArray headerNames = (BArray) entity.get(MimeConstants.HEADER_NAMES_ARRAY_FIELD);
+        BArray headerNames = (BArray) entity.get(HEADER_NAMES_ARRAY_FIELD);
         if (headerNames == null) {
             headerNames = getNewHeaderNamesArray();
-            entity.set(MimeConstants.HEADER_NAMES_ARRAY_FIELD, headerNames);
+            entity.set(HEADER_NAMES_ARRAY_FIELD, headerNames);
         }
         return headerNames;
     }
@@ -90,7 +93,7 @@ public class EntityHeaderHandler {
      */
     @SuppressWarnings("unchecked")
     public static String getHeaderValue(BObject entity, String headerName) {
-        BMap<BString, Object> headerMap = (BMap<BString, Object>) entity.get(MimeConstants.HEADERS_MAP_FIELD);
+        BMap<BString, Object> headerMap = (BMap<BString, Object>) entity.get(HEADERS_MAP_FIELD);
         if (headerMap == null) {
             return null;
         }

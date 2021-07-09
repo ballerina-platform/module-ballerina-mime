@@ -22,8 +22,10 @@ import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.stdlib.mime.util.MimeConstants;
 import io.ballerina.stdlib.mime.util.MimeUtil;
+
+import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_DISPOSITION_STRUCT;
+import static io.ballerina.stdlib.mime.util.MimeConstants.DISPOSITION_FIELD;
 
 /**
  * Functionality related to content disposition.
@@ -34,14 +36,14 @@ public class ContentDisposition {
 
     public static BObject getContentDispositionObject(BString contentDisposition) {
         BObject contentDispositionObj = ValueCreator.createObjectValue(MimeUtil.getMimePackage(),
-                                                                       MimeConstants.CONTENT_DISPOSITION_STRUCT);
+                                                                       CONTENT_DISPOSITION_STRUCT);
         MimeUtil.populateContentDispositionObject(contentDispositionObj, contentDisposition.getValue());
         return contentDispositionObj;
     }
 
     public static BString convertContentDispositionToString(BObject contentDispositionObj) {
         StringBuilder dispositionBuilder = new StringBuilder();
-        String disposition = String.valueOf(contentDispositionObj.get(MimeConstants.DISPOSITION_FIELD));
+        String disposition = String.valueOf(contentDispositionObj.get(DISPOSITION_FIELD));
         if (!disposition.isEmpty()) {
             dispositionBuilder.append(disposition);
             MimeUtil.convertDispositionObjectToString(dispositionBuilder, contentDispositionObj);

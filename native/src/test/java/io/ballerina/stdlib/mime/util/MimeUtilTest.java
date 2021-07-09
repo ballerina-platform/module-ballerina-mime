@@ -30,6 +30,15 @@ import io.ballerina.runtime.api.values.BString;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_DISPOSITION_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.DEFAULT_PRIMARY_TYPE;
+import static io.ballerina.stdlib.mime.util.MimeConstants.DEFAULT_SUB_TYPE;
+import static io.ballerina.stdlib.mime.util.MimeConstants.DISPOSITION_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.MEDIA_TYPE_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.PARAMETER_MAP_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.PRIMARY_TYPE_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.SUBTYPE_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.SUFFIX_FIELD;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -96,9 +105,9 @@ public class MimeUtilTest {
         BObject mediaType = mock(BObject.class);
         BObject field = mock(BObject.class);
         when(field.toString()).thenReturn("testField");
-        when(mediaType.get(MimeConstants.PRIMARY_TYPE_FIELD)).thenReturn(field);
-        when(mediaType.get(MimeConstants.SUBTYPE_FIELD)).thenReturn(field);
-        when(bodyPart.get(MimeConstants.MEDIA_TYPE_FIELD)).thenReturn(mediaType);
+        when(mediaType.get(PRIMARY_TYPE_FIELD)).thenReturn(field);
+        when(mediaType.get(SUBTYPE_FIELD)).thenReturn(field);
+        when(bodyPart.get(MEDIA_TYPE_FIELD)).thenReturn(mediaType);
         boolean returnVal = MimeUtil.isNestedPartsAvailable(bodyPart);
         Assert.assertFalse(returnVal);
     }
@@ -134,11 +143,11 @@ public class MimeUtilTest {
     public void testGetContentDisposition() {
         BObject entity =  mock(BObject.class);
         BObject contentDispositionField =  mock(BObject.class);
-        when(entity.get(MimeConstants.CONTENT_DISPOSITION_FIELD)).thenReturn(contentDispositionField);
+        when(entity.get(CONTENT_DISPOSITION_FIELD)).thenReturn(contentDispositionField);
         String returnVal = MimeUtil.getContentDisposition(entity);
         Assert.assertEquals(returnVal, "");
 
-        when(contentDispositionField.get(MimeConstants.DISPOSITION_FIELD)).thenReturn("disposition");
+        when(contentDispositionField.get(DISPOSITION_FIELD)).thenReturn("disposition");
         returnVal = MimeUtil.getContentDisposition(entity);
         Assert.assertEquals(returnVal, "disposition");
     }
@@ -147,11 +156,11 @@ public class MimeUtilTest {
     public void testGetContentDispositionWithMultipartFormData() {
         BObject entity = mock(BObject.class);
         BObject contentDispositionField = mock(BObject.class);
-        when(entity.get(MimeConstants.CONTENT_DISPOSITION_FIELD)).thenReturn(contentDispositionField);
+        when(entity.get(CONTENT_DISPOSITION_FIELD)).thenReturn(contentDispositionField);
         BObject mediaTypeField = mock(BObject.class);
-        when(entity.get(MimeConstants.MEDIA_TYPE_FIELD)).thenReturn(mediaTypeField);
-        when(mediaTypeField.get(MimeConstants.PRIMARY_TYPE_FIELD)).thenReturn("multipart");
-        when(mediaTypeField.get(MimeConstants.SUBTYPE_FIELD)).thenReturn("form-data");
+        when(entity.get(MEDIA_TYPE_FIELD)).thenReturn(mediaTypeField);
+        when(mediaTypeField.get(PRIMARY_TYPE_FIELD)).thenReturn("multipart");
+        when(mediaTypeField.get(SUBTYPE_FIELD)).thenReturn("form-data");
         String returnVal = MimeUtil.getContentDisposition(entity);
         Assert.assertEquals(returnVal, "form-data");
     }
@@ -167,12 +176,12 @@ public class MimeUtilTest {
         BString suffix, primaryType, subType;
         primaryType = suffix = subType = PredefinedTypes.TYPE_STRING.getZeroValue();
         MimeUtil.setContentType(mediaType, entityStruct, contentType);
-        verify(mediaType, times(1)).set(MimeConstants.PRIMARY_TYPE_FIELD, primaryType);
-        verify(mediaType, times(1)).set(MimeConstants.SUBTYPE_FIELD, suffix);
-        verify(mediaType, times(1)).set(MimeConstants.SUFFIX_FIELD, subType);
-        verify(mediaType, times(1)).set(MimeConstants.PARAMETER_MAP_FIELD, parameterMap);
-        verify(mediaType, times(1)).set(MimeConstants.PRIMARY_TYPE_FIELD, MimeConstants.DEFAULT_PRIMARY_TYPE);
-        verify(mediaType, times(1)).set(MimeConstants.SUBTYPE_FIELD, MimeConstants.DEFAULT_SUB_TYPE);
+        verify(mediaType, times(1)).set(PRIMARY_TYPE_FIELD, primaryType);
+        verify(mediaType, times(1)).set(SUBTYPE_FIELD, suffix);
+        verify(mediaType, times(1)).set(SUFFIX_FIELD, subType);
+        verify(mediaType, times(1)).set(PARAMETER_MAP_FIELD, parameterMap);
+        verify(mediaType, times(1)).set(PRIMARY_TYPE_FIELD, DEFAULT_PRIMARY_TYPE);
+        verify(mediaType, times(1)).set(SUBTYPE_FIELD, DEFAULT_SUB_TYPE);
     }
 
 }

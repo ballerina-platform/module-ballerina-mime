@@ -49,9 +49,33 @@ import javax.activation.MimeType;
 import javax.activation.MimeTypeParameterList;
 import javax.activation.MimeTypeParseException;
 
+import static io.ballerina.stdlib.mime.util.MimeConstants.ASSIGNMENT;
+import static io.ballerina.stdlib.mime.util.MimeConstants.BODY_PARTS;
+import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_DISPOSITION_FIELD;
 import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_DISPOSITION_FILENAME_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_DISPOSITION_FILE_NAME;
 import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_DISPOSITION_NAME;
 import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_DISPOSITION_NAME_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_DISPOSITION_PARA_MAP_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_TYPE;
+import static io.ballerina.stdlib.mime.util.MimeConstants.DEFAULT_PRIMARY_TYPE;
+import static io.ballerina.stdlib.mime.util.MimeConstants.DEFAULT_SUB_TYPE;
+import static io.ballerina.stdlib.mime.util.MimeConstants.DISPOSITION_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.DOUBLE_QUOTE;
+import static io.ballerina.stdlib.mime.util.MimeConstants.FORM_DATA_PARAM;
+import static io.ballerina.stdlib.mime.util.MimeConstants.INVALID_CONTENT_TYPE_ERROR;
+import static io.ballerina.stdlib.mime.util.MimeConstants.MEDIA_TYPE;
+import static io.ballerina.stdlib.mime.util.MimeConstants.MEDIA_TYPE_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.MULTIPART_AS_PRIMARY_TYPE;
+import static io.ballerina.stdlib.mime.util.MimeConstants.MULTIPART_FORM_DATA;
+import static io.ballerina.stdlib.mime.util.MimeConstants.PARAMETER_MAP_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.PRIMARY_TYPE_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.READABLE_BUFFER_SIZE;
+import static io.ballerina.stdlib.mime.util.MimeConstants.SEMICOLON;
+import static io.ballerina.stdlib.mime.util.MimeConstants.SIZE_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.SUBTYPE_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.SUFFIX_ATTACHMENT;
+import static io.ballerina.stdlib.mime.util.MimeConstants.SUFFIX_FIELD;
 
 /**
  * Mime utility functions are included in here.
@@ -68,11 +92,11 @@ public class MimeUtil {
      * @return content-type in 'primarytype/subType' format
      */
     public static String getBaseType(BObject entity) {
-        if (entity.get(MimeConstants.MEDIA_TYPE_FIELD) != null) {
-            BObject mediaType = (BObject) entity.get(MimeConstants.MEDIA_TYPE_FIELD);
+        if (entity.get(MEDIA_TYPE_FIELD) != null) {
+            BObject mediaType = (BObject) entity.get(MEDIA_TYPE_FIELD);
             if (mediaType != null) {
-                return mediaType.get(MimeConstants.PRIMARY_TYPE_FIELD).toString() + "/" +
-                        mediaType.get(MimeConstants.SUBTYPE_FIELD).toString();
+                return mediaType.get(PRIMARY_TYPE_FIELD).toString() + "/" +
+                        mediaType.get(SUBTYPE_FIELD).toString();
             }
         }
         return null;
@@ -85,20 +109,20 @@ public class MimeUtil {
      * @return content-type in 'primarytype/subType; key=value;' format
      */
     public static String getContentTypeWithParameters(BObject entity) {
-        if (entity.get(MimeConstants.MEDIA_TYPE_FIELD) == null) {
-            return EntityHeaderHandler.getHeaderValue(entity, MimeConstants.CONTENT_TYPE);
+        if (entity.get(MEDIA_TYPE_FIELD) == null) {
+            return EntityHeaderHandler.getHeaderValue(entity, CONTENT_TYPE);
         }
-        BObject mediaType = (BObject) entity.get(MimeConstants.MEDIA_TYPE_FIELD);
-        String primaryType = String.valueOf(mediaType.get(MimeConstants.PRIMARY_TYPE_FIELD));
-        String subType = String.valueOf(mediaType.get(MimeConstants.SUBTYPE_FIELD));
+        BObject mediaType = (BObject) entity.get(MEDIA_TYPE_FIELD);
+        String primaryType = String.valueOf(mediaType.get(PRIMARY_TYPE_FIELD));
+        String subType = String.valueOf(mediaType.get(SUBTYPE_FIELD));
         String contentType = null;
         if (!primaryType.isEmpty() && !subType.isEmpty()) {
             contentType = primaryType + "/" + subType;
-            if (mediaType.get(MimeConstants.PARAMETER_MAP_FIELD) != null) {
-                BMap<BString, Object> map = mediaType.get(MimeConstants.PARAMETER_MAP_FIELD) != null ?
-                        (BMap<BString, Object>) mediaType.get(MimeConstants.PARAMETER_MAP_FIELD) : null;
+            if (mediaType.get(PARAMETER_MAP_FIELD) != null) {
+                BMap<BString, Object> map = mediaType.get(PARAMETER_MAP_FIELD) != null ?
+                        (BMap<BString, Object>) mediaType.get(PARAMETER_MAP_FIELD) : null;
                 if (map != null && !map.isEmpty()) {
-                    contentType = contentType + MimeConstants.SEMICOLON;
+                    contentType = contentType + SEMICOLON;
                     return HeaderUtil.appendHeaderParams(new StringBuilder(contentType), map);
                 }
             }
@@ -119,7 +143,7 @@ public class MimeUtil {
             MimeTypeParameterList parameterList = mimeType.getParameters();
             return parameterList.get(parameterName);
         } catch (MimeTypeParseException e) {
-            throw MimeUtil.createError(MimeConstants.INVALID_CONTENT_TYPE_ERROR, e.getMessage());
+            throw MimeUtil.createError(INVALID_CONTENT_TYPE_ERROR, e.getMessage());
         }
     }
 
@@ -134,10 +158,10 @@ public class MimeUtil {
                                       String contentType) {
         BObject mimeType = parseMediaType(mediaType, contentType);
         if (contentType == null) {
-            mimeType.set(MimeConstants.PRIMARY_TYPE_FIELD, MimeConstants.DEFAULT_PRIMARY_TYPE);
-            mimeType.set(MimeConstants.SUBTYPE_FIELD, MimeConstants.DEFAULT_SUB_TYPE);
+            mimeType.set(PRIMARY_TYPE_FIELD, DEFAULT_PRIMARY_TYPE);
+            mimeType.set(SUBTYPE_FIELD, DEFAULT_SUB_TYPE);
         }
-        entityStruct.set(MimeConstants.MEDIA_TYPE_FIELD, mimeType);
+        entityStruct.set(MEDIA_TYPE_FIELD, mimeType);
     }
 
     /**
@@ -159,9 +183,9 @@ public class MimeUtil {
 
                 String subTypeStr = mimeType.getSubType();
                 subType = io.ballerina.runtime.api.utils.StringUtils.fromString(subTypeStr);
-                if (subTypeStr != null && subTypeStr.contains(MimeConstants.SUFFIX_ATTACHMENT)) {
+                if (subTypeStr != null && subTypeStr.contains(SUFFIX_ATTACHMENT)) {
                     suffix = io.ballerina.runtime.api.utils.StringUtils.fromString(
-                            subTypeStr.substring(subTypeStr.lastIndexOf(MimeConstants.SUFFIX_ATTACHMENT) + 1));
+                            subTypeStr.substring(subTypeStr.lastIndexOf(SUFFIX_ATTACHMENT) + 1));
                 } else {
                     suffix = PredefinedTypes.TYPE_STRING.getZeroValue();
                 }
@@ -178,20 +202,20 @@ public class MimeUtil {
                 primaryType = suffix = subType = PredefinedTypes.TYPE_STRING.getZeroValue();
             }
 
-            mediaType.set(MimeConstants.PRIMARY_TYPE_FIELD, primaryType);
-            mediaType.set(MimeConstants.SUBTYPE_FIELD, subType);
-            mediaType.set(MimeConstants.SUFFIX_FIELD, suffix);
-            mediaType.set(MimeConstants.PARAMETER_MAP_FIELD, parameterMap);
+            mediaType.set(PRIMARY_TYPE_FIELD, primaryType);
+            mediaType.set(SUBTYPE_FIELD, subType);
+            mediaType.set(SUFFIX_FIELD, suffix);
+            mediaType.set(PARAMETER_MAP_FIELD, parameterMap);
         } catch (MimeTypeParseException e) {
-            throw MimeUtil.createError(MimeConstants.INVALID_CONTENT_TYPE_ERROR, e.getMessage());
+            throw MimeUtil.createError(INVALID_CONTENT_TYPE_ERROR, e.getMessage());
         }
         return mediaType;
     }
 
     public static void setMediaTypeToEntity(BObject entityStruct, String contentType) {
-        BObject mediaType = ValueCreator.createObjectValue(getMimePackage(), MimeConstants.MEDIA_TYPE);
+        BObject mediaType = ValueCreator.createObjectValue(getMimePackage(), MEDIA_TYPE);
         MimeUtil.setContentType(mediaType, entityStruct, contentType);
-        HeaderUtil.setHeaderToEntity(entityStruct, MimeConstants.CONTENT_TYPE, contentType);
+        HeaderUtil.setHeaderToEntity(entityStruct, CONTENT_TYPE, contentType);
     }
 
     /**
@@ -204,25 +228,25 @@ public class MimeUtil {
     public static void setContentDisposition(BObject contentDisposition, BObject bodyPart,
                                              String contentDispositionHeaderWithParams) {
         populateContentDispositionObject(contentDisposition, contentDispositionHeaderWithParams);
-        bodyPart.set(MimeConstants.CONTENT_DISPOSITION_FIELD, contentDisposition);
+        bodyPart.set(CONTENT_DISPOSITION_FIELD, contentDisposition);
     }
 
     public static void populateContentDispositionObject(BObject contentDisposition,
                                                         String contentDispositionHeaderWithParams) {
         String dispositionValue;
         if (isNotNullAndEmpty(contentDispositionHeaderWithParams)) {
-            if (contentDispositionHeaderWithParams.contains(MimeConstants.SEMICOLON)) {
+            if (contentDispositionHeaderWithParams.contains(SEMICOLON)) {
                 dispositionValue = HeaderUtil.getHeaderValue(contentDispositionHeaderWithParams);
             } else {
                 dispositionValue = contentDispositionHeaderWithParams;
             }
-            contentDisposition.set(MimeConstants.DISPOSITION_FIELD,
+            contentDisposition.set(DISPOSITION_FIELD,
                                    io.ballerina.runtime.api.utils.StringUtils.fromString(dispositionValue));
             BMap<BString, Object> paramMap = HeaderUtil.getParamMap(contentDispositionHeaderWithParams);
             for (BString key : paramMap.getKeys()) {
                 BString paramValue = (BString) paramMap.get(key);
                 switch (key.getValue()) {
-                    case MimeConstants.CONTENT_DISPOSITION_FILE_NAME:
+                    case CONTENT_DISPOSITION_FILE_NAME:
                         contentDisposition.set(CONTENT_DISPOSITION_FILENAME_FIELD, stripQuotes(paramValue));
                         break;
                     case CONTENT_DISPOSITION_NAME:
@@ -231,10 +255,9 @@ public class MimeUtil {
                     default:
                 }
             }
-            paramMap.remove(io.ballerina.runtime.api.utils.StringUtils.fromString(
-                    MimeConstants.CONTENT_DISPOSITION_FILE_NAME));
+            paramMap.remove(io.ballerina.runtime.api.utils.StringUtils.fromString(CONTENT_DISPOSITION_FILE_NAME));
             paramMap.remove(io.ballerina.runtime.api.utils.StringUtils.fromString(CONTENT_DISPOSITION_NAME));
-            contentDisposition.set(MimeConstants.CONTENT_DISPOSITION_PARA_MAP_FIELD, paramMap);
+            contentDisposition.set(CONTENT_DISPOSITION_PARA_MAP_FIELD, paramMap);
         }
     }
 
@@ -246,15 +269,15 @@ public class MimeUtil {
      */
     public static String getContentDisposition(BObject entity) {
         StringBuilder dispositionBuilder = new StringBuilder();
-        if (entity.get(MimeConstants.CONTENT_DISPOSITION_FIELD) != null) {
+        if (entity.get(CONTENT_DISPOSITION_FIELD) != null) {
             BObject contentDispositionStruct =
-                    (BObject) entity.get(MimeConstants.CONTENT_DISPOSITION_FIELD);
+                    (BObject) entity.get(CONTENT_DISPOSITION_FIELD);
             if (contentDispositionStruct != null) {
-                Object disposition = contentDispositionStruct.get(MimeConstants.DISPOSITION_FIELD);
+                Object disposition = contentDispositionStruct.get(DISPOSITION_FIELD);
                 if (disposition == null || disposition.toString().isEmpty()) {
                     String contentType = getBaseType(entity);
-                    if (contentType != null && contentType.equals(MimeConstants.MULTIPART_FORM_DATA)) {
-                        dispositionBuilder.append(MimeConstants.FORM_DATA_PARAM);
+                    if (contentType != null && contentType.equals(MULTIPART_FORM_DATA)) {
+                        dispositionBuilder.append(FORM_DATA_PARAM);
                     }
                 } else {
                     dispositionBuilder.append(disposition);
@@ -276,31 +299,28 @@ public class MimeUtil {
         String fileName = fileNameBVal != null ? fileNameBVal.toString() : null;
 
         if (isNotNullAndEmpty(name)) {
-            appendSemiColon(dispositionBuilder).append(CONTENT_DISPOSITION_NAME).append(
-                    MimeConstants.ASSIGNMENT).append(
-                    includeQuotes(name)).append(MimeConstants.SEMICOLON);
+            appendSemiColon(dispositionBuilder).append(CONTENT_DISPOSITION_NAME).append(ASSIGNMENT).append(
+                    includeQuotes(name)).append(SEMICOLON);
         }
         if (isNotNullAndEmpty(fileName)) {
-            appendSemiColon(dispositionBuilder).append(MimeConstants.CONTENT_DISPOSITION_FILE_NAME).append(
-                    MimeConstants.ASSIGNMENT)
-                    .append(includeQuotes(fileName)).append(MimeConstants.SEMICOLON);
+            appendSemiColon(dispositionBuilder).append(CONTENT_DISPOSITION_FILE_NAME).append(ASSIGNMENT)
+                    .append(includeQuotes(fileName)).append(SEMICOLON);
         }
-        if (contentDispositionStruct.get(MimeConstants.CONTENT_DISPOSITION_PARA_MAP_FIELD) != null) {
+        if (contentDispositionStruct.get(CONTENT_DISPOSITION_PARA_MAP_FIELD) != null) {
             BMap<BString, Object> map =
-                    (BMap<BString, Object>) contentDispositionStruct.get(
-                            MimeConstants.CONTENT_DISPOSITION_PARA_MAP_FIELD);
+                    (BMap<BString, Object>) contentDispositionStruct.get(CONTENT_DISPOSITION_PARA_MAP_FIELD);
             HeaderUtil.appendHeaderParams(appendSemiColon(dispositionBuilder), map);
         }
 
-        if (dispositionBuilder.toString().endsWith(MimeConstants.SEMICOLON)) {
+        if (dispositionBuilder.toString().endsWith(SEMICOLON)) {
             dispositionBuilder.setLength(dispositionBuilder.length() - 1);
         }
         return dispositionBuilder;
     }
 
     private static StringBuilder appendSemiColon(StringBuilder disposition) {
-        if (!disposition.toString().endsWith(MimeConstants.SEMICOLON)) {
-            disposition.append(MimeConstants.SEMICOLON);
+        if (!disposition.toString().endsWith(SEMICOLON)) {
+            disposition.append(SEMICOLON);
         }
         return disposition;
     }
@@ -312,7 +332,7 @@ public class MimeUtil {
      * @param length       Size of the entity body
      */
     public static void setContentLength(BObject entityStruct, long length) {
-        entityStruct.set(MimeConstants.SIZE_FIELD, length);
+        entityStruct.set(SIZE_FIELD, length);
     }
 
     /**
@@ -324,7 +344,7 @@ public class MimeUtil {
      */
     public static void writeInputToOutputStream(InputStream inputStream, OutputStream outputStream) throws
             IOException {
-        byte[] buffer = new byte[MimeConstants.READABLE_BUFFER_SIZE];
+        byte[] buffer = new byte[READABLE_BUFFER_SIZE];
         int len;
         while ((len = inputStream.read(buffer)) != -1) {
             outputStream.write(buffer, 0, len);
@@ -340,7 +360,7 @@ public class MimeUtil {
      */
     public static byte[] getByteArray(InputStream input) throws IOException {
         try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-            byte[] buffer = new byte[MimeConstants.READABLE_BUFFER_SIZE];
+            byte[] buffer = new byte[READABLE_BUFFER_SIZE];
             for (int len; (len = input.read(buffer)) != -1; ) {
                 output.write(buffer, 0, len);
             }
@@ -365,11 +385,11 @@ public class MimeUtil {
      * @return a String surrounded by quotes
      */
     public static String includeQuotes(String textValue) {
-        if (!textValue.startsWith(MimeConstants.DOUBLE_QUOTE)) {
-            textValue = MimeConstants.DOUBLE_QUOTE + textValue;
+        if (!textValue.startsWith(DOUBLE_QUOTE)) {
+            textValue = DOUBLE_QUOTE + textValue;
         }
-        if (!textValue.endsWith(MimeConstants.DOUBLE_QUOTE)) {
-            textValue = textValue + MimeConstants.DOUBLE_QUOTE;
+        if (!textValue.endsWith(DOUBLE_QUOTE)) {
+            textValue = textValue + DOUBLE_QUOTE;
         }
         return textValue;
     }
@@ -381,10 +401,10 @@ public class MimeUtil {
      * @return a String surrounded by quotes
      */
     public static BString stripQuotes(BString textValue) {
-        if (textValue.getValue().startsWith(MimeConstants.DOUBLE_QUOTE)) {
+        if (textValue.getValue().startsWith(DOUBLE_QUOTE)) {
             textValue = textValue.substring(1, textValue.length());
         }
-        if (textValue.getValue().endsWith(MimeConstants.DOUBLE_QUOTE)) {
+        if (textValue.getValue().endsWith(DOUBLE_QUOTE)) {
             textValue = textValue.substring(0, textValue.length() - 1);
         }
         return textValue;
@@ -408,9 +428,8 @@ public class MimeUtil {
      */
     static boolean isNestedPartsAvailable(BObject bodyPart) {
         String contentTypeOfChildPart = MimeUtil.getBaseType(bodyPart);
-        return contentTypeOfChildPart != null && contentTypeOfChildPart.startsWith(
-                MimeConstants.MULTIPART_AS_PRIMARY_TYPE) &&
-                bodyPart.getNativeData(MimeConstants.BODY_PARTS) != null;
+        return contentTypeOfChildPart != null && contentTypeOfChildPart.startsWith(MULTIPART_AS_PRIMARY_TYPE) &&
+                bodyPart.getNativeData(BODY_PARTS) != null;
     }
 
     /**

@@ -309,8 +309,7 @@ public class EntityBodyHandler {
      * @return a boolean indicating the streaming requirement
      */
     public static boolean isStreamingRequired(BObject entity) {
-        return entity.getNativeData(ENTITY_BYTE_CHANNEL) != null || entity.getNativeData(
-                BODY_PARTS) != null;
+        return entity.getNativeData(ENTITY_BYTE_CHANNEL) != null || entity.getNativeData(BODY_PARTS) != null;
     }
 
     /**
@@ -338,7 +337,7 @@ public class EntityBodyHandler {
      */
     public static void populateBodyContent(BObject bodyPart, MIMEPart mimePart) {
         bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, new MimeEntityWrapper(new EntityBodyChannel(mimePart.readOnce()),
-                                                                          mimePart));
+                mimePart));
     }
 
     /**
@@ -441,8 +440,7 @@ public class EntityBodyHandler {
      * @return An array of body parts
      */
     public static BArray getBodyPartArray(BObject entityObj) {
-        return entityObj.getNativeData(BODY_PARTS) != null ? (BArray) entityObj.getNativeData(
-                BODY_PARTS)
+        return entityObj.getNativeData(BODY_PARTS) != null ? (BArray) entityObj.getNativeData(BODY_PARTS)
                 : (BArray) ValueCreator.createArrayValue(mimeEntityArrayType, 0);
     }
 

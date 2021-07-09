@@ -61,8 +61,16 @@ import java.util.Set;
 
 import javax.activation.MimeTypeParseException;
 
+import static io.ballerina.stdlib.mime.util.MimeConstants.APPLICATION_JSON;
+import static io.ballerina.stdlib.mime.util.MimeConstants.APPLICATION_XML;
 import static io.ballerina.stdlib.mime.util.MimeConstants.BODY_PARTS;
+import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_DISPOSITION_STRUCT;
+import static io.ballerina.stdlib.mime.util.MimeConstants.ENTITY;
+import static io.ballerina.stdlib.mime.util.MimeConstants.ENTITY_BYTE_CHANNEL;
+import static io.ballerina.stdlib.mime.util.MimeConstants.MEDIA_TYPE;
 import static io.ballerina.stdlib.mime.util.MimeConstants.MULTIPART_MIXED;
+import static io.ballerina.stdlib.mime.util.MimeConstants.OCTET_STREAM;
+import static io.ballerina.stdlib.mime.util.MimeConstants.TEXT_PLAIN;
 
 /**
  * Contains utility functions used by mime test cases.
@@ -92,8 +100,8 @@ public class ExternTestUtils {
     public static BObject getTextBodyPart() {
         String textPayload = "Ballerina text body part";
         BObject bodyPart = createEntityObject();
-        bodyPart.addNativeData(MimeConstants.ENTITY_BYTE_CHANNEL, EntityBodyHandler.getEntityWrapper(textPayload));
-        MimeUtil.setContentType(createMediaTypeObject(), bodyPart, MimeConstants.TEXT_PLAIN);
+        bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, EntityBodyHandler.getEntityWrapper(textPayload));
+        MimeUtil.setContentType(createMediaTypeObject(), bodyPart, TEXT_PLAIN);
         return bodyPart;
     }
 
@@ -106,9 +114,9 @@ public class ExternTestUtils {
         try {
             File file = getTemporaryFile("test", ".txt", "Ballerina text as a file part");
             BObject bodyPart = createEntityObject();
-            bodyPart.addNativeData(MimeConstants.ENTITY_BYTE_CHANNEL, getByteChannelForTempFile(
+            bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, getByteChannelForTempFile(
                     file.getAbsolutePath()));
-            MimeUtil.setContentType(createMediaTypeObject(), bodyPart, MimeConstants.TEXT_PLAIN);
+            MimeUtil.setContentType(createMediaTypeObject(), bodyPart, TEXT_PLAIN);
             return bodyPart;
         } catch (IOException e) {
             LOG.error("Error occurred while creating a temp file for json file part in getTextFilePart",
@@ -128,9 +136,9 @@ public class ExternTestUtils {
         try {
             File file = getTemporaryFile("test", ".txt", message);
             BObject bodyPart = createEntityObject();
-            bodyPart.addNativeData(MimeConstants.ENTITY_BYTE_CHANNEL, getByteChannelForTempFile(
+            bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, getByteChannelForTempFile(
                     file.getAbsolutePath()));
-            MimeUtil.setContentType(createMediaTypeObject(), bodyPart, MimeConstants.TEXT_PLAIN);
+            MimeUtil.setContentType(createMediaTypeObject(), bodyPart, TEXT_PLAIN);
             HeaderUtil.setHeaderToEntity(bodyPart, MimeConstants.CONTENT_TRANSFER_ENCODING, contentTransferEncoding);
             return bodyPart;
         } catch (IOException e) {
@@ -151,8 +159,8 @@ public class ExternTestUtils {
         String jsonContent = "{\"" + key + "\":\"" + value + "\"}";
         BObject bodyPart = createEntityObject();
         EntityWrapper byteChannel = EntityBodyHandler.getEntityWrapper(jsonContent);
-        bodyPart.addNativeData(MimeConstants.ENTITY_BYTE_CHANNEL, byteChannel);
-        MimeUtil.setContentType(createMediaTypeObject(), bodyPart, MimeConstants.APPLICATION_JSON);
+        bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, byteChannel);
+        MimeUtil.setContentType(createMediaTypeObject(), bodyPart, APPLICATION_JSON);
         return bodyPart;
     }
 
@@ -165,9 +173,9 @@ public class ExternTestUtils {
         try {
             File file = getTemporaryFile("test", ".json", "{'name':'wso2'}");
             BObject bodyPart = createEntityObject();
-            bodyPart.addNativeData(MimeConstants.ENTITY_BYTE_CHANNEL, getByteChannelForTempFile(
+            bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, getByteChannelForTempFile(
                     file.getAbsolutePath()));
-            MimeUtil.setContentType(createMediaTypeObject(), bodyPart, MimeConstants.APPLICATION_JSON);
+            MimeUtil.setContentType(createMediaTypeObject(), bodyPart, APPLICATION_JSON);
             return bodyPart;
         } catch (IOException e) {
             LOG.error("Error occurred while creating a temp file for json file part in getJsonFilePart",
@@ -186,8 +194,8 @@ public class ExternTestUtils {
         BObject bodyPart = createEntityObject();
         EntityBodyChannel byteChannel = new EntityBodyChannel(new ByteArrayInputStream(
                 xmlNode.stringValue(null).getBytes(StandardCharsets.UTF_8)));
-        bodyPart.addNativeData(MimeConstants.ENTITY_BYTE_CHANNEL, new EntityWrapper(byteChannel));
-        MimeUtil.setContentType(createMediaTypeObject(), bodyPart, MimeConstants.APPLICATION_XML);
+        bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, new EntityWrapper(byteChannel));
+        MimeUtil.setContentType(createMediaTypeObject(), bodyPart, APPLICATION_XML);
         return bodyPart;
     }
 
@@ -200,9 +208,9 @@ public class ExternTestUtils {
         try {
             File file = getTemporaryFile("test", ".xml", "<name>Ballerina xml file part</name>");
             BObject bodyPart = createEntityObject();
-            bodyPart.addNativeData(MimeConstants.ENTITY_BYTE_CHANNEL, getByteChannelForTempFile(
+            bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, getByteChannelForTempFile(
                     file.getAbsolutePath()));
-            MimeUtil.setContentType(createMediaTypeObject(), bodyPart, MimeConstants.APPLICATION_XML);
+            MimeUtil.setContentType(createMediaTypeObject(), bodyPart, APPLICATION_XML);
             return bodyPart;
         } catch (IOException e) {
             LOG.error("Error occurred while creating a temp file for xml file part in getXmlFilePart",
@@ -219,8 +227,8 @@ public class ExternTestUtils {
     public static BObject getBinaryBodyPart() {
         BObject bodyPart = createEntityObject();
         EntityWrapper byteChannel = EntityBodyHandler.getEntityWrapper("Ballerina binary part");
-        bodyPart.addNativeData(MimeConstants.ENTITY_BYTE_CHANNEL, byteChannel);
-        MimeUtil.setContentType(createMediaTypeObject(), bodyPart, MimeConstants.OCTET_STREAM);
+        bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, byteChannel);
+        MimeUtil.setContentType(createMediaTypeObject(), bodyPart, OCTET_STREAM);
         return bodyPart;
     }
 
@@ -233,9 +241,9 @@ public class ExternTestUtils {
         try {
             File file = getTemporaryFile("test", ".tmp", "Ballerina binary file part");
             BObject bodyPart = createEntityObject();
-            bodyPart.addNativeData(MimeConstants.ENTITY_BYTE_CHANNEL, getByteChannelForTempFile(
+            bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, getByteChannelForTempFile(
                     file.getAbsolutePath()));
-            MimeUtil.setContentType(createMediaTypeObject(), bodyPart, MimeConstants.OCTET_STREAM);
+            MimeUtil.setContentType(createMediaTypeObject(), bodyPart, OCTET_STREAM);
             return bodyPart;
         } catch (IOException e) {
             LOG.error("Error occurred while creating a temp file for binary file part in getBinaryFilePart",
@@ -300,16 +308,16 @@ public class ExternTestUtils {
     }
 
     public static BObject createEntityObject() {
-        return ValueCreator.createObjectValue(MimeUtil.getMimePackage(), MimeConstants.ENTITY);
+        return ValueCreator.createObjectValue(MimeUtil.getMimePackage(), ENTITY);
     }
 
 
     public static BObject createMediaTypeObject() {
-        return ValueCreator.createObjectValue(MimeUtil.getMimePackage(), MimeConstants.MEDIA_TYPE);
+        return ValueCreator.createObjectValue(MimeUtil.getMimePackage(), MEDIA_TYPE);
     }
 
     public static BObject getContentDispositionStruct() {
-        return ValueCreator.createObjectValue(MimeUtil.getMimePackage(), MimeConstants.CONTENT_DISPOSITION_STRUCT);
+        return ValueCreator.createObjectValue(MimeUtil.getMimePackage(), CONTENT_DISPOSITION_STRUCT);
     }
 
 

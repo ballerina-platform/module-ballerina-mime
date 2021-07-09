@@ -41,6 +41,13 @@ import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.Map;
 
+import static io.ballerina.stdlib.mime.util.MimeConstants.BODY_PARTS;
+import static io.ballerina.stdlib.mime.util.MimeConstants.BOUNDARY;
+import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_ID_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.MEDIA_TYPE_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.PARAMETER_MAP_FIELD;
+
+
 /**
  * Act as multipart encoder.
  *
@@ -82,8 +89,8 @@ public class MultipartDataSource implements BRefValue {
     private void serializeBodyPart(OutputStream outputStream, String parentBoundaryString,
                                    BObject parentBodyPart) {
         final Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream, Charset.defaultCharset()));
-        BArray childParts = parentBodyPart.getNativeData(MimeConstants.BODY_PARTS) != null ?
-                (BArray) parentBodyPart.getNativeData(MimeConstants.BODY_PARTS) : null;
+        BArray childParts = parentBodyPart.getNativeData(BODY_PARTS) != null ?
+                (BArray) parentBodyPart.getNativeData(BODY_PARTS) : null;
         try {
             if (childParts == null) {
                 return;
@@ -122,21 +129,21 @@ public class MultipartDataSource implements BRefValue {
         String childBoundaryString = null;
         if (MimeUtil.isNestedPartsAvailable(childPart)) {
             childBoundaryString = MimeUtil.getNewMultipartDelimiter();
-            BObject mediaType = (BObject) childPart.get(MimeConstants.MEDIA_TYPE_FIELD);
+            BObject mediaType = (BObject) childPart.get(MEDIA_TYPE_FIELD);
             BMap<BString, Object> paramMap;
-            if (mediaType.get(MimeConstants.PARAMETER_MAP_FIELD) != null) {
-                paramMap = (BMap<BString, Object>) mediaType.get(MimeConstants.PARAMETER_MAP_FIELD);
+            if (mediaType.get(PARAMETER_MAP_FIELD) != null) {
+                paramMap = (BMap<BString, Object>) mediaType.get(PARAMETER_MAP_FIELD);
             } else {
                 paramMap = ValueCreator.createMapValue(TypeCreator.createMapType(PredefinedTypes.TYPE_STRING));
             }
 
-            paramMap.put(StringUtils.fromString(MimeConstants.BOUNDARY), StringUtils.fromString(childBoundaryString));
-            mediaType.set(MimeConstants.PARAMETER_MAP_FIELD, paramMap);
+            paramMap.put(StringUtils.fromString(BOUNDARY), StringUtils.fromString(childBoundaryString));
+            mediaType.set(PARAMETER_MAP_FIELD, paramMap);
         }
         writeBodyPartHeaders(writer, childPart);
         //Serialize nested parts
         if (childBoundaryString != null) {
-            BArray nestedParts = (BArray) childPart.getNativeData(MimeConstants.BODY_PARTS);
+            BArray nestedParts = (BArray) childPart.getNativeData(BODY_PARTS);
             if (nestedParts != null && nestedParts.size() > 0) {
                 serializeBodyPart(this.outputStream, childBoundaryString, childPart);
             }
@@ -160,7 +167,7 @@ public class MultipartDataSource implements BRefValue {
             EntityHeaderHandler.addHeader(bodyPart, httpHeaders, MimeConstants.CONTENT_DISPOSITION, contentDisposition);
         }
         
-        Object contentId = bodyPart.get(MimeConstants.CONTENT_ID_FIELD);
+        Object contentId = bodyPart.get(CONTENT_ID_FIELD);
         if (contentId != null && !contentId.toString().isEmpty()) {
             EntityHeaderHandler.addHeader(bodyPart, httpHeaders, MimeConstants.CONTENT_ID, contentId.toString());
         }

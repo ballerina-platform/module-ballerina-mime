@@ -34,8 +34,12 @@ import java.util.stream.Collectors;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 
+import static io.ballerina.stdlib.mime.util.MimeConstants.ASSIGNMENT;
+import static io.ballerina.stdlib.mime.util.MimeConstants.BOUNDARY;
+import static io.ballerina.stdlib.mime.util.MimeConstants.FIRST_ELEMENT;
 import static io.ballerina.stdlib.mime.util.MimeConstants.INVALID_HEADER_PARAM_ERROR;
 import static io.ballerina.stdlib.mime.util.MimeConstants.INVALID_HEADER_VALUE_ERROR;
+import static io.ballerina.stdlib.mime.util.MimeConstants.MULTIPART_AS_PRIMARY_TYPE;
 import static io.ballerina.stdlib.mime.util.MimeConstants.SEMICOLON;
 
 /**
@@ -120,8 +124,7 @@ public class HeaderUtil {
     }
 
     static boolean isHeaderExist(List<String> headers) {
-        return headers != null && headers.get(MimeConstants.FIRST_ELEMENT) != null && !headers.get(
-                MimeConstants.FIRST_ELEMENT).isEmpty();
+        return headers != null && headers.get(FIRST_ELEMENT) != null && !headers.get(FIRST_ELEMENT).isEmpty();
     }
 
     /**
@@ -139,10 +142,9 @@ public class HeaderUtil {
                 for (BString key : keys) {
                     String paramValue = ((BString) map.get(key)).getValue();
                     if (index == keys.length - 1) {
-                        headerValue.append(key).append(MimeConstants.ASSIGNMENT).append(paramValue);
+                        headerValue.append(key).append(ASSIGNMENT).append(paramValue);
                     } else {
-                        headerValue.append(key).append(MimeConstants.ASSIGNMENT).append(paramValue).append(
-                                SEMICOLON);
+                        headerValue.append(key).append(ASSIGNMENT).append(paramValue).append(SEMICOLON);
                         index = index + 1;
                     }
                 }
@@ -152,7 +154,7 @@ public class HeaderUtil {
     }
 
     public static boolean isMultipart(String contentType) {
-        return contentType != null && contentType.startsWith(MimeConstants.MULTIPART_AS_PRIMARY_TYPE);
+        return contentType != null && contentType.startsWith(MULTIPART_AS_PRIMARY_TYPE);
     }
 
     /**
@@ -163,8 +165,8 @@ public class HeaderUtil {
      */
     public static String extractBoundaryParameter(String contentType) {
         BMap<BString, Object> paramMap = HeaderUtil.getParamMap(contentType);
-        return paramMap.get(StringUtils.fromString(MimeConstants.BOUNDARY)) != null ?
-                ((BString) paramMap.get(StringUtils.fromString(MimeConstants.BOUNDARY))).getValue() : null;
+        return paramMap.get(StringUtils.fromString(BOUNDARY)) != null ?
+                ((BString) paramMap.get(StringUtils.fromString(BOUNDARY))).getValue() : null;
     }
 
     public static void setHeaderToEntity(BObject entity, String key, String value) {
