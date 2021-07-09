@@ -13,8 +13,14 @@ plugins {
 }
 
 rootProject.name = 'mime'
-include(':build-config:checkstyle')
-include ':mime-native', ':mime-ballerina'
+
+include ':checkstyle'
+include ':mime-native'
+include ':mime-ballerina'
+
+project(':checkstyle').projectDir = file("build-config${File.separator}checkstyle")
+project(':mime-native').projectDir = file('native')
+project(':mime-ballerina').projectDir = file('ballerina')
 
 gradleEnterprise {
     buildScan {
