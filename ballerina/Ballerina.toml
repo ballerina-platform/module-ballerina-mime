@@ -5,9 +5,6 @@ version = "@toml.version@"
 
 [[platform.java11.dependency]]
 path = "../native/build/libs/mime-native-@project.version@.jar"
-groupId = "ballerina"
-artifactId = "mime"
-version = "@project.version@"
 
 
 [[platform.java11.dependency]]
