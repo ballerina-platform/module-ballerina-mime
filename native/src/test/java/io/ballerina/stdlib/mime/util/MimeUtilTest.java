@@ -30,15 +30,6 @@ import io.ballerina.runtime.api.values.BString;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import static org.ballerinalang.mime.util.MimeConstants.CONTENT_DISPOSITION_FIELD;
-import static org.ballerinalang.mime.util.MimeConstants.DEFAULT_PRIMARY_TYPE;
-import static org.ballerinalang.mime.util.MimeConstants.DEFAULT_SUB_TYPE;
-import static org.ballerinalang.mime.util.MimeConstants.DISPOSITION_FIELD;
-import static org.ballerinalang.mime.util.MimeConstants.MEDIA_TYPE_FIELD;
-import static org.ballerinalang.mime.util.MimeConstants.PARAMETER_MAP_FIELD;
-import static org.ballerinalang.mime.util.MimeConstants.PRIMARY_TYPE_FIELD;
-import static org.ballerinalang.mime.util.MimeConstants.SUBTYPE_FIELD;
-import static org.ballerinalang.mime.util.MimeConstants.SUFFIX_FIELD;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

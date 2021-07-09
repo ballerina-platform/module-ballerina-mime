@@ -30,9 +30,9 @@ import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BRefValue;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BXml;
-import io.ballerina.stdlib.mime.util.MimeConstants;
 import io.ballerina.stdlib.mime.util.EntityBodyHandler;
 import io.ballerina.stdlib.mime.util.EntityHeaderHandler;
+import io.ballerina.stdlib.mime.util.MimeConstants;
 import io.ballerina.stdlib.mime.util.MimeUtil;
 import org.wso2.ballerinalang.compiler.util.TypeTags;
 

@@ -32,6 +32,9 @@ import java.util.List;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 
+import static io.ballerina.stdlib.mime.util.MimeConstants.BOUNDARY;
+import static io.ballerina.stdlib.mime.util.MimeConstants.PARSER_ERROR;
+
 /**
  * Responsible for decoding an inputstream to get a set of multiparts.
  *
@@ -53,7 +56,7 @@ public class MultipartDecoder {
                 populateBallerinaParts(entity, mimeParts);
             }
         } catch (MimeTypeParseException e) {
-            throw MimeUtil.createError(MimeConstants.PARSER_ERROR,
+            throw MimeUtil.createError(PARSER_ERROR,
                                        "Error occurred while decoding body parts from inputstream " + e.getMessage());
         }
     }
@@ -69,7 +72,7 @@ public class MultipartDecoder {
     public static List<MIMEPart> decodeBodyParts(String contentType, InputStream inputStream)
             throws MimeTypeParseException {
         MimeType mimeType = new MimeType(contentType);
-        final MIMEMessage mimeMessage = new MIMEMessage(inputStream, mimeType.getParameter(MimeConstants.BOUNDARY), getMimeConfig());
+        final MIMEMessage mimeMessage = new MIMEMessage(inputStream, mimeType.getParameter(BOUNDARY), getMimeConfig());
         return mimeMessage.getAttachments();
     }
 

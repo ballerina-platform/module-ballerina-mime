@@ -49,6 +49,10 @@ import javax.activation.MimeType;
 import javax.activation.MimeTypeParameterList;
 import javax.activation.MimeTypeParseException;
 
+import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_DISPOSITION_FILENAME_FIELD;
+import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_DISPOSITION_NAME;
+import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_DISPOSITION_NAME_FIELD;
+
 /**
  * Mime utility functions are included in here.
  *
@@ -219,17 +223,17 @@ public class MimeUtil {
                 BString paramValue = (BString) paramMap.get(key);
                 switch (key.getValue()) {
                     case MimeConstants.CONTENT_DISPOSITION_FILE_NAME:
-                        contentDisposition.set(MimeConstants.CONTENT_DISPOSITION_FILENAME_FIELD, stripQuotes(paramValue));
+                        contentDisposition.set(CONTENT_DISPOSITION_FILENAME_FIELD, stripQuotes(paramValue));
                         break;
-                    case MimeConstants.CONTENT_DISPOSITION_NAME:
-                        contentDisposition.set(MimeConstants.CONTENT_DISPOSITION_NAME_FIELD, stripQuotes(paramValue));
+                    case CONTENT_DISPOSITION_NAME:
+                        contentDisposition.set(CONTENT_DISPOSITION_NAME_FIELD, stripQuotes(paramValue));
                         break;
                     default:
                 }
             }
             paramMap.remove(io.ballerina.runtime.api.utils.StringUtils.fromString(
                     MimeConstants.CONTENT_DISPOSITION_FILE_NAME));
-            paramMap.remove(io.ballerina.runtime.api.utils.StringUtils.fromString(MimeConstants.CONTENT_DISPOSITION_NAME));
+            paramMap.remove(io.ballerina.runtime.api.utils.StringUtils.fromString(CONTENT_DISPOSITION_NAME));
             contentDisposition.set(MimeConstants.CONTENT_DISPOSITION_PARA_MAP_FIELD, paramMap);
         }
     }
@@ -265,14 +269,14 @@ public class MimeUtil {
 
     public static StringBuilder convertDispositionObjectToString(StringBuilder dispositionBuilder,
                                                                  BObject contentDispositionStruct) {
-        Object nameBVal = contentDispositionStruct.get(MimeConstants.CONTENT_DISPOSITION_NAME_FIELD);
+        Object nameBVal = contentDispositionStruct.get(CONTENT_DISPOSITION_NAME_FIELD);
         String name = nameBVal != null ? nameBVal.toString() : null;
 
-        Object fileNameBVal = contentDispositionStruct.get(MimeConstants.CONTENT_DISPOSITION_FILENAME_FIELD);
+        Object fileNameBVal = contentDispositionStruct.get(CONTENT_DISPOSITION_FILENAME_FIELD);
         String fileName = fileNameBVal != null ? fileNameBVal.toString() : null;
 
         if (isNotNullAndEmpty(name)) {
-            appendSemiColon(dispositionBuilder).append(MimeConstants.CONTENT_DISPOSITION_NAME).append(
+            appendSemiColon(dispositionBuilder).append(CONTENT_DISPOSITION_NAME).append(
                     MimeConstants.ASSIGNMENT).append(
                     includeQuotes(name)).append(MimeConstants.SEMICOLON);
         }

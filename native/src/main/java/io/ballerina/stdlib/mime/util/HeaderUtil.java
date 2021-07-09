@@ -34,6 +34,10 @@ import java.util.stream.Collectors;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 
+import static io.ballerina.stdlib.mime.util.MimeConstants.INVALID_HEADER_PARAM_ERROR;
+import static io.ballerina.stdlib.mime.util.MimeConstants.INVALID_HEADER_VALUE_ERROR;
+import static io.ballerina.stdlib.mime.util.MimeConstants.SEMICOLON;
+
 /**
  * Utility methods for parsing headers.
  *
@@ -51,10 +55,10 @@ public class HeaderUtil {
      */
     public static BMap<BString, Object> getParamMap(String headerValue) {
         BMap<BString, Object> paramMap = null;
-        if (headerValue.contains(MimeConstants.SEMICOLON)) {
+        if (headerValue.contains(SEMICOLON)) {
             extractValue(headerValue);
-            List<String> paramList = Arrays.stream(headerValue.substring(headerValue.indexOf(MimeConstants.SEMICOLON) + 1)
-                                                   .split(MimeConstants.SEMICOLON)).map(String::trim).collect(Collectors.toList());
+            List<String> paramList = Arrays.stream(headerValue.substring(headerValue.indexOf(SEMICOLON) + 1)
+                                                   .split(SEMICOLON)).map(String::trim).collect(Collectors.toList());
             paramMap = validateParams(paramList) ? getHeaderParamMap(paramList) : getEmptyMap();
         } else {
             paramMap = getEmptyMap();
@@ -79,9 +83,9 @@ public class HeaderUtil {
      * @return Header value without parameters
      */
     private static String extractValue(String headerValue) {
-        String value = headerValue.substring(0, headerValue.indexOf(MimeConstants.SEMICOLON)).trim();
+        String value = headerValue.substring(0, headerValue.indexOf(SEMICOLON)).trim();
         if (value.isEmpty()) {
-            throw MimeUtil.createError(MimeConstants.INVALID_HEADER_VALUE_ERROR, "invalid header value: " + headerValue);
+            throw MimeUtil.createError(INVALID_HEADER_VALUE_ERROR, "invalid header value: " + headerValue);
         }
         return value;
     }
@@ -103,7 +107,7 @@ public class HeaderUtil {
             if (param.contains("=")) {
                 String[] keyValuePair = param.split("=", 2);
                 if (keyValuePair.length != 2 || keyValuePair[0].isEmpty() || keyValuePair[1].isEmpty()) {
-                    throw MimeUtil.createError(MimeConstants.INVALID_HEADER_PARAM_ERROR, "invalid header parameter: " + param);
+                    throw MimeUtil.createError(INVALID_HEADER_PARAM_ERROR, "invalid header parameter: " + param);
                 }
                 paramMap.put(StringUtils.fromString(keyValuePair[0].trim()),
                         StringUtils.fromString(keyValuePair[1].trim()));
@@ -138,7 +142,7 @@ public class HeaderUtil {
                         headerValue.append(key).append(MimeConstants.ASSIGNMENT).append(paramValue);
                     } else {
                         headerValue.append(key).append(MimeConstants.ASSIGNMENT).append(paramValue).append(
-                                MimeConstants.SEMICOLON);
+                                SEMICOLON);
                         index = index + 1;
                     }
                 }

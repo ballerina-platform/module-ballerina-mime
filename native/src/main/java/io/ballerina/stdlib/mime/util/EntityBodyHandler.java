@@ -36,7 +36,7 @@ import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BStream;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BXml;
-import org.ballerinalang.stdlib.io.channels.base.Channel;
+import io.ballerina.stdlib.io.channels.base.Channel;
 import org.jvnet.mimepull.MIMEPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +50,17 @@ import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static io.ballerina.stdlib.mime.util.MimeConstants.BODY_PARTS;
+import static io.ballerina.stdlib.mime.util.MimeConstants.BYTE_STREAM_NEXT_FUNC;
+import static io.ballerina.stdlib.mime.util.MimeConstants.CHARSET;
+import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_TYPE;
+import static io.ballerina.stdlib.mime.util.MimeConstants.ENTITY;
+import static io.ballerina.stdlib.mime.util.MimeConstants.ENTITY_BYTE_CHANNEL;
+import static io.ballerina.stdlib.mime.util.MimeConstants.ENTITY_BYTE_STREAM;
+import static io.ballerina.stdlib.mime.util.MimeConstants.FIELD_VALUE;
+import static io.ballerina.stdlib.mime.util.MimeConstants.FIRST_BODY_PART_INDEX;
+import static io.ballerina.stdlib.mime.util.MimeConstants.MESSAGE_DATA_SOURCE;
+import static io.ballerina.stdlib.mime.util.MimeConstants.MULTIPART_AS_PRIMARY_TYPE;
 import static io.ballerina.stdlib.mime.util.MimeUtil.isNotNullAndEmpty;
 
 /**
@@ -61,7 +72,7 @@ public class EntityBodyHandler {
 
     private static final Logger log = LoggerFactory.getLogger(EntityBodyHandler.class);
     private static final Type MIME_ENTITY_TYPE =
-            ValueCreator.createObjectValue(MimeUtil.getMimePackage(), MimeConstants.ENTITY).getType();
+            ValueCreator.createObjectValue(MimeUtil.getMimePackage(), ENTITY).getType();
     private static final ArrayType mimeEntityArrayType = TypeCreator.createArrayType(MIME_ENTITY_TYPE);
 
     /**
@@ -82,7 +93,7 @@ public class EntityBodyHandler {
      * @return MessageDataSource which represent the entity body in memory
      */
     public static Object getMessageDataSource(BObject entityObj) {
-        return entityObj.getNativeData(MimeConstants.MESSAGE_DATA_SOURCE);
+        return entityObj.getNativeData(MESSAGE_DATA_SOURCE);
     }
 
     /**
@@ -110,7 +121,7 @@ public class EntityBodyHandler {
         /* specifies whether the type of the datasource is json. This is necessary because json is a union of
          * different data types and is not a single data type.*/
         entityObj.addNativeData(MimeConstants.PARSE_AS_JSON, json);
-        entityObj.addNativeData(MimeConstants.MESSAGE_DATA_SOURCE, messageDataSource);
+        entityObj.addNativeData(MESSAGE_DATA_SOURCE, messageDataSource);
     }
 
     /**
@@ -178,9 +189,9 @@ public class EntityBodyHandler {
      */
     public static Object constructJsonDataSource(BObject entity, InputStream inputStream) {
         Object jsonData;
-        String contentTypeValue = EntityHeaderHandler.getHeaderValue(entity, MimeConstants.CONTENT_TYPE);
+        String contentTypeValue = EntityHeaderHandler.getHeaderValue(entity, CONTENT_TYPE);
         if (isNotNullAndEmpty(contentTypeValue)) {
-            String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, MimeConstants.CHARSET);
+            String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
             if (isNotNullAndEmpty(charsetValue)) {
                 jsonData = JsonUtils.parse(inputStream, charsetValue);
             } else {
@@ -221,9 +232,9 @@ public class EntityBodyHandler {
      */
     public static BXml constructXmlDataSource(BObject entityObj, InputStream inputStream) {
         BXml xmlContent;
-        String contentTypeValue = EntityHeaderHandler.getHeaderValue(entityObj, MimeConstants.CONTENT_TYPE);
+        String contentTypeValue = EntityHeaderHandler.getHeaderValue(entityObj, CONTENT_TYPE);
         if (isNotNullAndEmpty(contentTypeValue)) {
-            String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, MimeConstants.CHARSET);
+            String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
             if (isNotNullAndEmpty(charsetValue)) {
                 xmlContent = XmlUtils.parse(inputStream, charsetValue);
             } else {
@@ -264,9 +275,9 @@ public class EntityBodyHandler {
      */
     public static BString constructStringDataSource(BObject entity, InputStream inputStream) {
         BString textContent;
-        String contentTypeValue = EntityHeaderHandler.getHeaderValue(entity, MimeConstants.CONTENT_TYPE);
+        String contentTypeValue = EntityHeaderHandler.getHeaderValue(entity, CONTENT_TYPE);
         if (isNotNullAndEmpty(contentTypeValue)) {
-            String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, MimeConstants.CHARSET);
+            String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
             if (isNotNullAndEmpty(charsetValue)) {
                 textContent = StringUtils.getStringFromInputStream(inputStream, charsetValue);
             } else {
@@ -286,9 +297,8 @@ public class EntityBodyHandler {
      * @return a boolean indicating entity body availability
      */
     public static boolean checkEntityBodyAvailability(BObject entityObj) {
-        return entityObj.getNativeData(MimeConstants.ENTITY_BYTE_CHANNEL) != null || getMessageDataSource(entityObj) != null
-                || entityObj.getNativeData(MimeConstants.BODY_PARTS) != null || entityObj.getNativeData(
-                MimeConstants.ENTITY_BYTE_STREAM) != null;
+        return entityObj.getNativeData(ENTITY_BYTE_CHANNEL) != null || getMessageDataSource(entityObj) != null
+                || entityObj.getNativeData(BODY_PARTS) != null || entityObj.getNativeData(ENTITY_BYTE_STREAM) != null;
     }
 
     /**
@@ -299,8 +309,8 @@ public class EntityBodyHandler {
      * @return a boolean indicating the streaming requirement
      */
     public static boolean isStreamingRequired(BObject entity) {
-        return entity.getNativeData(MimeConstants.ENTITY_BYTE_CHANNEL) != null || entity.getNativeData(
-                MimeConstants.BODY_PARTS) != null;
+        return entity.getNativeData(ENTITY_BYTE_CHANNEL) != null || entity.getNativeData(
+                BODY_PARTS) != null;
     }
 
     /**
@@ -311,11 +321,11 @@ public class EntityBodyHandler {
      */
     static void setPartsToTopLevelEntity(BObject entity, ArrayList<BObject> bodyParts) {
         if (!bodyParts.isEmpty()) {
-            ObjectType typeOfBodyPart = bodyParts.get(MimeConstants.FIRST_BODY_PART_INDEX).getType();
+            ObjectType typeOfBodyPart = bodyParts.get(FIRST_BODY_PART_INDEX).getType();
             BObject[] result = bodyParts.toArray(new BObject[bodyParts.size()]);
             BArray partsArray = (BArray) ValueCreator
                     .createArrayValue(result, TypeCreator.createArrayType(typeOfBodyPart));
-            entity.addNativeData(MimeConstants.BODY_PARTS, partsArray);
+            entity.addNativeData(BODY_PARTS, partsArray);
         }
     }
 
@@ -327,8 +337,8 @@ public class EntityBodyHandler {
      * @param mimePart Represent decoded mime part
      */
     public static void populateBodyContent(BObject bodyPart, MIMEPart mimePart) {
-        bodyPart.addNativeData(MimeConstants.ENTITY_BYTE_CHANNEL, new MimeEntityWrapper(new EntityBodyChannel(mimePart.readOnce()),
-                                                                                        mimePart));
+        bodyPart.addNativeData(ENTITY_BYTE_CHANNEL, new MimeEntityWrapper(new EntityBodyChannel(mimePart.readOnce()),
+                                                                          mimePart));
     }
 
     /**
@@ -345,7 +355,7 @@ public class EntityBodyHandler {
             MimeUtil.writeInputToOutputStream(byteChannel.getInputStream(), messageOutputStream);
             byteChannel.close();
             //Set the byte channel to null, once it is consumed
-            entityObj.addNativeData(MimeConstants.ENTITY_BYTE_CHANNEL, null);
+            entityObj.addNativeData(ENTITY_BYTE_CHANNEL, null);
         }
     }
 
@@ -377,15 +387,15 @@ public class EntityBodyHandler {
 
     private static void writeContent(Environment env, BObject entity, OutputStream outputStream,
                                      BObject iteratorObj, CountDownLatch latch) {
-        env.getRuntime().invokeMethodAsync(iteratorObj, MimeConstants.BYTE_STREAM_NEXT_FUNC, null, null, new Callback() {
+        env.getRuntime().invokeMethodAsync(iteratorObj, BYTE_STREAM_NEXT_FUNC, null, null, new Callback() {
             @Override
             public void notifySuccess(Object result) {
                 if (result == null) {
-                    entity.addNativeData(MimeConstants.ENTITY_BYTE_STREAM, null);
+                    entity.addNativeData(ENTITY_BYTE_STREAM, null);
                     latch.countDown();
                     return;
                 }
-                BArray arrayValue = ((BMap) result).getArrayValue(MimeConstants.FIELD_VALUE);
+                BArray arrayValue = ((BMap) result).getArrayValue(FIELD_VALUE);
                 byte[] bytes = arrayValue.getBytes();
                 try (ByteArrayInputStream str = new ByteArrayInputStream(bytes)) {
                     MimeUtil.writeInputToOutputStream(str, outputStream);
@@ -414,7 +424,7 @@ public class EntityBodyHandler {
      */
     public static void decodeEntityBody(BObject entityObj, Channel byteChannel) throws IOException {
         String contentType = MimeUtil.getContentTypeWithParameters(entityObj);
-        if (!isNotNullAndEmpty(contentType) || !contentType.startsWith(MimeConstants.MULTIPART_AS_PRIMARY_TYPE)) {
+        if (!isNotNullAndEmpty(contentType) || !contentType.startsWith(MULTIPART_AS_PRIMARY_TYPE)) {
             return;
         }
         try {
@@ -431,19 +441,19 @@ public class EntityBodyHandler {
      * @return An array of body parts
      */
     public static BArray getBodyPartArray(BObject entityObj) {
-        return entityObj.getNativeData(MimeConstants.BODY_PARTS) != null ? (BArray) entityObj.getNativeData(
-                MimeConstants.BODY_PARTS)
+        return entityObj.getNativeData(BODY_PARTS) != null ? (BArray) entityObj.getNativeData(
+                BODY_PARTS)
                 : (BArray) ValueCreator.createArrayValue(mimeEntityArrayType, 0);
     }
 
     public static Channel getByteChannel(BObject entityObj) {
-        return entityObj.getNativeData(MimeConstants.ENTITY_BYTE_CHANNEL) != null ? (Channel) entityObj.getNativeData
-                (MimeConstants.ENTITY_BYTE_CHANNEL) : null;
+        return entityObj.getNativeData(ENTITY_BYTE_CHANNEL) != null ? (Channel) entityObj.getNativeData
+                (ENTITY_BYTE_CHANNEL) : null;
     }
 
     public static BStream getByteStream(BObject entityObj) {
-        return entityObj.getNativeData(MimeConstants.ENTITY_BYTE_STREAM) != null ? (BStream) entityObj.getNativeData
-                (MimeConstants.ENTITY_BYTE_STREAM) : null;
+        return entityObj.getNativeData(ENTITY_BYTE_STREAM) != null ? (BStream) entityObj.getNativeData
+                (ENTITY_BYTE_STREAM) : null;
     }
 
     public static void closeByteChannel(Channel byteChannel) {

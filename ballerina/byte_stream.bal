@@ -75,11 +75,11 @@ class ByteStream {
 
 isolated function externGetStreamEntryRecord(Entity entity, int arraySize) returns record {|byte[] value;|}|io:Error? = 
 @java:Method {
-    'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
+    'class: "io.ballerina.stdlib.mime.nativeimpl.MimeEntityBody",
     name: "getStreamEntryRecord"
 } external;
 
 isolated function externCloseInputStream(Entity entity) returns io:Error? = @java:Method {
-    'class: "org.ballerinalang.mime.nativeimpl.MimeEntityBody",
+    'class: "io.ballerina.stdlib.mime.nativeimpl.MimeEntityBody",
     name: "closeInputByteStream"
 } external;

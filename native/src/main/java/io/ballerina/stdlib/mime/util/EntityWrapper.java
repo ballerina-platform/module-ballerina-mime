@@ -18,7 +18,7 @@
 
 package io.ballerina.stdlib.mime.util;
 
-import org.ballerinalang.stdlib.io.channels.base.Channel;
+import io.ballerina.stdlib.io.channels.base.Channel;
 
 import java.nio.channels.WritableByteChannel;
 

@@ -28,12 +28,12 @@ import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BXml;
+import io.ballerina.stdlib.io.channels.TempFileIOChannel;
+import io.ballerina.stdlib.io.channels.base.Channel;
+import io.ballerina.stdlib.io.utils.IOConstants;
+import io.ballerina.stdlib.io.utils.IOUtils;
 import org.ballerinalang.core.model.values.BError;
 import org.ballerinalang.core.model.values.BValue;
-import org.ballerinalang.stdlib.io.channels.TempFileIOChannel;
-import org.ballerinalang.stdlib.io.channels.base.Channel;
-import org.ballerinalang.stdlib.io.utils.IOConstants;
-import org.ballerinalang.stdlib.io.utils.IOUtils;
 import org.jvnet.mimepull.MIMEPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +60,9 @@ import java.util.List;
 import java.util.Set;
 
 import javax.activation.MimeTypeParseException;
+
+import static io.ballerina.stdlib.mime.util.MimeConstants.BODY_PARTS;
+import static io.ballerina.stdlib.mime.util.MimeConstants.MULTIPART_MIXED;
 
 /**
  * Contains utility functions used by mime test cases.
@@ -249,7 +252,7 @@ public class ExternTestUtils {
     public static BObject getMultipartEntity() {
         BObject multipartEntity = createEntityObject();
         ArrayList<BObject> bodyParts = getMultipleBodyParts();
-        multipartEntity.addNativeData(MimeConstants.BODY_PARTS, ExternTestUtils.getArrayOfBodyParts(bodyParts));
+        multipartEntity.addNativeData(BODY_PARTS, ExternTestUtils.getArrayOfBodyParts(bodyParts));
         return multipartEntity;
     }
 
@@ -262,10 +265,10 @@ public class ExternTestUtils {
         BObject nestedMultipartEntity = createEntityObject();
         ArrayList<BObject> bodyParts = getEmptyBodyPartList();
         for (BObject bodyPart : bodyParts) {
-            MimeUtil.setContentType(createMediaTypeObject(), bodyPart, MimeConstants.MULTIPART_MIXED);
-            bodyPart.addNativeData(MimeConstants.BODY_PARTS, ExternTestUtils.getArrayOfBodyParts(getMultipleBodyParts()));
+            MimeUtil.setContentType(createMediaTypeObject(), bodyPart, MULTIPART_MIXED);
+            bodyPart.addNativeData(BODY_PARTS, ExternTestUtils.getArrayOfBodyParts(getMultipleBodyParts()));
         }
-        nestedMultipartEntity.addNativeData(MimeConstants.BODY_PARTS, ExternTestUtils.getArrayOfBodyParts(bodyParts));
+        nestedMultipartEntity.addNativeData(BODY_PARTS, ExternTestUtils.getArrayOfBodyParts(bodyParts));
         return nestedMultipartEntity;
     }
 

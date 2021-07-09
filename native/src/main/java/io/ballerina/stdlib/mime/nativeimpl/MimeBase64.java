@@ -19,9 +19,9 @@
 package io.ballerina.stdlib.mime.nativeimpl;
 
 import io.ballerina.runtime.api.values.BString;
+import io.ballerina.stdlib.io.utils.Utils;
 import io.ballerina.stdlib.mime.util.MimeConstants;
 import io.ballerina.stdlib.mime.util.MimeUtil;
-import org.ballerinalang.stdlib.io.utils.Utils;
 
 /**
  * Utilities related to MIME base64.
