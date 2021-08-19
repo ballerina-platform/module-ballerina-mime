@@ -34,10 +34,8 @@ description = 'Ballerina - Mime Ballerina Generator'
 def packageName = "mime"
 def packageOrg = "ballerina"
 def tomlVersion = stripBallerinaExtensionVersion("${project.version}")
-def ballerinaConfigFile = new File("$project.projectDir/Ballerina.toml")
-def ballerinaDependencyFile = new File("$project.projectDir/Dependencies.toml")
-def originalConfig = ballerinaConfigFile.text
-def originalDependencies = ballerinaDependencyFile.text
+def ballerinaTomlFile = new File("$project.projectDir/Ballerina.toml")
+def originalBallerinaToml = ballerinaTomlFile.text
 
 def stripBallerinaExtensionVersion(String extVersion) {
     if (extVersion.matches(project.ext.timestampedVersionRegex)) {
@@ -77,29 +75,22 @@ dependencies {
 
 task updateTomlFiles {
     doLast {
-        def stdlibDependentIoVersion = stripBallerinaExtensionVersion(project.stdlibIoVersion)
-        def stdlibDependentLogVersion = stripBallerinaExtensionVersion(project.stdlibLogVersion)
         def stdlibDependentMimepullVersion = project.mimepullVersion
         def stdlibDependentJakartaActivationVersion = project.jakartaActivationVersion
         def stdlibDependentTestNgVersion = project.testngVersion
 
-        def newConfig = ballerinaConfigFile.text.replace("@project.version@", project.version)
-        newConfig = newConfig.replace("@toml.version@", tomlVersion)
-        newConfig = newConfig.replace("@mimepull.version@", stdlibDependentMimepullVersion)
-        newConfig = newConfig.replace("@jakarta.activation.version@", stdlibDependentJakartaActivationVersion)
-        newConfig = newConfig.replace("@testng.version@", stdlibDependentTestNgVersion)
-        ballerinaConfigFile.text = newConfig
-
-        def newDependencyConfig = ballerinaDependencyFile.text.replace("@stdlib.io.version@", stdlibDependentIoVersion)
-        newDependencyConfig = newDependencyConfig.replace("@stdlib.log.version@", stdlibDependentLogVersion)
-        ballerinaDependencyFile.text = newDependencyConfig
+        def newBallerinaToml = ballerinaTomlFile.text.replace("@project.version@", project.version)
+        newBallerinaToml = newBallerinaToml.replace("@toml.version@", tomlVersion)
+        newBallerinaToml = newBallerinaToml.replace("@mimepull.version@", stdlibDependentMimepullVersion)
+        newBallerinaToml = newBallerinaToml.replace("@jakarta.activation.version@", stdlibDependentJakartaActivationVersion)
+        newBallerinaToml = newBallerinaToml.replace("@testng.version@", stdlibDependentTestNgVersion)
+        ballerinaTomlFile.text = newBallerinaToml
     }
 }
 
 task revertTomlFiles {
     doLast {
-        ballerinaConfigFile.text = originalConfig
-        ballerinaDependencyFile.text = originalDependencies
+        ballerinaTomlFile.text = originalBallerinaToml
     }
 }
 
