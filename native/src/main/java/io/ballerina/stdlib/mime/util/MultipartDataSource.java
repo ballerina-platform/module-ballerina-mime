@@ -29,6 +29,7 @@ import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BRefValue;
 import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.api.values.BTypedesc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,7 +167,7 @@ public class MultipartDataSource implements BRefValue {
         if (!contentDisposition.isEmpty()) {
             EntityHeaderHandler.addHeader(bodyPart, httpHeaders, MimeConstants.CONTENT_DISPOSITION, contentDisposition);
         }
-        
+
         Object contentId = bodyPart.get(CONTENT_ID_FIELD);
         if (contentId != null && !contentId.toString().isEmpty()) {
             EntityHeaderHandler.addHeader(bodyPart, httpHeaders, MimeConstants.CONTENT_ID, contentId.toString());
@@ -249,5 +250,10 @@ public class MultipartDataSource implements BRefValue {
     public Object frozenCopy(Map<Object, Object> refs) {
 
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public BTypedesc getTypedesc() {
+        return null;
     }
 }
