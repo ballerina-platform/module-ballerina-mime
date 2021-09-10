@@ -1,28 +1,28 @@
 [package]
 org = "ballerina"
 name = "mime"
-version = "2.0.0"
+version = "@toml.version@"
 distribution = "slbeta3"
 
 [[platform.java11.dependency]]
-path = "../native/build/libs/mime-native-2.0.0-SNAPSHOT.jar"
+path = "../native/build/libs/mime-native-@project.version@.jar"
 
 
 [[platform.java11.dependency]]
-path = "./lib/mimepull-1.9.11.jar"
+path = "./lib/mimepull-@mimepull.version@.jar"
 groupId = "org.jvnet.mimepull"
 artifactId = "mimepull"
-version = "1.9.11"
+version = "@mimepull.version@"
 
 
 [[platform.java11.dependency]]
-path = "./lib/jakarta.activation-1.2.2.jar"
+path = "./lib/jakarta.activation-@jakarta.activation.version@.jar"
 groupId = "com.sun.activation"
 artifactId = "jakarta.activation"
-version = "1.2.2"
+version = "@jakarta.activation.version@"
 
 [[platform.java11.dependency]]
-path = "./lib/testng-7.4.0.jar"
+path = "./lib/testng-@testng.version@.jar"
 groupId = "org.testng"
 artifactId = "org.testng"
-version = "7.4.0"
+version = "@testng.version@"

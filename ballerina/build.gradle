@@ -14,6 +14,9 @@
  * limitations under the License.
  *
  */
+
+import org.apache.tools.ant.taskdefs.condition.Os
+
 buildscript {
     repositories {
         maven {
@@ -35,7 +38,7 @@ def packageName = "mime"
 def packageOrg = "ballerina"
 def tomlVersion = stripBallerinaExtensionVersion("${project.version}")
 def ballerinaTomlFile = new File("$project.projectDir/Ballerina.toml")
-def originalBallerinaToml = ballerinaTomlFile.text
+def ballerinaTomlFilePlaceHolder = new File("${project.rootDir}/build-config/resources/Ballerina.toml")
 
 def stripBallerinaExtensionVersion(String extVersion) {
     if (extVersion.matches(project.ext.timestampedVersionRegex)) {
@@ -79,7 +82,7 @@ task updateTomlFiles {
         def stdlibDependentJakartaActivationVersion = project.jakartaActivationVersion
         def stdlibDependentTestNgVersion = project.testngVersion
 
-        def newBallerinaToml = ballerinaTomlFile.text.replace("@project.version@", project.version)
+        def newBallerinaToml = ballerinaTomlFilePlaceHolder.text.replace("@project.version@", project.version)
         newBallerinaToml = newBallerinaToml.replace("@toml.version@", tomlVersion)
         newBallerinaToml = newBallerinaToml.replace("@mimepull.version@", stdlibDependentMimepullVersion)
         newBallerinaToml = newBallerinaToml.replace("@jakarta.activation.version@", stdlibDependentJakartaActivationVersion)
@@ -88,9 +91,16 @@ task updateTomlFiles {
     }
 }
 
-task revertTomlFiles {
+task commitTomlFiles {
     doLast {
-        ballerinaTomlFile.text = originalBallerinaToml
+        project.exec {
+            ignoreExitValue true
+            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                commandLine 'cmd', '/c', "git commit Ballerina.toml Dependencies.toml -m '[Automated] Update the native jar versions'"
+            } else {
+                commandLine 'sh', '-c', "git commit Ballerina.toml Dependencies.toml -m '[Automated] Update the native jar versions'"
+            }
+        }
     }
 }
 
