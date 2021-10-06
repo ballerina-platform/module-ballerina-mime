@@ -208,24 +208,30 @@ public class MimeEntityBody {
         }
     }
 
-    public static Object getStreamEntryRecord(BObject entityObj, long arraySize) {
+    public static Object getStreamEntryRecord(BObject entityObj, long inputArraySize) {
         Channel byteChannel = EntityBodyHandler.getByteChannel(entityObj);
         if (byteChannel == null) {
             return null;
         }
         byte[] bytes;
-        int arraySizeInt = (int) arraySize;
+        int arraySize = (int) inputArraySize;
         try {
             InputStream inputStream = byteChannel.getInputStream();
             try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-                byte[] buffer = new byte[arraySizeInt];
-                int readCount = inputStream.read(buffer, 0, arraySizeInt);
-                if (readCount == -1) {
-                    EntityBodyHandler.closeByteChannel(byteChannel);
-                    entityObj.addNativeData(ENTITY_BYTE_CHANNEL, null);
-                    return null;
-                }
-                output.write(buffer, 0, readCount);
+                do {
+                    byte[] buffer = new byte[arraySize];
+                    int readCount = inputStream.read(buffer, 0, arraySize);
+                    arraySize -= readCount;
+                    if (readCount == -1 && output.size() == 0) {
+                        EntityBodyHandler.closeByteChannel(byteChannel);
+                        entityObj.addNativeData(ENTITY_BYTE_CHANNEL, null);
+                        return null;
+                    }
+                    if (readCount == -1) {
+                        break;
+                    }
+                    output.write(buffer, 0, readCount);
+                } while (arraySize > 0);
                 bytes = output.toByteArray();
             }
         } catch (IOException ex) {

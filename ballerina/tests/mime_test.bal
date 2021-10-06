@@ -673,7 +673,7 @@ public function testSetByteStreamAndGetJson() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-    stream<io:Block, io:Error?> blockStream = checkpanic byteChannel.blockStream(8196);
+    stream<io:Block, io:Error?> blockStream = checkpanic byteChannel.blockStream(8192);
     Entity entity = new;
     entity.setByteStream(blockStream);
     entity.setHeader("content-type", "application/json");
@@ -697,7 +697,7 @@ public function testSetByteStreamAndGetText() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-    stream<io:Block, io:Error?> blockStream = checkpanic byteChannel.blockStream(8196);
+    stream<io:Block, io:Error?> blockStream = checkpanic byteChannel.blockStream(8192);
     Entity entity = new;
     entity.setByteStream(blockStream);
     entity.setHeader("content-type", "text/plain");
@@ -721,7 +721,7 @@ public function testSetByteStreamAndGetXml() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-    stream<io:Block, io:Error?> blockStream = checkpanic byteChannel.blockStream(8196);
+    stream<io:Block, io:Error?> blockStream = checkpanic byteChannel.blockStream(8192);
     Entity entity = new;
     entity.setByteStream(blockStream);
     entity.setHeader("content-type", "application/xml");
@@ -1448,7 +1448,7 @@ public function testSetByteStreamFromChannelAndGetByteStream() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
-    stream<io:Block, io:Error?> blockStream = checkpanic byteChannel.blockStream(8196);
+    stream<io:Block, io:Error?> blockStream = checkpanic byteChannel.blockStream(8192);
     Entity entity = new;
     entity.setByteStream(blockStream);
 
