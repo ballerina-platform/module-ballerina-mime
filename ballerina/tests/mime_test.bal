@@ -1072,7 +1072,7 @@ public function testGetAnyStreamAsString() {
 //have used internally
 @test:Config {}
 public function testByteArrayWithContentType() {
-    string content = "{'code':'123'}";
+    string content = "{\"code\":\"123\"}";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
     Entity entity = new;
@@ -1085,7 +1085,7 @@ public function testByteArrayWithContentType() {
 
 @test:Config {}
 public function testGetJsonDataSourceWithCharset() {
-    string content = "{'code':'123'}";
+    string content = "{\"code\":\"123\"}";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
     Entity entity = new;
