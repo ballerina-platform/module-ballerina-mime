@@ -76,6 +76,12 @@ dependencies {
     externalJars(group: 'org.testng', name: 'testng', version: "${testngVersion}")
 }
 
+task updateTestProperties() {
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        project.ext."disable" = "disabledOnWindows"
+    }
+}
+
 task updateTomlFiles {
     doLast {
         def stdlibDependentMimepullVersion = project.mimepullVersion
@@ -123,6 +129,7 @@ publishing {
     }
 }
 
+initializeVariables.dependsOn updateTestProperties
 updateTomlFiles.dependsOn copyStdlibs
 
 build.dependsOn "generatePomFileForMavenPublication"

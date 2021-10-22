@@ -1095,8 +1095,9 @@ public function testGetJsonDataSourceWithCharset() {
 }
 
 //Once the entity body is constructed as json and a charset value is included in the content-type, get body as a byte[]
-//Due to windows test failure : https://github.com/ballerina-platform/module-ballerina-mime/issues/19
-@test:Config {enable:false}
+@test:Config {
+    groups: ["disabledOnWindows"]
+}
 public function testByteArrayWithCharset() {
     string content = "{\"test\":\"菜鸟驿站\"}";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
