@@ -721,7 +721,6 @@ isolated function externGetBodyPartsAsStream(Entity entity) returns @tainted Par
 #            type byte[], an encoded `io:ReadableByteChannel` if the given input is of type `io:ReadableByteChannel`,
 #            or else a `mime:EncodeError` record in case of errors
 # # Deprecated
-# This `base64Encode` method deprecated by introducing the a new `lang.array:toBase64` method.
 @deprecated
 public isolated function base64Encode((string|byte[]|io:ReadableByteChannel) contentToBeEncoded, string charset = "utf-8")
                 returns (string|byte[]|io:ReadableByteChannel|EncodeError) = @java:Method {
@@ -737,7 +736,6 @@ public isolated function base64Encode((string|byte[]|io:ReadableByteChannel) con
 #            type byte[], a decoded `io:ReadableByteChannel` if the given input is of type io:ReadableByteChannel
 #            or else a `mime:DecodeError` in case of errors
 # # Deprecated
-# This `base64Decode` method deprecated by introducing the a new `lang.array:fromBase64` method.
 @deprecated
 public isolated function base64Decode((string|byte[]|io:ReadableByteChannel) contentToBeDecoded, string charset = "utf-8")
     returns (string|byte[]|io:ReadableByteChannel|DecodeError) = @java:Method {
@@ -750,7 +748,6 @@ public isolated function base64Decode((string|byte[]|io:ReadableByteChannel) con
 # + valueToBeEncoded - Content, which needs to be encoded
 # + return - An encoded byte[] or else a `mime:EncodeError` record in case of errors
 # # Deprecated
-# This `base64EncodeBlob` method deprecated by introducing the a new `lang.array:toBase64` method.
 @deprecated
 public isolated function base64EncodeBlob(byte[] valueToBeEncoded) returns byte[]|EncodeError {
     var result = base64Encode(valueToBeEncoded);
@@ -766,7 +763,6 @@ public isolated function base64EncodeBlob(byte[] valueToBeEncoded) returns byte[
 # + valueToBeDecoded - Content, which needs to be decoded
 # + return - A decoded `byte[]` or else a `mime:DecodeError` record in case of errors
 # # Deprecated
-# This `base64DecodeBlob` method deprecated by introducing the a new `lang.array:fromBase64` method.
 @deprecated
 public isolated function base64DecodeBlob(byte[] valueToBeDecoded) returns byte[]|DecodeError {
     var result = base64Decode(valueToBeDecoded);
