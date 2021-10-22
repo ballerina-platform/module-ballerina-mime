@@ -15,7 +15,7 @@
 // under the License.
 
 // Ballerina MIME Error Types
-# Defines the common error type for the module
+# Defines the common error type for the module.
 public type Error distinct error;
 
 # Represents an `EncodeError` with the message and the cause.
