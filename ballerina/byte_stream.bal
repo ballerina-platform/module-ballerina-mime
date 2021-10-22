@@ -55,7 +55,7 @@ class ByteStream {
     }
 
     # Closes the stream. The primary usage of this function is to close the stream without reaching the end.
-    # If the stream reaches the end, the `byteStream.next()` will automatically close the stream.
+    # If the stream reaches the end, the `ByteStream.next()` will automatically close the stream.
     # ```ballerina
     # io:Error? result = streamer.close();
     # ```
