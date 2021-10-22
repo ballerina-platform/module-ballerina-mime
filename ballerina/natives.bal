@@ -713,36 +713,45 @@ isolated function externGetBodyPartsAsStream(Entity entity) returns @tainted Par
     name: "getBodyPartsAsStream"
 } external;
 
-# **Deprecated API**. Encodes a given input with MIME specific Base64 encoding scheme.
+# Encodes a given input with MIME specific Base64 encoding scheme.
 #
 # + contentToBeEncoded - Content that needs to be encoded can be of type `string`, `byte[]` or `io:ReadableByteChannel`
 # + charset - Charset to be used. This is used only with the string input
 # + return - An encoded `string` if the given input is of type string, an encoded `byte[]` if the given input is of
 #            type byte[], an encoded `io:ReadableByteChannel` if the given input is of type `io:ReadableByteChannel`,
 #            or else a `mime:EncodeError` record in case of errors
+# # Deprecated
+# This `base64Encode` method deprecated by introducing the a new `lang.array:toBase64` method.
+@deprecated
 public isolated function base64Encode((string|byte[]|io:ReadableByteChannel) contentToBeEncoded, string charset = "utf-8")
                 returns (string|byte[]|io:ReadableByteChannel|EncodeError) = @java:Method {
     'class: "io.ballerina.stdlib.mime.nativeimpl.MimeBase64",
     name: "base64Encode"
 } external;
 
-# **Deprecated API**. Decodes a given input with MIME specific Base64 encoding scheme.
+# Decodes a given input with MIME specific Base64 encoding scheme.
 #
 # + contentToBeDecoded - Content that needs to be decoded can be of type `string`, `byte[]` or `io:ReadableByteChannel`
 # + charset - Charset to be used. This is used only with the string input
 # + return - A decoded `string` if the given input is of type string, a decoded `byte[]` if the given input is of
 #            type byte[], a decoded `io:ReadableByteChannel` if the given input is of type io:ReadableByteChannel
 #            or else a `mime:DecodeError` in case of errors
+# # Deprecated
+# This `base64Decode` method deprecated by introducing the a new `lang.array:fromBase64` method.
+@deprecated
 public isolated function base64Decode((string|byte[]|io:ReadableByteChannel) contentToBeDecoded, string charset = "utf-8")
     returns (string|byte[]|io:ReadableByteChannel|DecodeError) = @java:Method {
     'class: "io.ballerina.stdlib.mime.nativeimpl.MimeBase64",
     name: "base64Decode"
 } external;
 
-# **Deprecated API**. Encodes a given byte[] using the Base64 encoding scheme.
+# Encodes a given byte[] using the Base64 encoding scheme.
 #
 # + valueToBeEncoded - Content, which needs to be encoded
 # + return - An encoded byte[] or else a `mime:EncodeError` record in case of errors
+# # Deprecated
+# This `base64EncodeBlob` method deprecated by introducing the a new `lang.array:toBase64` method.
+@deprecated
 public isolated function base64EncodeBlob(byte[] valueToBeEncoded) returns byte[]|EncodeError {
     var result = base64Encode(valueToBeEncoded);
     if (result is byte[]|EncodeError) {
@@ -752,10 +761,13 @@ public isolated function base64EncodeBlob(byte[] valueToBeEncoded) returns byte[
     }
 }
 
-# **Deprecated API**. Decodes a given byte[] using the Base64 encoding scheme.
+# Decodes a given byte[] using the Base64 encoding scheme.
 #
 # + valueToBeDecoded - Content, which needs to be decoded
 # + return - A decoded `byte[]` or else a `mime:DecodeError` record in case of errors
+# # Deprecated
+# This `base64DecodeBlob` method deprecated by introducing the a new `lang.array:fromBase64` method.
+@deprecated
 public isolated function base64DecodeBlob(byte[] valueToBeDecoded) returns byte[]|DecodeError {
     var result = base64Decode(valueToBeDecoded);
     if (result is byte[]|DecodeError) {
