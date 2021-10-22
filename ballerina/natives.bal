@@ -386,7 +386,7 @@ public class Entity {
     }
 
     # Gets the entity body as a `byte[]` from a given entity. If the entity size is considerably large, consider
-    # using the `getByteStream()` method instead.
+    # using the `Entity.getByteStream()` method instead.
     # ```ballerina
     # byte[]|mime:ParserError result = entity.getByteArray();
     # ```
