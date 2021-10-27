@@ -158,6 +158,7 @@ public class Entity {
     public isolated function setContentType(@untainted string mediaType) returns InvalidContentTypeError? {
         self.cType = check getMediaType(mediaType);
         self.setHeader(CONTENT_TYPE, mediaType);
+        return;
     }
 
     # Gets the content type of the entity.
