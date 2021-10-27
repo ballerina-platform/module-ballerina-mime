@@ -721,8 +721,6 @@ isolated function externGetBodyPartsAsStream(Entity entity) returns @tainted Par
 # + return - An encoded `string` if the given input is of type string, an encoded `byte[]` if the given input is of
 #            type byte[], an encoded `io:ReadableByteChannel` if the given input is of type `io:ReadableByteChannel`,
 #            or else a `mime:EncodeError` record in case of errors
-# # Deprecated
-@deprecated
 public isolated function base64Encode((string|byte[]|io:ReadableByteChannel) contentToBeEncoded, string charset = "utf-8")
                 returns (string|byte[]|io:ReadableByteChannel|EncodeError) = @java:Method {
     'class: "io.ballerina.stdlib.mime.nativeimpl.MimeBase64",
@@ -736,8 +734,6 @@ public isolated function base64Encode((string|byte[]|io:ReadableByteChannel) con
 # + return - A decoded `string` if the given input is of type string, a decoded `byte[]` if the given input is of
 #            type byte[], a decoded `io:ReadableByteChannel` if the given input is of type io:ReadableByteChannel
 #            or else a `mime:DecodeError` in case of errors
-# # Deprecated
-@deprecated
 public isolated function base64Decode((string|byte[]|io:ReadableByteChannel) contentToBeDecoded, string charset = "utf-8")
     returns (string|byte[]|io:ReadableByteChannel|DecodeError) = @java:Method {
     'class: "io.ballerina.stdlib.mime.nativeimpl.MimeBase64",
@@ -748,8 +744,6 @@ public isolated function base64Decode((string|byte[]|io:ReadableByteChannel) con
 #
 # + valueToBeEncoded - Content, which needs to be encoded
 # + return - An encoded byte[] or else a `mime:EncodeError` record in case of errors
-# # Deprecated
-@deprecated
 public isolated function base64EncodeBlob(byte[] valueToBeEncoded) returns byte[]|EncodeError {
     var result = base64Encode(valueToBeEncoded);
     if (result is byte[]|EncodeError) {
@@ -763,8 +757,6 @@ public isolated function base64EncodeBlob(byte[] valueToBeEncoded) returns byte[
 #
 # + valueToBeDecoded - Content, which needs to be decoded
 # + return - A decoded `byte[]` or else a `mime:DecodeError` record in case of errors
-# # Deprecated
-@deprecated
 public isolated function base64DecodeBlob(byte[] valueToBeDecoded) returns byte[]|DecodeError {
     var result = base64Decode(valueToBeDecoded);
     if (result is byte[]|DecodeError) {
