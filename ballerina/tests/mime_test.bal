@@ -516,6 +516,7 @@ public function testSetEntityBodyMultipleTimesInDifferentTypes() returns error? 
     } else {
        test:assertFail(msg = "Found unexpected str output type" + str.message());
     }
+    return;
 }
 
 //An EntityError should be returned from 'getByteChannel()', in case the payload is in data source form 
@@ -872,6 +873,34 @@ public function testBase64DecodeByteArray() {
 }
 
 @test:Config {}
+public function testBase64DecodeString() {
+    string content = "YmFsbGVyaW5hMTIz";
+    var res = base64Decode(content);
+    if (res is string) {
+        test:assertEquals(res, "ballerina123");
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+}
+
+@test:Config {}
+public function testBase64DecodeByteChannel() returns error? {
+    string content = "YmFsbGVyaW5hMTIz";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    var res = base64Decode(byteChannel);
+    if (res is io:ReadableByteChannel) {
+        byte[] result = check res.readAll();
+        string name = checkpanic strings:fromBytes(result);
+        test:assertEquals(name, "ballerina123");
+        check res.close();
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+    return;
+}
+
+@test:Config {}
 public function testBase64EncodeByteArray() {
     string content = "ballerina123";
     byte[] bytes = content.toBytes();
@@ -881,6 +910,34 @@ public function testBase64EncodeByteArray() {
     } else {
         test:assertFail(msg = "Found unexpected output type");
     }
+}
+
+@test:Config {}
+public function testBase64EncodeString() {
+    string content = "ballerina123";
+    var res = base64Encode(content);
+    if (res is string) {
+        test:assertEquals(res, "YmFsbGVyaW5hMTIz");
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+}
+
+@test:Config {}
+public function testBase64EncodeByteChannel() returns error? {
+    string content = "ballerina123";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    var res = base64Encode(byteChannel);
+    if (res is io:ReadableByteChannel) {
+        byte[] result = check res.readAll();
+        string name = checkpanic strings:fromBytes(result);
+        test:assertEquals(name, "YmFsbGVyaW5hMTIz");
+        check res.close();
+    } else {
+        test:assertFail(msg = "Found unexpected output type");
+    }
+    return;
 }
 
 @test:Config {}
@@ -968,6 +1025,7 @@ public function testSetBodyAndGetByteStream() returns error? {
     } else {
        test:assertFail(msg = "Found unexpected str output type" + str.message());
     }
+    return;
 }
 
 @test:Config {}
@@ -1330,6 +1388,7 @@ public function testSeStreamAndGetStream() returns error? {
     } else {
        test:assertFail(msg = "Found unexpected str output type" + str.message());
     }
+    return;
 }
 
 //TODO check Stream.close(), I think we need to use custom stream here rather the default
@@ -1368,6 +1427,7 @@ public function testStreamClose() returns error? {
     } else {
        test:assertFail(msg = "Found unexpected str output type" + str.message());
     }
+    return;
 }
 
 //TODO check stream.close()
@@ -1396,6 +1456,7 @@ public function testStreamMultipleClose() returns error? {
     } else {
        test:assertFail(msg = "Found unexpected str output type" + str.message());
     }
+    return;
 }
 
 @test:Config {}
@@ -1487,6 +1548,7 @@ public function testSeStreamAndForeachTheStream() returns error? {
     } else {
        test:assertFail(msg = "Found unexpected str output type" + str.message());
     }
+    return;
 }
 
 //Test whether the xml content can be constructed properly once the body has been retrieved as a byte array first
