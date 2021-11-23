@@ -9,7 +9,7 @@ license = ["Apache-2.0"]
 distribution = "slbeta3"
 
 [[platform.java11.dependency]]
-path = "../native/build/libs/mime-native-2.0.1-SNAPSHOT.jar"
+path = "../native/build/libs/mime-native-2.0.1.jar"
 
 
 [[platform.java11.dependency]]
