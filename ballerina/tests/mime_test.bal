@@ -1605,9 +1605,6 @@ function consumeStream(stream<byte[], io:Error?> byteStream) {
         consumeStream(byteStream);
     } else if (arr is io:Error) {
         test:assertFail(msg = "Found unexpected arr1 output type");
-        return;
-    } else {
-        return;
     }
 }
 
