@@ -266,7 +266,7 @@ public class Entity {
     # ```
     #
     # + entityBody - Entity body can be of the type `string`,`xml`,`json`,`byte[]`,`Entity[]`, or `stream<byte[], io:Error?>`
-    public isolated function setBody(@untainted string|xml|json|byte[]|Entity[]|stream<byte[], io:Error?> entityBody) {
+    public isolated function setBody(string|xml|json|byte[]|Entity[]|stream<byte[], io:Error?> entityBody) {
         if (entityBody is string) {
             self.setText(entityBody);
         } else if (entityBody is xml) {
@@ -277,8 +277,11 @@ public class Entity {
             self.setJson(entityBody);
         } else if (entityBody is stream<byte[], io:Error?>) {
             self.setByteStream(entityBody);
-        } else {
+        } else if (entityBody is Entity[]) {
             self.setBodyParts(entityBody);
+        } else {
+            panic error Error("invalid entity body type." +
+                "expected one of the types: string|xml|json|byte[]|Entity[]|stream<byte[],io:Error?>");
         }
     }
 
