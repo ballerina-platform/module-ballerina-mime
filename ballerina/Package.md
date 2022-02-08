@@ -1,15 +1,33 @@
 ## Package Overview
 
-The `mime` library is one of the standard library packages of the <a target="_blank" href="https://ballerina.io/">Ballerina</a> language.
+This package provides a set of APIs to work with messages, which follow the Multipurpose Internet Mail Extensions
+(MIME) specification as specified in the [RFC 2045 standard](https://www.ietf.org/rfc/rfc2045.txt).
 
-It provides a set of APIs to work with messages, which follow the Multipurpose Internet Mail Extensions
-(MIME) specification as specified in the <a target="_blank" href="https://www.ietf.org/rfc/rfc2045.txt">RFC 2045 standard</a>
+```
+Entity refers to the header fields and the content of a message or a part of the body in a multipart entity. 
+```
+
+### Supported multipart types
+
+The package supports `multipart/form-data`, `multipart/mixed`, `multipart/alternative`, `multipart/related`, and
+`multipart/parallel` as multipart content types.
+
+### Modify and retrieve the data in an entity
+
+This package provides functions to set and get an entity body from different kinds of message types such as XML, text,
+JSON, byte[], and body parts. Headers can be modified through functions such as `addHeader()`, `setHeader()`,
+`removeHeader()`, etc.
+
+### Handling large files
+
+The entity object method `setFileAsEntityBody()` can be used to set large files as the entity body and
+is able to read it as a stream using the `getByteStream()` function.
 
 ## Report Issues
 
-To report bugs, request new features, start new discussions, view project boards, etc., go to the <a target="_blank" href="https://github.com/ballerina-platform/ballerina-standard-library">Ballerina standard library parent repository</a>
+To report bugs, request new features, start new discussions, view project boards, etc., go to the [Ballerina standard library parent repository](https://github.com/ballerina-platform/ballerina-standard-library).
 
 ## Useful Links
 
-* Chat live with us via our <a target="_blank" href="https://ballerina.io/community/slack/">Slack channel</a>.
-* Post all technical questions on Stack Overflow with the <a target="_blank" href="https://stackoverflow.com/questions/tagged/ballerina">#ballerina</a> tag.
+- Chat live with us via our [Slack channel](https://ballerina.io/community/slack/).
+- Post all technical questions on Stack Overflow with the [#ballerina](https://stackoverflow.com/questions/tagged/ballerina) tag.
