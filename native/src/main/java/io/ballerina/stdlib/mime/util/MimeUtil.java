@@ -441,7 +441,7 @@ public class MimeUtil {
      */
     public static BError createError(String errorTypeName, String errMsg) {
         return ErrorCreator.createError(MimeUtil.getMimePackage(), errorTypeName,
-                                        StringUtils.fromString(errMsg), null, null);
+                                        StringUtils.fromString(errMsg), null, ValueCreator.createMapValue());
     }
 
     /**
@@ -454,7 +454,7 @@ public class MimeUtil {
      */
     public static BError createError(String errorTypeName, String errMsg, BError errorValue) {
         return ErrorCreator.createError(MimeUtil.getMimePackage(), errorTypeName,
-                                        StringUtils.fromString(errMsg), errorValue, null);
+                                        StringUtils.fromString(errMsg), errorValue, ValueCreator.createMapValue());
     }
 
     public static boolean isJSONCompatible(io.ballerina.runtime.api.types.Type type) {
