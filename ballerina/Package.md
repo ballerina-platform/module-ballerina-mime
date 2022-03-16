@@ -1,4 +1,4 @@
-## Package Overview
+## Package overview
 
 This package provides a set of APIs to work with messages, which follow the Multipurpose Internet Mail Extensions
 (MIME) specification as specified in the [RFC 2045 standard](https://www.ietf.org/rfc/rfc2045.txt).
@@ -23,11 +23,11 @@ JSON, byte[], and body parts. Headers can be modified through functions such as 
 The entity object method `setFileAsEntityBody()` can be used to set large files as the entity body and
 is able to read it as a stream using the `getByteStream()` function.
 
-## Report Issues
+## Report issues
 
 To report bugs, request new features, start new discussions, view project boards, etc., go to the [Ballerina standard library parent repository](https://github.com/ballerina-platform/ballerina-standard-library).
 
-## Useful Links
+## Useful links
 
 - Chat live with us via our [Slack channel](https://ballerina.io/community/slack/).
 - Post all technical questions on Stack Overflow with the [#ballerina](https://stackoverflow.com/questions/tagged/ballerina) tag.
