@@ -18,7 +18,7 @@ This module provides functions to set and get an entity body from different kind
 JSON, byte[], and body parts. Headers can be modified through functions such as `addHeader()`, `setHeader()`, 
 `removeHeader()`, etc. 
 
-### Handling large files
+### Handle large files
 
 The entity object method `setFileAsEntityBody()` can be used to set large files as the entity body and 
 is able to read it as a stream using the `getByteStream()` function.

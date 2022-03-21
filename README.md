@@ -24,20 +24,20 @@ This module provides functions to set and get an entity body from different kind
 JSON, byte[], and body parts. Headers can be modified through functions such as `addHeader()`, `setHeader()`,
 `removeHeader()`, etc.
 
-### Handling large files
+### Handle large files
 
 The entity object method `setFileAsEntityBody()` can be used to set large files as the entity body and
 is able to read it as a stream using the `getByteStream()` function.
 
-## Issues and Projects 
+## Issues and projects 
 
 Issues and Projects tabs are disabled for this repository as this is part of the Ballerina Standard Library. To report bugs, request new features, start new discussions, view project boards, etc. please visit Ballerina Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library). 
 
 This repository only contains the source code for the package.
 
-## Building from the Source
+## Build from the source
 
-### Setting Up the Prerequisites
+### Set up the prerequisites
 
 1. Download and install Java SE Development Kit (JDK) version 11 (from one of the following locations).
 
@@ -47,9 +47,9 @@ This repository only contains the source code for the package.
    
         > **Note:** Set the JAVA_HOME environment variable to the path name of the directory into which you installed JDK.
      
-### Building the Source
+### Build the source
 
-Execute the commands below to build from source.
+Execute the commands below to build from the source.
 
 1. To build the library:
     ```
@@ -91,17 +91,17 @@ Execute the commands below to build from source.
     ./gradlew clean build -PpublishToCentral=true
     ```
 
-## Contributing to Ballerina
+## Contribute to Ballerina
 
 As an open source project, Ballerina welcomes contributions from the community. 
 
 For more information, go to the [contribution guidelines](https://github.com/ballerina-platform/ballerina-lang/blob/master/CONTRIBUTING.md).
 
-## Code of Conduct
+## Code of conduct
 
 All contributors are encouraged to read the [Ballerina Code of Conduct](https://ballerina.io/code-of-conduct).
 
-## Useful Links
+## Useful links
 * For more information go to the [`MIME` library](https://lib.ballerina.io/ballerina/mime/latest).
 * For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/learn/by-example/).
 * Chat live with us via our [Slack channel](https://ballerina.io/community/slack/).
