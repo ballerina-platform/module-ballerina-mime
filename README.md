@@ -24,7 +24,7 @@ This module provides functions to set and get an entity body from different kind
 JSON, byte[], and body parts. Headers can be modified through functions such as `addHeader()`, `setHeader()`,
 `removeHeader()`, etc.
 
-### Handling large files
+### Handle large files
 
 The entity object method `setFileAsEntityBody()` can be used to set large files as the entity body and
 is able to read it as a stream using the `getByteStream()` function.
@@ -35,9 +35,9 @@ Issues and Projects tabs are disabled for this repository as this is part of the
 
 This repository only contains the source code for the package.
 
-## Building from the source
+## Build from the source
 
-### Setting up the prerequisites
+### Set up the prerequisites
 
 1. Download and install Java SE Development Kit (JDK) version 11 (from one of the following locations).
 
@@ -47,7 +47,7 @@ This repository only contains the source code for the package.
    
         > **Note:** Set the JAVA_HOME environment variable to the path name of the directory into which you installed JDK.
      
-### Building the source
+### Build the source
 
 Execute the commands below to build from the source.
 
@@ -91,7 +91,7 @@ Execute the commands below to build from the source.
     ./gradlew clean build -PpublishToCentral=true
     ```
 
-## Contributing to ballerina
+## Contribute to ballerina
 
 As an open source project, Ballerina welcomes contributions from the community. 
 
