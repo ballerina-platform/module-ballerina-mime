@@ -169,7 +169,7 @@ public class EntityBodyHandler {
     public static Object constructJsonDataSource(BObject entityObj) {
         Channel byteChannel = getByteChannel(entityObj);
         if (byteChannel == null) {
-            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR,"empty JSON document");
+            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, "empty JSON document");
         }
         try {
             return constructJsonDataSource(entityObj, byteChannel.getInputStream());
@@ -212,7 +212,7 @@ public class EntityBodyHandler {
     public static BXml constructXmlDataSource(BObject entityObj) {
         Channel byteChannel = getByteChannel(entityObj);
         if (byteChannel == null) {
-            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR,"Empty xml payload");
+            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, "Empty xml payload");
         }
         try {
             return constructXmlDataSource(entityObj, byteChannel.getInputStream());
@@ -255,7 +255,7 @@ public class EntityBodyHandler {
     public static BString constructStringDataSource(BObject entityObj) {
         Channel byteChannel = getByteChannel(entityObj);
         if (byteChannel == null) {
-            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR,"String payload is null");
+            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, "String payload is null");
         }
         try {
             return constructStringDataSource(entityObj, byteChannel.getInputStream());
