@@ -865,8 +865,8 @@ public function testBase64DecodeByteArray() {
     string content = "ballerina123";
     byte[] bytes = content.toBytes();
     var res = base64Decode(bytes);
-    if (res is byte[]) {
-        assertByteArray(res, "m�ez��k]�");
+    if res is byte[] {
+        test:assertEquals(res, <byte[]> [109,169,101,122,184,167,107,93,183], msg = "Found unexpected output");
     } else {
         test:assertFail(msg = "Found unexpected output type");
     }
@@ -945,8 +945,8 @@ public function testBase64DecodeBlob() {
     string content = "ballerina123";
     byte[] bytes = content.toBytes();
     var res = base64DecodeBlob(bytes);
-    if (res is byte[]) {
-        assertByteArray(res, "m�ez��k]�");
+    if res is byte[] {
+        test:assertEquals(res, <byte[]> [109,169,101,122,184,167,107,93,183], msg = "Found unexpected output");
     } else {
         test:assertFail(msg = "Found unexpected output type");
     }
