@@ -163,7 +163,7 @@ entity.setJson({ "Hello": "World" });
 json|mime:ParserError result = entity.getJson();
 
 // handling bodypart
-entity.setBodyParts(bodyParts, contentType);
+entity.setBodyParts(bodyParts, contentType); 
 ```
 
 Headers can be modified through functions such as addHeader(), 
