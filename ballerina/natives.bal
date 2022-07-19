@@ -277,11 +277,8 @@ public class Entity {
             self.setJson(entityBody);
         } else if (entityBody is stream<byte[], io:Error?>) {
             self.setByteStream(entityBody);
-        } else if (entityBody is Entity[]) {
-            self.setBodyParts(entityBody);
         } else {
-            panic error Error("invalid entity body type." +
-                "expected one of the types: string|xml|json|byte[]|Entity[]|stream<byte[],io:Error?>");
+            self.setBodyParts(entityBody);
         }
     }
 
