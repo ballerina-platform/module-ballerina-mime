@@ -826,7 +826,7 @@ public function testSetJsonAndGetAlreadyBuiltByteArray() {
     Entity entity = new;
     entity.setJson(jsonContent);
     entity.setHeader(CONTENT_TYPE, "application/json; charset=UTF-8");
-    json firstTime = checkpanic entity.getJson();
+    json _ = checkpanic entity.getJson();
     assertByteArray(entity.getByteArray(), "{\"code\":123}");
 }
 
@@ -835,7 +835,7 @@ public function testSetTextAndGetAlreadyBuiltJson() {
     string content = "{\"code\":123}";
     Entity entity = new;
     entity.setText(content);
-    string firstTime = checkpanic entity.getText();
+    string _ = checkpanic entity.getText();
     assertJsonPayload(entity.getJson(), {code:123});
 }
 
@@ -1136,7 +1136,7 @@ public function testByteArrayWithContentType() {
     Entity entity = new;
     entity.setByteChannel(byteChannel, "application/json");
     //First time the json will be constructed from the byte channel
-    json firstTime = checkpanic entity.getJson();
+    json _ = checkpanic entity.getJson();
     //Then get the body as byte[]
     assertByteArray(entity.getByteArray(), "{\"code\":\"123\"}");
 }
@@ -1163,7 +1163,7 @@ public function testByteArrayWithCharset() {
     Entity entity = new;
     entity.setByteChannel(byteChannel, "application/json; charset=utf8");
     //First time the json will be constructed from the byte channel
-    json firstTime = checkpanic entity.getJson();
+    json _ = checkpanic entity.getJson();
     //Then get the body as byte[]
     assertByteArray(entity.getByteArray(), content);
 }
@@ -1545,6 +1545,9 @@ public function testSeStreamAndForeachTheStream() returns error? {
             test:assertEquals(name, expectedContent[i], msg = "Found unexpected output");
             i = i + 1;
         });
+        if e is error {
+            log:printError("error in testSeStreamAndForeachTheStream", 'error = e);
+        }
     } else {
        test:assertFail(msg = "Found unexpected str output type" + str.message());
     }
@@ -1560,7 +1563,7 @@ public function testXmlWithByteArrayContent() {
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
     Entity entity = new;
     entity.setByteChannel(byteChannel, "application/xml; charset=utf8");
-    byte[] binaryPayload = checkpanic entity.getByteArray();
+    byte[] _ = checkpanic entity.getByteArray();
     assertXmlPayload(entity.getXml(), content);
 }
 
@@ -1597,6 +1600,9 @@ function assertByteArray(byte[]|error returnResult, string expectValue) {
 
 function consumeChannel(io:ReadableByteChannel byteChannel) {
     byte[]|error result = byteChannel.read(1000000);
+    if result is error {
+        log:printError("error in consuming channel", 'error = result);
+    }
 }
 
 function consumeStream(stream<byte[], io:Error?> byteStream) {
