@@ -1,16 +1,15 @@
 name: Update Specifications
 
 env:
-    SPEC_FOLDER_PATH: 'docs/spec'
+  SPEC_FOLDER_PATH: 'docs/spec'
 
 on:
   workflow_dispatch:
   push:
     branches:
       - master
-      - 2201.1.x
     paths:
-      - ${{ env.SPEC_FOLDER_PATH }}
+      - 'docs/spec'
 
 jobs:
   update_specs:
@@ -29,12 +28,12 @@ jobs:
       - name: Get Repo Name
         id: repo_name
         run: |
-            MODULE=${{ github.event.repository.name }}
-            echo "::set-output name=short_name::${MODULE##*-}"
+          MODULE=${{ github.event.repository.name }}
+          echo "::set-output name=short_name::${MODULE##*-}"
 
       - name: Trigger Workflow
         run: |
-          curl -X POST \
+          curl --request POST \
           'https://api.github.com/repos/ballerina-platform/ballerina-dev-website/dispatches' \
           -H 'Accept: application/vnd.github.v3+json' \
           -H 'Authorization: Bearer ${{ secrets.BALLERINA_BOT_TOKEN }}' \
