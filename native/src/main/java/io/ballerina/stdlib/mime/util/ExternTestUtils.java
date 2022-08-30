@@ -32,8 +32,6 @@ import io.ballerina.stdlib.io.channels.TempFileIOChannel;
 import io.ballerina.stdlib.io.channels.base.Channel;
 import io.ballerina.stdlib.io.utils.IOConstants;
 import io.ballerina.stdlib.io.utils.IOUtils;
-import org.ballerinalang.core.model.values.BError;
-import org.ballerinalang.core.model.values.BValue;
 import org.jvnet.mimepull.MIMEPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -408,16 +406,6 @@ public class ExternTestUtils {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         blobDataSource.serialize(outStream);
         Assert.assertEquals(new String(outStream.toByteArray(), StandardCharsets.UTF_8), "Ballerina binary file part");
-    }
-
-    static void verifyMimeError(BValue returnValue, String errMsg) {
-        Assert.assertEquals(((BError) returnValue).getMessage(), errMsg);
-    }
-
-    public static void assertJBytesWithBBytes(byte[] jBytes, byte[] bBytes) {
-        for (int i = 0; i < jBytes.length; i++) {
-            Assert.assertEquals(bBytes[i], jBytes[i], "Invalid byte value returned.");
-        }
     }
 
     private ExternTestUtils() {}

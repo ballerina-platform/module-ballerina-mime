@@ -19,7 +19,6 @@
 module io.ballerina.stdlib.mime {
     requires io.ballerina.runtime;
     requires io.ballerina.lang;
-    requires io.ballerina.core;
     requires io.ballerina.stdlib.io;
     requires org.slf4j;
     requires org.jvnet.mimepull;
