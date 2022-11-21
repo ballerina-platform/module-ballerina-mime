@@ -28,6 +28,7 @@ import io.ballerina.runtime.api.types.ObjectType;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.JsonUtils;
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.utils.XmlUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
@@ -320,7 +321,8 @@ public class EntityBodyHandler {
      */
     static void setPartsToTopLevelEntity(BObject entity, ArrayList<BObject> bodyParts) {
         if (!bodyParts.isEmpty()) {
-            ObjectType typeOfBodyPart = bodyParts.get(FIRST_BODY_PART_INDEX).getType();
+            ObjectType typeOfBodyPart =
+                    (ObjectType) TypeUtils.getReferredType(bodyParts.get(FIRST_BODY_PART_INDEX).getType());
             BObject[] result = bodyParts.toArray(new BObject[bodyParts.size()]);
             BArray partsArray = (BArray) ValueCreator
                     .createArrayValue(result, TypeCreator.createArrayType(typeOfBodyPart));
