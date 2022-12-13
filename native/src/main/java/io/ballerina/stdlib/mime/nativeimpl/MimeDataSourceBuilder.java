@@ -75,10 +75,10 @@ public abstract class MimeDataSourceBuilder {
             String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
             if (isNotNullAndEmpty(charsetValue)) {
                 return ValueCreator.createArrayValue(
-                        StringUtils.getJsonString(messageDataSource).getBytes(charsetValue));
+                        StringUtils.getStringValue(messageDataSource, null).getBytes(charsetValue));
             }
             return ValueCreator.createArrayValue(
-                    StringUtils.getJsonString(messageDataSource).getBytes(Charset.defaultCharset()));
+                    StringUtils.getStringValue(messageDataSource, null).getBytes(Charset.defaultCharset()));
         }
         return ValueCreator.createArrayValue(new byte[0]);
     }
