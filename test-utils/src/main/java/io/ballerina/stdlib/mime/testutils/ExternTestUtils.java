@@ -42,7 +42,6 @@ import io.ballerina.stdlib.mime.util.MultipartDecoder;
 import org.jvnet.mimepull.MIMEPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;

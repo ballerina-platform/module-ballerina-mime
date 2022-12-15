@@ -19,11 +19,9 @@
 
 module io.ballerina.stdlib.mime.testutils {
     requires org.slf4j;
-    requires org.testng;
     requires io.ballerina.stdlib.mime;
     requires io.ballerina.runtime;
     requires io.ballerina.stdlib.io;
     requires org.jvnet.mimepull;
     requires jakarta.activation;
-
 }
