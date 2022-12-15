@@ -15,13 +15,15 @@ artifactId = "mime-native"
 version = "@toml.version@"
 path = "../native/build/libs/mime-native-@project.version@.jar"
 
+[[platform.java11.dependency]]
+path = "../test-utils/build/libs/mime-test-utils-@project.version@.jar"
+scope = "testOnly"
 
 [[platform.java11.dependency]]
 path = "./lib/mimepull-@mimepull.version@.jar"
 groupId = "org.jvnet.mimepull"
 artifactId = "mimepull"
 version = "@mimepull.version@"
-
 
 [[platform.java11.dependency]]
 path = "./lib/jakarta.activation-@jakarta.activation.version@.jar"
@@ -31,6 +33,4 @@ version = "@jakarta.activation.version@"
 
 [[platform.java11.dependency]]
 path = "./lib/testng-@testng.version@.jar"
-groupId = "org.testng"
-artifactId = "org.testng"
-version = "@testng.version@"
+scope = "testOnly"

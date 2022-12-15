@@ -16,7 +16,7 @@
 *  under the License.
 */
 
-package io.ballerina.stdlib.mime.util;
+package io.ballerina.stdlib.mime.testutils;
 
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
@@ -32,6 +32,13 @@ import io.ballerina.stdlib.io.channels.TempFileIOChannel;
 import io.ballerina.stdlib.io.channels.base.Channel;
 import io.ballerina.stdlib.io.utils.IOConstants;
 import io.ballerina.stdlib.io.utils.IOUtils;
+import io.ballerina.stdlib.mime.util.EntityBodyChannel;
+import io.ballerina.stdlib.mime.util.EntityBodyHandler;
+import io.ballerina.stdlib.mime.util.EntityWrapper;
+import io.ballerina.stdlib.mime.util.HeaderUtil;
+import io.ballerina.stdlib.mime.util.MimeConstants;
+import io.ballerina.stdlib.mime.util.MimeUtil;
+import io.ballerina.stdlib.mime.util.MultipartDecoder;
 import org.jvnet.mimepull.MIMEPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

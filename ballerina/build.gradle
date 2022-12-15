@@ -134,6 +134,7 @@ updateTomlFiles.dependsOn copyStdlibs
 
 build.dependsOn "generatePomFileForMavenPublication"
 build.dependsOn ":${packageName}-native:build"
+build.dependsOn ":${packageName}-test-utils:build"
 test.dependsOn ":${packageName}-native:build"
 
 publishToMavenLocal.dependsOn build
