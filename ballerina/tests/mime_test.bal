@@ -1634,9 +1634,9 @@ function assertJsonPayload(json|error payload, json expectValue) {
 
 public function createTemporaryFile(string fileName, string fileType, string valueTobeWritten) returns string|error
 = @java:Method {
-    'class: "io.ballerina.stdlib.mime.util.ExternTestUtils"
+    'class: "io.ballerina.stdlib.mime.testutils.ExternTestUtils"
 } external;
 
 public function assertGetBodyPartsAsChannel(io:ReadableByteChannel bodyChannel) = @java:Method {
-    'class: "io.ballerina.stdlib.mime.util.ExternTestUtils"
+    'class: "io.ballerina.stdlib.mime.testutils.ExternTestUtils"
 } external;
