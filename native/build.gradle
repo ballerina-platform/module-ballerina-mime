@@ -39,8 +39,8 @@ dependencies {
     implementation group: 'org.jvnet.mimepull', name: 'mimepull', version: "${mimepullVersion}"
     implementation group: 'com.sun.activation', name: 'jakarta.activation', version: "${jakartaActivationVersion}"
     implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: "${slf4jVersion}"
-    implementation group: 'org.testng', name: 'testng', version: "${testngVersion}"
 
+    testImplementation group: 'org.testng', name: 'testng', version: "${testngVersion}"
     testImplementation group: 'org.mockito', name:'mockito-inline', version: "${mockitoVersion}"
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: "${mockitoVersion}"
 }
