@@ -73,7 +73,6 @@ dependencies {
     externalJars(group: 'com.sun.activation', name: 'jakarta.activation', version: "${jakartaActivationVersion}") {
         transitive = false
     }
-    externalJars(group: 'org.testng', name: 'testng', version: "${testngVersion}")
 }
 
 task updateTestProperties() {
@@ -86,13 +85,11 @@ task updateTomlFiles {
     doLast {
         def stdlibDependentMimepullVersion = project.mimepullVersion
         def stdlibDependentJakartaActivationVersion = project.jakartaActivationVersion
-        def stdlibDependentTestNgVersion = project.testngVersion
 
         def newBallerinaToml = ballerinaTomlFilePlaceHolder.text.replace("@project.version@", project.version)
         newBallerinaToml = newBallerinaToml.replace("@toml.version@", tomlVersion)
         newBallerinaToml = newBallerinaToml.replace("@mimepull.version@", stdlibDependentMimepullVersion)
         newBallerinaToml = newBallerinaToml.replace("@jakarta.activation.version@", stdlibDependentJakartaActivationVersion)
-        newBallerinaToml = newBallerinaToml.replace("@testng.version@", stdlibDependentTestNgVersion)
         ballerinaTomlFile.text = newBallerinaToml
     }
 }
@@ -134,7 +131,9 @@ updateTomlFiles.dependsOn copyStdlibs
 
 build.dependsOn "generatePomFileForMavenPublication"
 build.dependsOn ":${packageName}-native:build"
+build.dependsOn ":${packageName}-test-utils:build"
 test.dependsOn ":${packageName}-native:build"
+test.dependsOn ":${packageName}-test-utils:build"
 
 publishToMavenLocal.dependsOn build
 publish.dependsOn build
