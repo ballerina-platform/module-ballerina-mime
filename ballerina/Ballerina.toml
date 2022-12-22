@@ -13,10 +13,10 @@ distribution = "2201.3.0"
 groupId = "io.ballerina.stdlib"
 artifactId = "mime-native"
 version = "2.5.1"
-path = "../native/build/libs/mime-native-2.5.1-SNAPSHOT.jar"
+path = "../native/build/libs/mime-native-2.5.1.jar"
 
 [[platform.java11.dependency]]
-path = "../test-utils/build/libs/mime-test-utils-2.5.1-SNAPSHOT.jar"
+path = "../test-utils/build/libs/mime-test-utils-2.5.1.jar"
 scope = "testOnly"
 
 [[platform.java11.dependency]]
