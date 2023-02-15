@@ -22,6 +22,7 @@ import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MapType;
+import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
@@ -57,6 +58,36 @@ public class HeaderUtilTest {
         BObject entityStruct = Mockito.mock(BObject.class);
         String returnVal = HeaderUtil.getBaseType(entityStruct);
         Assert.assertNull(returnVal);
+    }
+
+    @Test
+    public void testGetHeaderValueWithSemiColon() {
+        String value = HeaderUtil.getHeaderValue("application/x-www-form-urlencoded" + ";");
+        Assert.assertEquals(value, "application/x-www-form-urlencoded");
+    }
+
+    @Test
+    public void testGetHeaderValueWithoutSemiColon() {
+        String headerValue = "application/x-www-form-urlencoded";
+        String value = HeaderUtil.getHeaderValue(headerValue);
+        Assert.assertEquals(value, headerValue);
+    }
+
+    @Test
+    public void testGetHeaderValueWithParameters() {
+        String value = HeaderUtil.getHeaderValue("application/x-www-form-urlencoded; charset=UTF-8");
+        Assert.assertEquals(value, "application/x-www-form-urlencoded");
+    }
+
+    @Test
+    public void testGetHeaderValueWithInvalidInput() {
+        try {
+            HeaderUtil.getHeaderValue("; application/x-www-form-urlencoded; charset=UTF-8");
+            Assert.fail("Expected an error");
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof BError);
+            Assert.assertEquals(e.toString(), "a");
+        }
     }
 
 }
