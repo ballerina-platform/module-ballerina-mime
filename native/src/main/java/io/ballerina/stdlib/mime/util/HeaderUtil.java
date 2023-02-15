@@ -91,11 +91,11 @@ public class HeaderUtil {
         if (semicolonIndex < 0) {
             return headerValue.trim();
         }
-        String value = headerValue.substring(0, semicolonIndex);
+        String value = headerValue.substring(0, semicolonIndex).trim();
         if (value.isEmpty()) {
             throw MimeUtil.createError(INVALID_HEADER_VALUE_ERROR, "invalid header value: " + headerValue);
         }
-        return value.trim();
+        return value;
     }
 
     private static boolean validateParams(List<String> paramList) {
