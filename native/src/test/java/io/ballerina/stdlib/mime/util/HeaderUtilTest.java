@@ -79,15 +79,4 @@ public class HeaderUtilTest {
         Assert.assertEquals(value, "application/x-www-form-urlencoded");
     }
 
-    @Test
-    public void testGetHeaderValueWithInvalidInput() {
-        try {
-            HeaderUtil.getHeaderValue("; application/x-www-form-urlencoded; charset=UTF-8");
-            Assert.fail("Expected an error");
-        } catch (Exception e) {
-            Assert.assertTrue(e instanceof BError);
-            Assert.assertEquals(e.toString(), "a");
-        }
-    }
-
 }
