@@ -87,11 +87,15 @@ public class HeaderUtil {
      * @return Header value without parameters
      */
     private static String extractValue(String headerValue) {
-        String value = headerValue.substring(0, headerValue.indexOf(SEMICOLON)).trim();
+        int semicolonIndex = headerValue.indexOf(SEMICOLON);
+        if (semicolonIndex < 0) {
+            return headerValue.trim();
+        }
+        String value = headerValue.substring(0, semicolonIndex);
         if (value.isEmpty()) {
             throw MimeUtil.createError(INVALID_HEADER_VALUE_ERROR, "invalid header value: " + headerValue);
         }
-        return value;
+        return value.trim();
     }
 
     private static boolean validateParams(List<String> paramList) {
