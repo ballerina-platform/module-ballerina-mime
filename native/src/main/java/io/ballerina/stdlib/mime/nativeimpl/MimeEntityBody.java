@@ -110,7 +110,7 @@ public class MimeEntityBody {
         try {
             String contentType = getContentTypeWithParameters(entityObj);
             if (isMultipart(contentType)) {
-                EntityBodyChannel entityBodyChannel = creatEntityBodyChannel(env, entityObj, contentType);
+                EntityBodyChannel entityBodyChannel = createEntityBodyChannel(env, entityObj, contentType);
                 BObject byteChannelObj = ValueCreator.createObjectValue(IOUtils.getIOPackage(),
                                                                         READABLE_BYTE_CHANNEL_STRUCT);
                 byteChannelObj.addNativeData(IOConstants.BYTE_CHANNEL_NAME, new EntityWrapper(entityBodyChannel));
@@ -129,7 +129,7 @@ public class MimeEntityBody {
         try {
             String contentType = getContentTypeWithParameters(entityObj);
             if (isMultipart(contentType)) {
-                EntityBodyChannel entityBodyChannel = creatEntityBodyChannel(env, entityObj, contentType);
+                EntityBodyChannel entityBodyChannel = createEntityBodyChannel(env, entityObj, contentType);
                 entityObj.addNativeData(ENTITY_BYTE_CHANNEL, new EntityWrapper(entityBodyChannel));
                 return null;
             } else {
@@ -142,7 +142,7 @@ public class MimeEntityBody {
         }
     }
 
-    private static EntityBodyChannel creatEntityBodyChannel(Environment env, BObject entityObj, String contentType)
+    private static EntityBodyChannel createEntityBodyChannel(Environment env, BObject entityObj, String contentType)
             throws IOException {
         String boundaryValue = HeaderUtil.extractBoundaryParameter(contentType);
         String multipartDataBoundary = boundaryValue != null ? boundaryValue : getNewMultipartDelimiter();

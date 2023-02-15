@@ -59,4 +59,23 @@ public class HeaderUtilTest {
         Assert.assertNull(returnVal);
     }
 
+    @Test
+    public void testGetHeaderValueWithSemiColon() {
+        String value = HeaderUtil.getHeaderValue("application/x-www-form-urlencoded" + ";");
+        Assert.assertEquals(value, "application/x-www-form-urlencoded");
+    }
+
+    @Test
+    public void testGetHeaderValueWithoutSemiColon() {
+        String headerValue = "application/x-www-form-urlencoded";
+        String value = HeaderUtil.getHeaderValue(headerValue);
+        Assert.assertEquals(value, headerValue);
+    }
+
+    @Test
+    public void testGetHeaderValueWithParameters() {
+        String value = HeaderUtil.getHeaderValue("application/x-www-form-urlencoded; charset=UTF-8");
+        Assert.assertEquals(value, "application/x-www-form-urlencoded");
+    }
+
 }
