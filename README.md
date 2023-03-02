@@ -1,4 +1,4 @@
-Ballerina MIME Library
+Ballerina MIME Librar
 ===================
 
   [![Build](https://github.com/ballerina-platform/module-ballerina-mime/actions/workflows/build-timestamped-master.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-mime/actions/workflows/build-timestamped-master.yml)
