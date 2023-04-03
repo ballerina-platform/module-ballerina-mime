@@ -1,22 +1,22 @@
 [package]
 org = "ballerina"
 name = "mime"
-version = "2.6.0"
+version = "2.7.0"
 authors = ["Ballerina"]
 keywords = ["mime", "multipart", "entity"]
 repository = "https://github.com/ballerina-platform/module-ballerina-mime"
 icon = "icon.png"
 license = ["Apache-2.0"]
-distribution = "2201.4.0"
+distribution = "2201.5.0"
 
 [[platform.java11.dependency]]
 groupId = "io.ballerina.stdlib"
 artifactId = "mime-native"
-version = "2.6.0"
-path = "../native/build/libs/mime-native-2.6.0-SNAPSHOT.jar"
+version = "2.7.0"
+path = "../native/build/libs/mime-native-2.7.0-SNAPSHOT.jar"
 
 [[platform.java11.dependency]]
-path = "../test-utils/build/libs/mime-test-utils-2.6.0-SNAPSHOT.jar"
+path = "../test-utils/build/libs/mime-test-utils-2.7.0-SNAPSHOT.jar"
 scope = "testOnly"
 
 [[platform.java11.dependency]]
