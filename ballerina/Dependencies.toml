@@ -5,7 +5,7 @@
 
 [ballerina]
 dependencies-toml-version = "2"
-distribution-version = "2201.5.0-20230404-105200-b8aec90e"
+distribution-version = "2201.5.0"
 
 [[package]]
 org = "ballerina"
@@ -102,7 +102,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "mime"
-version = "2.7.0"
+version = "2.7.1"
 dependencies = [
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
