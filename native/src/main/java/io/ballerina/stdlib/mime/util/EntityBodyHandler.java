@@ -73,7 +73,7 @@ public class EntityBodyHandler {
 
     private static final Logger log = LoggerFactory.getLogger(EntityBodyHandler.class);
     private static final Type MIME_ENTITY_TYPE =
-            ValueCreator.createObjectValue(MimeUtil.getMimePackage(), ENTITY).getType();
+            TypeUtils.getType(ValueCreator.createObjectValue(MimeUtil.getMimePackage(), ENTITY));
     private static final ArrayType mimeEntityArrayType = TypeCreator.createArrayType(MIME_ENTITY_TYPE);
 
     /**
@@ -322,7 +322,7 @@ public class EntityBodyHandler {
     static void setPartsToTopLevelEntity(BObject entity, ArrayList<BObject> bodyParts) {
         if (!bodyParts.isEmpty()) {
             ObjectType typeOfBodyPart =
-                    (ObjectType) TypeUtils.getReferredType(bodyParts.get(FIRST_BODY_PART_INDEX).getType());
+                    (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(bodyParts.get(FIRST_BODY_PART_INDEX)));
             BObject[] result = bodyParts.toArray(new BObject[bodyParts.size()]);
             BArray partsArray = (BArray) ValueCreator
                     .createArrayValue(result, TypeCreator.createArrayType(typeOfBodyPart));
