@@ -21,6 +21,8 @@ package io.ballerina.stdlib.mime.util;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BObject;
+import jakarta.activation.MimeType;
+import jakarta.activation.MimeTypeParseException;
 import org.jvnet.mimepull.MIMEConfig;
 import org.jvnet.mimepull.MIMEMessage;
 import org.jvnet.mimepull.MIMEPart;
@@ -28,9 +30,6 @@ import org.jvnet.mimepull.MIMEPart;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
 
 import static io.ballerina.stdlib.mime.util.MimeConstants.BOUNDARY;
 import static io.ballerina.stdlib.mime.util.MimeConstants.CONTENT_DISPOSITION_STRUCT;

@@ -34,6 +34,9 @@ import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BStreamingJson;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.stdlib.mime.nativeimpl.ModuleUtils;
+import jakarta.activation.MimeType;
+import jakarta.activation.MimeTypeParameterList;
+import jakarta.activation.MimeTypeParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,10 +47,6 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Random;
-
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParameterList;
-import javax.activation.MimeTypeParseException;
 
 import static io.ballerina.stdlib.mime.util.MimeConstants.ASSIGNMENT;
 import static io.ballerina.stdlib.mime.util.MimeConstants.BODY_PARTS;

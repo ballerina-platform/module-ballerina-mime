@@ -19,4 +19,22 @@
 	<Match>
 		<Bug pattern="BC_UNCONFIRMED_CAST" />
 	</Match>
+	<Match>
+		<Class name="io.ballerina.stdlib.mime.util.MimeEntityWrapper"/>
+		<Field name="mimePart"/>
+		<Bug pattern="EI_EXPOSE_REP2" />
+	</Match>
+	<Match>
+		<Class name="io.ballerina.stdlib.mime.util.MimeUtil"/>
+		<Metod name="getNewMultipartDelimiter"/>
+		<Bug pattern="DMI_RANDOM_USED_ONLY_ONCE" />
+	</Match>
+	<Match>
+		<Class name="io.ballerina.stdlib.mime.util.MultipartDataSource"/>
+		<Bug pattern="EI_EXPOSE_REP2" />
+	</Match>
+	<Match>
+		<Class name="io.ballerina.stdlib.mime.util.MultipartDataSource.serialize"/>
+		<Bug pattern="EI_EXPOSE_REP2" />
+	</Match>
 </FindBugsFilter>

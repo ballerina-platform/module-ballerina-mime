@@ -25,11 +25,10 @@ import io.ballerina.runtime.api.types.MapType;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
+import jakarta.activation.MimeTypeParseException;
 import org.mockito.Mockito;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import javax.activation.MimeTypeParseException;
 
 /**
  * A unit test class for Mime module HeaderUtil class functions.
