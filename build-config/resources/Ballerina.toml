@@ -9,26 +9,26 @@ icon = "icon.png"
 license = ["Apache-2.0"]
 distribution = "2201.7.0"
 
-[platform.java11]
+[platform.java17]
 graalvmCompatible = true
 
-[[platform.java11.dependency]]
+[[platform.java17.dependency]]
 groupId = "io.ballerina.stdlib"
 artifactId = "mime-native"
 version = "@toml.version@"
 path = "../native/build/libs/mime-native-@project.version@.jar"
 
-[[platform.java11.dependency]]
+[[platform.java17.dependency]]
 path = "../test-utils/build/libs/mime-test-utils-@project.version@.jar"
 scope = "testOnly"
 
-[[platform.java11.dependency]]
+[[platform.java17.dependency]]
 path = "./lib/mimepull-@mimepull.version@.jar"
 groupId = "org.jvnet.mimepull"
 artifactId = "mimepull"
 version = "@mimepull.version@"
 
-[[platform.java11.dependency]]
+[[platform.java17.dependency]]
 path = "./lib/jakarta.activation-@jakarta.activation.version@.jar"
 groupId = "com.sun.activation"
 artifactId = "jakarta.activation"

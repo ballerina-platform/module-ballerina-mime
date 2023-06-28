@@ -22,7 +22,7 @@ plugins {
 }
 
 jacoco {
-    toolVersion = "0.8.6"
+    toolVersion = "0.8.10"
 }
 
 description = 'Ballerina - Mime Java Utils'
@@ -40,7 +40,7 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: "${slf4jVersion}"
 
     testImplementation group: 'org.testng', name: 'testng', version: "${testngVersion}"
-    testImplementation group: 'org.mockito', name:'mockito-inline', version: "${mockitoVersion}"
+    testImplementation group: 'org.mockito', name:'mockito-core', version: "${mockitoVersion}"
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: "${mockitoVersion}"
 }
 
@@ -66,7 +66,7 @@ test {
 jacocoTestReport {
     dependsOn test
     reports {
-        xml.enabled true
+        xml.required = true
     }
 }
 

@@ -26,13 +26,12 @@ import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
+import jakarta.activation.MimeType;
+import jakarta.activation.MimeTypeParseException;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
 
 import static io.ballerina.stdlib.mime.util.MimeConstants.ASSIGNMENT;
 import static io.ballerina.stdlib.mime.util.MimeConstants.BOUNDARY;
