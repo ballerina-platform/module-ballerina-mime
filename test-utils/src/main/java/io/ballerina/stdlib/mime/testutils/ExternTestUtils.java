@@ -30,6 +30,7 @@ import io.ballerina.stdlib.io.utils.IOConstants;
 import io.ballerina.stdlib.mime.util.EntityBodyHandler;
 import io.ballerina.stdlib.mime.util.MimeUtil;
 import io.ballerina.stdlib.mime.util.MultipartDecoder;
+import jakarta.activation.MimeTypeParseException;
 import org.jvnet.mimepull.MIMEPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +44,6 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-
-import javax.activation.MimeTypeParseException;
 
 import static io.ballerina.stdlib.mime.util.MimeConstants.ENTITY;
 
