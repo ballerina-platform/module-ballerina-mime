@@ -40,7 +40,7 @@ dependencies {
     implementation group: 'io.ballerina.stdlib', name: 'io-native', version: "${stdlibIoVersion}"
 
     implementation group: 'org.jvnet.mimepull', name: 'mimepull', version: "${mimepullVersion}"
-    implementation group: 'com.sun.activation', name: 'jakarta.activation', version: "${jakartaActivationVersion}"
+    implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: "${jakartaActivationVersion}"
     implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: "${slf4jVersion}"
 }
 

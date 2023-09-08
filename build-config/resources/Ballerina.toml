@@ -29,7 +29,7 @@ artifactId = "mimepull"
 version = "@mimepull.version@"
 
 [[platform.java17.dependency]]
-path = "./lib/jakarta.activation-@jakarta.activation.version@.jar"
-groupId = "com.sun.activation"
-artifactId = "jakarta.activation"
+path = "./lib/jakarta.activation-api-@jakarta.activation.version@.jar"
+groupId = "jakarta.activation"
+artifactId = "jakarta.activation-api"
 version = "@jakarta.activation.version@"

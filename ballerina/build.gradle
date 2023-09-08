@@ -70,7 +70,7 @@ dependencies {
     externalJars(group: 'org.jvnet.mimepull', name: 'mimepull', version: "${mimepullVersion}") {
         transitive = false
     }
-    externalJars(group: 'com.sun.activation', name: 'jakarta.activation', version: "${jakartaActivationVersion}") {
+    externalJars(group: 'jakarta.activation', name: 'jakarta.activation-api', version: "${jakartaActivationVersion}") {
         transitive = false
     }
 }
