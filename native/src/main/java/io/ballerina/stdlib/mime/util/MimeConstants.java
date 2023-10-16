@@ -28,7 +28,9 @@ import static io.ballerina.runtime.api.constants.RuntimeConstants.BALLERINA_PACK
 /**
  * Constants related to MIME.
  */
-public class MimeConstants {
+public final class MimeConstants {
+
+    private MimeConstants() {}
 
     public static final String ENTITY = "Entity";
     public static final String MEDIA_TYPE = "MediaType";
