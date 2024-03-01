@@ -1530,8 +1530,6 @@ public isolated function testSetByteStreamFromChannelAndGetByteStream() {
     }
 }
 
-isolated int i = 0;
-
 @test:Config {}
 public isolated function testSeStreamAndForeachTheStream() returns error? {
     final readonly & string[] expectedContent = ["ballerina", "language"];
@@ -1541,18 +1539,18 @@ public isolated function testSeStreamAndForeachTheStream() returns error? {
 
     stream<byte[], io:Error?>|ParserError str = entity.getByteStream();
     if (str is stream<byte[], io:Error?>) {
-        error? e = str.forEach(isolated function(byte[] student) {
-            string name = checkpanic strings:fromBytes(student);
-            lock {
+        int i = 0;
+        io:Error? e = from byte[] student in str
+            do {
+                string name = checkpanic strings:fromBytes(student);
                 test:assertEquals(name, expectedContent[i], msg = "Found unexpected output");
                 i += 1;
-            }
-        });
+            };
         if e is error {
             log:printError("error in testSeStreamAndForeachTheStream", 'error = e);
         }
     } else {
-       test:assertFail(msg = "Found unexpected str output type" + str.message());
+        test:assertFail(msg = "Found unexpected str output type" + str.message());
     }
     return;
 }
