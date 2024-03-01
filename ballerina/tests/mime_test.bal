@@ -22,14 +22,14 @@ import ballerina/test;
 
 const string TEMP_DIR = "build/";
 
-function getMediaTypeTestObj() returns MediaType {
+isolated function getMediaTypeTestObj() returns MediaType {
     MediaType mediaType = new;
     mediaType.primaryType = "application";
     mediaType.subType = "my-custom-type+json";
     return mediaType;
 }
 
-function getDispositionTestObj() returns ContentDisposition {
+isolated function getDispositionTestObj() returns ContentDisposition {
     ContentDisposition disposition = new;
     disposition.fileName = "test_file.xml";
     disposition.disposition = "inline";
@@ -37,7 +37,7 @@ function getDispositionTestObj() returns ContentDisposition {
     return disposition;
 }
 
-function getDispositionWithoutParamsTestObj() returns ContentDisposition {
+isolated function getDispositionWithoutParamsTestObj() returns ContentDisposition {
     ContentDisposition disposition = new;
     disposition.disposition = "inline";
     return disposition;
@@ -45,7 +45,7 @@ function getDispositionWithoutParamsTestObj() returns ContentDisposition {
 
 //Test 'getMediaType' function in ballerina/mime package
 @test:Config {}
-public function testGetMediaTypeFunction() {
+public isolated function testGetMediaTypeFunction() {
     MediaType|error returnVal = getMediaType("multipart/form-data; boundary=032a1ab685934650abbe059cb45d6ff3");
     if returnVal is MediaType {
         test:assertEquals(returnVal.primaryType, "multipart", msg = "Found unexpected output");
@@ -60,7 +60,7 @@ public function testGetMediaTypeFunction() {
 
 //Test whether an error is returned while constructing MediaType object with an incorrect content type value
 @test:Config {}
-public function getMediaTypeWithIncorrectContentType() {
+public isolated function getMediaTypeWithIncorrectContentType() {
     MediaType|error returnVal = getMediaType("testContentType");
     if returnVal is error {
         test:assertEquals(returnVal.message(), "error InvalidContentTypeError (\"Unable to find a sub type.\")",
@@ -72,7 +72,7 @@ public function getMediaTypeWithIncorrectContentType() {
 
 //Test 'getBaseType' function in ballerina/mime package
 @test:Config {}
-public function testGetBaseTypeOnMediaTypeFunc() {
+public isolated function testGetBaseTypeOnMediaTypeFunc() {
     MediaType mediaType = new;
     mediaType.primaryType = "application";
     mediaType.subType = "test+xml";
@@ -82,7 +82,7 @@ public function testGetBaseTypeOnMediaTypeFunc() {
 
 //"Test 'MediaType.toString()' function in ballerina/mime package
 @test:Config {}
-public function testToStringOnMediaTypeFunc() {
+public isolated function testToStringOnMediaTypeFunc() {
     MediaType mediaType = new;
     mediaType.primaryType = "application";
     mediaType.subType = "test+xml";
@@ -92,7 +92,7 @@ public function testToStringOnMediaTypeFunc() {
 }
 
 @test:Config {}
-public function testToStringOnMediaTypeFuncWithMultipleParameters() {
+public isolated function testToStringOnMediaTypeFuncWithMultipleParameters() {
     MediaType mediaType = new;
     mediaType.primaryType = "application";
     mediaType.subType = "test+xml";
@@ -103,7 +103,7 @@ public function testToStringOnMediaTypeFuncWithMultipleParameters() {
 
 //Test 'getContentDispositionObject' function in ballerina/mime package
 @test:Config {}
-public function testGetContentDispositionObject() {
+public isolated function testGetContentDispositionObject() {
     ContentDisposition cDisposition = getContentDispositionObject("form-data; name=filepart; filename=file-01.txt");
     test:assertEquals(cDisposition.fileName, "file-01.txt", msg = "Found unexpected output");
     test:assertEquals(cDisposition.name, "filepart", msg = "Found unexpected output");
@@ -112,7 +112,7 @@ public function testGetContentDispositionObject() {
 }
 
 @test:Config {}
-public function testGetContentDispositionWithInvalidHeader() {
+public isolated function testGetContentDispositionWithInvalidHeader() {
     Entity entity = new;
     entity.setHeader(CONTENT_DISPOSITION, ";");
     var result = trap entity.getContentDisposition();
@@ -126,7 +126,7 @@ public function testGetContentDispositionWithInvalidHeader() {
 }
 
 @test:Config {}
-public function testToStringOnContentDisposition() {
+public isolated function testToStringOnContentDisposition() {
     ContentDisposition cDisposition = new;
     cDisposition.fileName = "file-01.txt";
     cDisposition.disposition = "form-data";
@@ -137,7 +137,7 @@ public function testToStringOnContentDisposition() {
 
 //Set json data to entity and get the content back from entity as json
 @test:Config {}
-public function testGetAndSetJsonFunc() {
+public isolated function testGetAndSetJsonFunc() {
     Entity entity = new;
     entity.setJson({"code":"123"});
     var result = entity.getJson();
@@ -148,7 +148,7 @@ public function testGetAndSetJsonFunc() {
 
 //Test whether the json content can be retrieved properly when it is called multiple times
 @test:Config {}
-public function testGetJsonMoreThanOnce() {
+public isolated function testGetJsonMoreThanOnce() {
     Entity entity = new;
     entity.setJson({"code":"123"});
     json|error returnContent1 = entity.getJson();
@@ -184,7 +184,7 @@ public function testGetJsonMoreThanOnce() {
 
 //Set xml data to entity and get the content back from entity as xml
 @test:Config {}
-public function testGetAndSetXml() {
+public isolated function testGetAndSetXml() {
     Entity entity = new;
     xml xmlContent = xml `<name>ballerina</name>`;
     entity.setXml(xmlContent);
@@ -193,7 +193,7 @@ public function testGetAndSetXml() {
 
 //Test whether the xml content can be retrieved properly when it is called multiple times
 @test:Config {}
-public function testGetXmlMoreThanOnce() {
+public isolated function testGetXmlMoreThanOnce() {
     Entity entity = new;
     xml xmlContent = xml `<name>ballerina</name>`;
     entity.setXml(xmlContent);
@@ -230,7 +230,7 @@ public function testGetXmlMoreThanOnce() {
 
 //Set text data to entity and get the content back from entity as text
 @test:Config {}
-public function testGetAndSetText() {
+public isolated function testGetAndSetText() {
     Entity entity = new;
     string textContent = "Hello Ballerina !";
     entity.setText(textContent);
@@ -239,7 +239,7 @@ public function testGetAndSetText() {
 
 //Test whether the text content can be retrieved properly when it is called multiple times
 @test:Config {}
-public function testGetTextMoreThanOnce() {
+public isolated function testGetTextMoreThanOnce() {
     Entity entity = new;
     string textContent = "Hello Ballerina !";
     entity.setText(textContent);
@@ -276,7 +276,7 @@ public function testGetTextMoreThanOnce() {
 
 //Set byte array data to entity and get the content back from entity as a byte array
 @test:Config {}
-public function testGetAndSetByteArray() {
+public isolated function testGetAndSetByteArray() {
     string content = "ballerina";
     Entity entity = new;
     entity.setByteArray(content.toBytes());
@@ -285,7 +285,7 @@ public function testGetAndSetByteArray() {
 
 //Test whether the byte array content can be retrieved properly when it is called multiple times
 @test:Config {}
-public function testGetByteArrayMoreThanOnce() {
+public isolated function testGetByteArrayMoreThanOnce() {
     Entity entity = new;
     string content = "ballerina";
     entity.setByteArray(content.toBytes());
@@ -339,7 +339,7 @@ public function testGetByteArrayMoreThanOnce() {
 
 //Set file as entity body and get the content back as a byte array
 @test:Config {}
-public function testSetFileAsEntityBody() {
+public isolated function testSetFileAsEntityBody() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     Entity entity = new;
@@ -348,10 +348,10 @@ public function testSetFileAsEntityBody() {
 }
 
 
-//Set byte channel as entity body and get the content back as a byte array. API setByteChannel() is hidden but have 
+//Set byte channel as entity body and get the content back as a byte array. API setByteChannel() is hidden but have
 //used internally
 @test:Config {}
-public function testSetByteChannel() {
+public isolated function testSetByteChannel() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -362,7 +362,7 @@ public function testSetByteChannel() {
 
 //Set byte channel as entity body and get that channel back. (to test internal channel functionality)
 @test:Config {}
-public function testGetByteChannel() {
+public isolated function testGetByteChannel() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -384,7 +384,7 @@ public function testGetByteChannel() {
 
 //Set byte channel as entity body and get the content as byte stream
 @test:Config {}
-public function testSetByteChannelAndGetByteStream() {
+public isolated function testSetByteChannelAndGetByteStream() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -409,7 +409,7 @@ public function testSetByteChannelAndGetByteStream() {
 }
 
 @test:Config {}
-public function testSetByteChannelAndGetByteStreamOf8ByteSizedArray() {
+public isolated function testSetByteChannelAndGetByteStreamOf8ByteSizedArray() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -440,7 +440,7 @@ public function testSetByteChannelAndGetByteStreamOf8ByteSizedArray() {
 }
 
 @test:Config {}
-public function testSetByteChannelAndGetByteStreamOf10ByteSizedArray() {
+public isolated function testSetByteChannelAndGetByteStreamOf10ByteSizedArray() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -473,7 +473,7 @@ public function testSetByteChannelAndGetByteStreamOf10ByteSizedArray() {
 
 //Set entity body as a byte channel get the content back as a string (to test internal channel functionality)
 @test:Config {}
-public function testSetEntityBodyMultipleTimes() {
+public isolated function testSetEntityBodyMultipleTimes() {
     string content = "File Content";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -495,7 +495,7 @@ public function testSetEntityBodyMultipleTimes() {
 }
 
 @test:Config {}
-public function testSetEntityBodyMultipleTimesInDifferentTypes() returns error? {
+public isolated function testSetEntityBodyMultipleTimesInDifferentTypes() returns error? {
     string fileContent = "File Content";
     string resourcePath = TEMP_DIR + "byteContent1.txt";
     check io:fileWriteString(resourcePath, fileContent);
@@ -522,7 +522,7 @@ public function testSetEntityBodyMultipleTimesInDifferentTypes() returns error? 
 //An EntityError should be returned from 'getByteChannel()', in case the payload is in data source form 
 // (to test internal channel functionality)
 @test:Config {}
-public function testByteChannelWhenPayloadInDataSource() {
+public isolated function testByteChannelWhenPayloadInDataSource() {
     Entity entity = new;
     entity.setJson({code:123});
     var result = entity.getByteChannel();
@@ -537,7 +537,7 @@ public function testByteChannelWhenPayloadInDataSource() {
 
 //An EntityError should be returned from 'getByteStream()', in case the payload is in data source form
 @test:Config {}
-public function testByteStreamWhenPayloadInDataSource() {
+public isolated function testByteStreamWhenPayloadInDataSource() {
     Entity entity = new;
     entity.setJson({code:123});
     var result = entity.getByteStream();
@@ -552,7 +552,7 @@ public function testByteStreamWhenPayloadInDataSource() {
 //Once the byte channel is consumed by the user, check whether the content retrieved as a text data source is empty
 //(to test internal channel functionality)
 @test:Config {}
-public function testGetTextDataSource() {
+public isolated function testGetTextDataSource() {
     string content = "{'code':'123'}";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -570,7 +570,7 @@ public function testGetTextDataSource() {
 }
 
 @test:Config {}
-public function testGetTextDataSourceWithCharset() {
+public isolated function testGetTextDataSourceWithCharset() {
     string content = "ballerina";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -582,7 +582,7 @@ public function testGetTextDataSourceWithCharset() {
 
 //Once the byte stream is consumed by the user, check whether the content retrieved as a text data source is empty
 @test:Config {}
-public function testGetTextDataSourceOncetheStreamIsConsumed() {
+public isolated function testGetTextDataSourceOncetheStreamIsConsumed() {
     string content = "{'code':'123'}";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -609,7 +609,7 @@ public function testGetTextDataSourceOncetheStreamIsConsumed() {
 //Once the byte channel is consumed, check whether the content retrieved as a json data source return an error
 //(to test internal channel funcassertTextPayloadtionality)
 @test:Config {}
-public function testGetJsonDataSource() {
+public isolated function testGetJsonDataSource() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -640,7 +640,7 @@ public function testGetJsonDataSource() {
 
 //Once the byte stream is consumed, check whether the content retrieved as a json data source return an error
 @test:Config {}
-public function testGetJsonDataSourceOnceTheByteStreamIsConsumed() {
+public isolated function testGetJsonDataSourceOnceTheByteStreamIsConsumed() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -670,7 +670,7 @@ public function testGetJsonDataSourceOnceTheByteStreamIsConsumed() {
 }
 
 @test:Config {}
-public function testSetByteStreamAndGetJson() {
+public isolated function testSetByteStreamAndGetJson() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -694,7 +694,7 @@ public function testSetByteStreamAndGetJson() {
 }
 
 @test:Config {}
-public function testSetByteStreamAndGetText() {
+public isolated function testSetByteStreamAndGetText() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -718,7 +718,7 @@ public function testSetByteStreamAndGetText() {
 }
 
 @test:Config {}
-public function testSetByteStreamAndGetXml() {
+public isolated function testSetByteStreamAndGetXml() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -742,7 +742,7 @@ public function testSetByteStreamAndGetXml() {
 }
 
 @test:Config {}
-public function testGetXmlWithSuffix() {
+public isolated function testGetXmlWithSuffix() {
     Entity entity = new;
     xml xmlContent = xml `<name>ballerina</name>`;
     entity.setHeader("content-type", "application/3gpdash-qoe-report+xml");
@@ -752,7 +752,7 @@ public function testGetXmlWithSuffix() {
 
 //Get xml content from entity that has a non compatible xml content-type
 @test:Config {}
-public function testGetXmlWithNonCompatibleMediaType() {
+public isolated function testGetXmlWithNonCompatibleMediaType() {
     Entity entity = new;
     xml xmlContent = xml `<name>ballerina</name>`;
     entity.setXml(xmlContent);
@@ -761,7 +761,7 @@ public function testGetXmlWithNonCompatibleMediaType() {
 }
 
 @test:Config {}
-public function testGetJsonWithSuffix() {
+public isolated function testGetJsonWithSuffix() {
     Entity entity = new;
     json jsonContent = {code:123};
     entity.setHeader("content-type", "application/yang-patch+json");
@@ -770,7 +770,7 @@ public function testGetJsonWithSuffix() {
 }
 
 @test:Config {}
-public function testGetJsonWithNonCompatibleMediaType() {
+public isolated function testGetJsonWithNonCompatibleMediaType() {
     Entity entity = new;
     json jsonContent = {code:123};
     entity.setJson(jsonContent);
@@ -780,7 +780,7 @@ public function testGetJsonWithNonCompatibleMediaType() {
 }
 
 @test:Config {}
-public function testGetTextContentWithNonCompatibleMediaType() {
+public isolated function testGetTextContentWithNonCompatibleMediaType() {
     Entity entity = new;
     string textContent = "Hello Ballerina!";
     entity.setText(textContent);
@@ -789,7 +789,7 @@ public function testGetTextContentWithNonCompatibleMediaType() {
 }
 
 @test:Config {}
-public function testSetBodyAndGetText() {
+public isolated function testSetBodyAndGetText() {
     Entity entity = new;
     string entityBody = "Hello Ballerina!";
     entity.setBody(entityBody);
@@ -797,7 +797,7 @@ public function testSetBodyAndGetText() {
 }
 
 @test:Config {}
-public function testSetBodyAndGetXml() {
+public isolated function testSetBodyAndGetXml() {
     Entity entity = new;
     xml entityBody = xml `<name>ballerina</name>`;
     entity.setBody(entityBody);
@@ -805,7 +805,7 @@ public function testSetBodyAndGetXml() {
 }
 
 @test:Config {}
-public function testSetBodyAndGetJson() {
+public isolated function testSetBodyAndGetJson() {
     Entity entity = new;
     json entityBody = {code:123};
     entity.setBody(entityBody);
@@ -813,7 +813,7 @@ public function testSetBodyAndGetJson() {
 }
 
 @test:Config {}
-public function testSetBodyAndGetByteArray() {
+public isolated function testSetBodyAndGetByteArray() {
     string content = "ballerina";
     Entity entity = new;
     entity.setBody(content.toBytes());
@@ -821,7 +821,7 @@ public function testSetBodyAndGetByteArray() {
 }
 
 @test:Config {}
-public function testSetJsonAndGetAlreadyBuiltByteArray() {
+public isolated function testSetJsonAndGetAlreadyBuiltByteArray() {
     json jsonContent = {code:123};
     Entity entity = new;
     entity.setJson(jsonContent);
@@ -831,16 +831,16 @@ public function testSetJsonAndGetAlreadyBuiltByteArray() {
 }
 
 @test:Config {}
-public function testSetTextAndGetAlreadyBuiltJson() {
+public isolated function testSetTextAndGetAlreadyBuiltJson() {
     string content = "{\"code\":123}";
     Entity entity = new;
     entity.setText(content);
     string _ = checkpanic entity.getText();
-    assertJsonPayload(entity.getJson(), {code:123});
+    assertJsonPayload(entity.getJson(), {code: 123});
 }
 
 @test:Config {}
-public function testXmlNotBuiltDataSource() {
+public isolated function testXmlNotBuiltDataSource() {
     xml content = xml `<name>Ballerina xml content</name>`;
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", "<name>Ballerina xml content</name>");
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -850,7 +850,7 @@ public function testXmlNotBuiltDataSource() {
 }
 
 @test:Config {}
-public function testGetXmlDataSourceWithOutCharset() {
+public isolated function testGetXmlDataSourceWithOutCharset() {
     xml content = xml `<name>Ballerina xml content</name>`;
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", "<name>Ballerina xml content</name>");
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -861,7 +861,7 @@ public function testGetXmlDataSourceWithOutCharset() {
 }
 
 @test:Config {}
-public function testBase64DecodeByteArray() {
+public isolated function testBase64DecodeByteArray() {
     string content = "ballerina123";
     byte[] bytes = content.toBytes();
     var res = base64Decode(bytes);
@@ -873,7 +873,7 @@ public function testBase64DecodeByteArray() {
 }
 
 @test:Config {}
-public function testBase64DecodeString() {
+public isolated function testBase64DecodeString() {
     string content = "YmFsbGVyaW5hMTIz";
     var res = base64Decode(content);
     if (res is string) {
@@ -884,7 +884,7 @@ public function testBase64DecodeString() {
 }
 
 @test:Config {}
-public function testBase64DecodeByteChannel() returns error? {
+public isolated function testBase64DecodeByteChannel() returns error? {
     string content = "YmFsbGVyaW5hMTIz";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -901,7 +901,7 @@ public function testBase64DecodeByteChannel() returns error? {
 }
 
 @test:Config {}
-public function testBase64EncodeByteArray() {
+public isolated function testBase64EncodeByteArray() {
     string content = "ballerina123";
     byte[] bytes = content.toBytes();
     var res = base64Encode(bytes);
@@ -913,7 +913,7 @@ public function testBase64EncodeByteArray() {
 }
 
 @test:Config {}
-public function testBase64EncodeString() {
+public isolated function testBase64EncodeString() {
     string content = "ballerina123";
     var res = base64Encode(content);
     if (res is string) {
@@ -924,7 +924,7 @@ public function testBase64EncodeString() {
 }
 
 @test:Config {}
-public function testBase64EncodeByteChannel() returns error? {
+public isolated function testBase64EncodeByteChannel() returns error? {
     string content = "ballerina123";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -941,7 +941,7 @@ public function testBase64EncodeByteChannel() returns error? {
 }
 
 @test:Config {}
-public function testBase64DecodeBlob() {
+public isolated function testBase64DecodeBlob() {
     string content = "ballerina123";
     byte[] bytes = content.toBytes();
     var res = base64DecodeBlob(bytes);
@@ -953,7 +953,7 @@ public function testBase64DecodeBlob() {
 }
 
 @test:Config {}
-public function testBase64DecodeBlobError() {
+public isolated function testBase64DecodeBlobError() {
     string content = "ballerina";
     byte[] bytes = content.toBytes();
     var res = base64DecodeBlob(bytes);
@@ -965,7 +965,7 @@ public function testBase64DecodeBlobError() {
 }
 
 @test:Config {}
-public function testBase64EncodeBlob() {
+public isolated function testBase64EncodeBlob() {
     string content = "ballerina123";
     byte[] bytes = content.toBytes();
     var res = base64EncodeBlob(bytes);
@@ -977,7 +977,7 @@ public function testBase64EncodeBlob() {
 }
 
 @test:Config {}
-public function testEmptyContentDisposition() {
+public isolated function testEmptyContentDisposition() {
     ContentDisposition disposition = new;
     assertTextPayload(disposition.toString(), "");
 }
@@ -1005,7 +1005,7 @@ public function testEmptyContentDisposition() {
 // }
 
 @test:Config {}
-public function testSetBodyAndGetByteStream() returns error? {
+public isolated function testSetBodyAndGetByteStream() returns error? {
     string content = "Hello Ballerina!";
     string resourcePath = TEMP_DIR + "byteContent2.txt";
     check io:fileWriteString(resourcePath, content);
@@ -1029,7 +1029,7 @@ public function testSetBodyAndGetByteStream() returns error? {
 }
 
 @test:Config {}
-public function testSetMediaTypeToEntity() {
+public isolated function testSetMediaTypeToEntity() {
     Entity entity = new;
     MediaType mediaType = getMediaTypeTestObj();
     checkpanic entity.setContentType(mediaType.toString());
@@ -1037,7 +1037,7 @@ public function testSetMediaTypeToEntity() {
 }
 
 @test:Config {}
-public function testSetMediaTypeAndGetValueAsHeader() {
+public isolated function testSetMediaTypeAndGetValueAsHeader() {
     Entity entity = new;
     MediaType mediaType = getMediaTypeTestObj();
     checkpanic entity.setContentType(mediaType.toString());
@@ -1046,23 +1046,23 @@ public function testSetMediaTypeAndGetValueAsHeader() {
 }
 
 @test:Config {}
-public function testSetHeaderAndGetMediaType() {
+public isolated function testSetHeaderAndGetMediaType() {
     Entity entity = new;
     entity.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
     test:assertEquals(entity.getContentType(), "text/plain; charset=UTF-8", msg = "Found unexpected output");
 }
 
 @test:Config {}
-public function testSetContentDispositionToEntity() {
+public isolated function testSetContentDispositionToEntity() {
     Entity entity = new;
     entity.setContentDisposition(getDispositionTestObj());
     ContentDisposition disposition = entity.getContentDisposition();
     test:assertEquals(disposition.toString(), "inline;name=\"test\";filename=\"test_file.xml\"",
-                      msg = "Found unexpected output");
+                    msg = "Found unexpected output");
 }
 
 @test:Config {}
-public function testSetContentDispositionToEntityWithoutParams() {
+public isolated function testSetContentDispositionToEntityWithoutParams() {
     Entity entity = new;
     entity.setContentDisposition(getDispositionWithoutParamsTestObj());
     ContentDisposition disposition = entity.getContentDisposition();
@@ -1070,24 +1070,24 @@ public function testSetContentDispositionToEntityWithoutParams() {
 }
 
 @test:Config {}
-public function testSetContentDispositionAndGetValueAsHeader() {
+public isolated function testSetContentDispositionAndGetValueAsHeader() {
     Entity entity = new;
     entity.setContentDisposition(getDispositionTestObj());
     test:assertEquals(entity.getHeader(CONTENT_DISPOSITION), "inline;name=\"test\";filename=\"test_file.xml\"",
-                      msg = "Found unexpected output");
+                    msg = "Found unexpected output");
 }
 
 @test:Config {}
-public function testSetHeaderAndGetContentDisposition() {
+public isolated function testSetHeaderAndGetContentDisposition() {
     Entity entity = new;
     entity.setHeader(CONTENT_DISPOSITION, "inline;name=\"test\";filename=\"test_file.xml\"");
     ContentDisposition receivedDisposition = entity.getContentDisposition();
     test:assertEquals(receivedDisposition.toString(), "inline;name=\"test\";filename=\"test_file.xml\"",
-                      msg = "Found unexpected output");
+                    msg = "Found unexpected output");
 }
 
 @test:Config {}
-public function testSetContentLengthToEntity() {
+public isolated function testSetContentLengthToEntity() {
     Entity entity = new;
     entity.setContentLength(45555);
     int length = checkpanic entity.getContentLength();
@@ -1095,21 +1095,21 @@ public function testSetContentLengthToEntity() {
 }
 
 @test:Config {}
-public function testSetContentLengthAndGetValueAsHeader() {
+public isolated function testSetContentLengthAndGetValueAsHeader() {
     Entity entity = new;
     entity.setContentLength(45555);
     test:assertEquals(entity.getHeader(CONTENT_LENGTH), "45555", msg = "Found unexpected output");
 }
 
 @test:Config {}
-public function testSetContentIdToEntity() {
+public isolated function testSetContentIdToEntity() {
     Entity entity = new;
     entity.setContentId("test-id");
     test:assertEquals(entity.getContentId(), "test-id", msg = "Found unexpected output");
 }
 
 @test:Config {}
-public function testSetContentIdAndGetValueAsHeader() {
+public isolated function testSetContentIdAndGetValueAsHeader() {
     Entity entity = new;
     entity.setContentId("test-id");
     test:assertEquals(entity.getHeader(CONTENT_ID), "test-id", msg = "Found unexpected output");
@@ -1117,7 +1117,7 @@ public function testSetContentIdAndGetValueAsHeader() {
 
 //API setByteChannel() is hidden but have used internally
 @test:Config {}
-public function testGetAnyStreamAsString() {
+public isolated function testGetAnyStreamAsString() {
     string content = "{'code':'123'}";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -1129,7 +1129,7 @@ public function testGetAnyStreamAsString() {
 //Once an entity body has been constructed as json, get the body as a byte[]. API setByteChannel() is hidden but 
 //have used internally
 @test:Config {}
-public function testByteArrayWithContentType() {
+public isolated function testByteArrayWithContentType() {
     string content = "{\"code\":\"123\"}";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -1142,7 +1142,7 @@ public function testByteArrayWithContentType() {
 }
 
 @test:Config {}
-public function testGetJsonDataSourceWithCharset() {
+public isolated function testGetJsonDataSourceWithCharset() {
     string content = "{\"code\":\"123\"}";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -1156,7 +1156,7 @@ public function testGetJsonDataSourceWithCharset() {
 @test:Config {
     groups: ["disabledOnWindows"]
 }
-public function testByteArrayWithCharset() {
+public isolated function testByteArrayWithCharset() {
     string content = "{\"test\":\"菜鸟驿站\"}";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -1170,7 +1170,7 @@ public function testByteArrayWithCharset() {
 
 //Test whether the body parts in a multipart entity can be retrieved as a byte channel
 @test:Config {}
-public function testGetBodyPartsAsChannel() {
+public isolated function testGetBodyPartsAsChannel() {
     //Create a body part with json content.
     Entity bodyPart1 = new;
     bodyPart1.setJson({ "bodyPart": "jsonPart" });
@@ -1198,7 +1198,7 @@ public function testGetBodyPartsAsChannel() {
 }
 
 @test:Config {}
-public function testGetBodyPartsAsItIs() {
+public isolated function testGetBodyPartsAsItIs() {
     //Create a body part with json content.
     Entity bodyPart1 = new;
     bodyPart1.setJson({ "bodyPart": "jsonPart" });
@@ -1228,7 +1228,7 @@ public function testGetBodyPartsAsItIs() {
 }
 
 @test:Config {}
-public function testGetBodyPartsFromByteChannel() {
+public isolated function testGetBodyPartsFromByteChannel() {
     Entity bodyPart1 = new;
     bodyPart1.setFileAsEntityBody("tests/resources/datafiles/multipart.txt",
             MULTIPART_MIXED + "; boundary=bd7547c98465dae2");
@@ -1243,7 +1243,7 @@ public function testGetBodyPartsFromByteChannel() {
 }
 
 @test:Config {}
-public function testGetBodyPartsAsStream() {
+public isolated function testGetBodyPartsAsStream() {
     //Create a body part with json content.
     Entity bodyPart1 = new;
     bodyPart1.setJson({ "bodyPart": "jsonPart" });
@@ -1285,7 +1285,7 @@ public function testGetBodyPartsAsStream() {
 
 //Test whether an error is returned when trying to extract body parts from entity that has discrete media type content
 @test:Config {}
-public function getBodyPartsFromDiscreteTypeEntity() {
+public isolated function getBodyPartsFromDiscreteTypeEntity() {
     Entity entity = new;
     entity.setJson({ "bodyPart": "jsonPart" });
     var result = entity.getBodyParts();
@@ -1300,7 +1300,7 @@ public function getBodyPartsFromDiscreteTypeEntity() {
 //Test whether an error returned when trying convert body parts as byte channel when actual content is not
 // composite media type
 @test:Config {}
-public function getChannelFromParts() {
+public isolated function getChannelFromParts() {
     Entity entity = new;
     entity.setJson({ "bodyPart": "jsonPart" });
     var result = entity.getBodyPartsAsChannel();
@@ -1312,7 +1312,7 @@ public function getChannelFromParts() {
 }
 
 @test:Config {}
-public function getStreamFromParts() {
+public isolated function getStreamFromParts() {
     Entity entity = new;
     entity.setJson({ "bodyPart": "jsonPart" });
     var result = entity.getBodyPartsAsStream();
@@ -1325,7 +1325,7 @@ public function getStreamFromParts() {
 
 //Test whether an error is returned when trying to retrieve a byte channel from a multipart entity
 @test:Config {}
-public function getChannelFromMultipartEntity() {
+public isolated function getChannelFromMultipartEntity() {
     Entity bodyPart1 = new;
     bodyPart1.setJson({ "bodyPart": "jsonPart" });
 
@@ -1347,7 +1347,7 @@ public function getChannelFromMultipartEntity() {
 
 //Test whether the string body is retrieved from the cache. API setByteChannel() is hidden but have used internally
 @test:Config {}
-public function getAnyStreamAsStringFromCache() {
+public isolated function getAnyStreamAsStringFromCache() {
     string content = "{'code':'123'}";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -1361,7 +1361,7 @@ public function getAnyStreamAsStringFromCache() {
 }
 
 @test:Config {}
-public function testSeStreamAndGetStream() returns error? {
+public isolated function testSeStreamAndGetStream() returns error? {
     string[] expectedContent = ["ballerina", "language"];
     stream<byte[], io:Error?> byteStream = new(new ByteStreamFromStringsGenerator(expectedContent));
     Entity entity = new;
@@ -1392,8 +1392,8 @@ public function testSeStreamAndGetStream() returns error? {
 }
 
 //TODO check Stream.close(), I think we need to use custom stream here rather the default
-@test:Config {enable:false}
-public function testStreamClose() returns error? {
+@test:Config {enable: false}
+public isolated function testStreamClose() returns error? {
     string content = "ballerinalanguage";
     string resourcePath = TEMP_DIR + "byteContent4.txt";
     check io:fileWriteString(resourcePath, content);
@@ -1432,7 +1432,7 @@ public function testStreamClose() returns error? {
 
 //TODO check stream.close()
 @test:Config {enable:false}
-public function testStreamMultipleClose() returns error? {
+public isolated function testStreamMultipleClose() returns error? {
     string content = "ballerina";
     string resourcePath = TEMP_DIR + "byteContent3.txt";
     check io:fileWriteString(resourcePath, content);
@@ -1460,7 +1460,7 @@ public function testStreamMultipleClose() returns error? {
 }
 
 @test:Config {}
-public function testStreamCloseWithSetByteChannel() {
+public isolated function testStreamCloseWithSetByteChannel() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -1479,7 +1479,7 @@ public function testStreamCloseWithSetByteChannel() {
 }
 
 @test:Config {}
-public function testStreamMultipleCloseWithSetByteChannel() {
+public isolated function testStreamMultipleCloseWithSetByteChannel() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -1506,7 +1506,7 @@ public function testStreamMultipleCloseWithSetByteChannel() {
 
 //Set byte channel as entity body and get the content as byte stream
 @test:Config {}
-public function testSetByteStreamFromChannelAndGetByteStream() {
+public isolated function testSetByteStreamFromChannelAndGetByteStream() {
     string content = "Hello Ballerina!";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -1530,20 +1530,23 @@ public function testSetByteStreamFromChannelAndGetByteStream() {
     }
 }
 
+isolated int i = 0;
+
 @test:Config {}
-public function testSeStreamAndForeachTheStream() returns error? {
-    string[] expectedContent = ["ballerina", "language"];
-    stream<byte[], io:Error?> byteStream = new(new ByteStreamFromStringsGenerator(expectedContent));
+public isolated function testSeStreamAndForeachTheStream() returns error? {
+    final readonly & string[] expectedContent = ["ballerina", "language"];
+    stream<byte[], io:Error?> byteStream = new (new ByteStreamFromStringsGenerator(expectedContent));
     Entity entity = new;
     entity.setByteStream(byteStream);
 
     stream<byte[], io:Error?>|ParserError str = entity.getByteStream();
     if (str is stream<byte[], io:Error?>) {
-        int i = 0;
-        error? e = str.forEach(function (byte[] student) {
+        error? e = str.forEach(isolated function(byte[] student) {
             string name = checkpanic strings:fromBytes(student);
-            test:assertEquals(name, expectedContent[i], msg = "Found unexpected output");
-            i = i + 1;
+            lock {
+                test:assertEquals(name, expectedContent[i], msg = "Found unexpected output");
+                i += 1;
+            }
         });
         if e is error {
             log:printError("error in testSeStreamAndForeachTheStream", 'error = e);
@@ -1557,7 +1560,7 @@ public function testSeStreamAndForeachTheStream() returns error? {
 //Test whether the xml content can be constructed properly once the body has been retrieved as a byte array first
 //API setByteChannel() is hidden but have used internally
 @test:Config {}
-public function testXmlWithByteArrayContent() {
+public isolated function testXmlWithByteArrayContent() {
     xml content = xml `<name>Ballerina xml content</name>`;
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", "<name>Ballerina xml content</name>");
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -1570,7 +1573,7 @@ public function testXmlWithByteArrayContent() {
 //Test whether an error is returned when trying to construct body parts from an invalid channel
 //API setByteChannel() is hidden but have used internally
 @test:Config {}
-public function getPartsFromInvalidChannel() {
+public isolated function getPartsFromInvalidChannel() {
     string content = "test file";
     string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", content);
     io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
@@ -1579,13 +1582,13 @@ public function getPartsFromInvalidChannel() {
     var result = entity.getBodyParts();
     if (result is error) {
         test:assertEquals(result.message(), "Error occurred while extracting body parts from entity: Missing start " +
-                          "boundary", msg = "Found unexpected output");
+                        "boundary", msg = "Found unexpected output");
     } else {
         test:assertFail(msg = "Found unexpected output type");
     }
 }
 
-function assertByteArray(byte[]|error returnResult, string expectValue) {
+isolated function assertByteArray(byte[]|error returnResult, string expectValue) {
     if returnResult is byte[] {
         var value = strings:fromBytes(returnResult);
         if (value is string) {
@@ -1598,14 +1601,14 @@ function assertByteArray(byte[]|error returnResult, string expectValue) {
     }
 }
 
-function consumeChannel(io:ReadableByteChannel byteChannel) {
+isolated function consumeChannel(io:ReadableByteChannel byteChannel) {
     byte[]|error result = byteChannel.read(1000000);
     if result is error {
         log:printError("error in consuming channel", 'error = result);
     }
 }
 
-function consumeStream(stream<byte[], io:Error?> byteStream) {
+isolated function consumeStream(stream<byte[], io:Error?> byteStream) {
     record {|byte[] value;|}|io:Error? arr = byteStream.next();
     if (arr is record {|byte[] value;|}) {
         consumeStream(byteStream);
@@ -1614,7 +1617,7 @@ function consumeStream(stream<byte[], io:Error?> byteStream) {
     }
 }
 
-function assertXmlPayload(xml|error payload, xml expectValue) {
+isolated function assertXmlPayload(xml|error payload, xml expectValue) {
     if payload is xml {
         test:assertEquals(payload, expectValue, msg = "Found unexpected output");
     } else {
@@ -1622,7 +1625,7 @@ function assertXmlPayload(xml|error payload, xml expectValue) {
     }
 }
 
-function assertTextPayload(string|error payload, string expectValue) {
+isolated function assertTextPayload(string|error payload, string expectValue) {
     if payload is string {
         test:assertEquals(payload, expectValue, msg = "Found unexpected output");
     } else {
@@ -1630,7 +1633,7 @@ function assertTextPayload(string|error payload, string expectValue) {
     }
 }
 
-function assertJsonPayload(json|error payload, json expectValue) {
+isolated function assertJsonPayload(json|error payload, json expectValue) {
     if payload is json {
         test:assertEquals(payload, expectValue, msg = "Found unexpected output");
     } else {
@@ -1638,11 +1641,11 @@ function assertJsonPayload(json|error payload, json expectValue) {
     }
 }
 
-public function createTemporaryFile(string fileName, string fileType, string valueTobeWritten) returns string|error
+public isolated function createTemporaryFile(string fileName, string fileType, string valueTobeWritten) returns string|error
 = @java:Method {
     'class: "io.ballerina.stdlib.mime.testutils.ExternTestUtils"
 } external;
 
-public function assertGetBodyPartsAsChannel(io:ReadableByteChannel bodyChannel) = @java:Method {
+public isolated function assertGetBodyPartsAsChannel(io:ReadableByteChannel bodyChannel) = @java:Method {
     'class: "io.ballerina.stdlib.mime.testutils.ExternTestUtils"
 } external;
