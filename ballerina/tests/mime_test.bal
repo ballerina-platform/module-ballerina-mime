@@ -1542,7 +1542,7 @@ isolated function testSeStreamAndForeachTheStream() returns error? {
         int i = 0;
         io:Error? e = from byte[] student in str
             do {
-                string name = checkpanic strings:fromBytes(student);
+                string name = check strings:fromBytes(student);
                 test:assertEquals(name, expectedContent[i], msg = "Found unexpected output");
                 i += 1;
             };
