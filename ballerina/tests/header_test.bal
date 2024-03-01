@@ -18,7 +18,7 @@ import ballerina/test;
 
 //Test whether the correct http header value is returned when the header exist as requested
 @test:Config {}
-public isolated function testGetHeaderAsIs() {
+isolated function testGetHeaderAsIs() {
     string headerName = "Content-Type";
     string headerValue = "application/json";
     string headerNameToBeUsedForRetrieval = "Content-Type";
@@ -28,7 +28,7 @@ public isolated function testGetHeaderAsIs() {
 
 //Test whether the empty http header value is returned when the header exist
 @test:Config {}
-public isolated function testGetEmptyHeaderValue() {
+isolated function testGetEmptyHeaderValue() {
     string headerName = "X-Empty-Header";
     string headerValue = "";
     string headerNameToBeUsedForRetrieval = "X-Empty-Header";
@@ -38,7 +38,7 @@ public isolated function testGetEmptyHeaderValue() {
 
 //Test whether the case is ignored when dealing with http headers
 @test:Config {}
-public isolated function testCaseInsensitivityOfHeaders() {
+isolated function testCaseInsensitivityOfHeaders() {
     string headerName = "content-type";
     string headerValue = "application/json";
     string headerNameToBeUsedForRetrieval = "ConTeNT-TYpE";
@@ -48,7 +48,7 @@ public isolated function testCaseInsensitivityOfHeaders() {
 
 //Test adding multiple headers to entity
 @test:Config {}
-public isolated function testAddingMultipleHeadersToEntity() {
+isolated function testAddingMultipleHeadersToEntity() {
     Entity entity = new;
     entity.addHeader("header1", "value1");
     entity.addHeader("header2", "value2");
@@ -61,7 +61,7 @@ public isolated function testAddingMultipleHeadersToEntity() {
 
 //Test adding multiple values to same header
 @test:Config {}
-public isolated function testAddingMultipleValuesToSameHeaderKey() {
+isolated function testAddingMultipleValuesToSameHeaderKey() {
     Entity entity = new;
     entity.addHeader("heAder1", "value1");
     entity.addHeader("header1", "value2");
@@ -82,7 +82,7 @@ public isolated function testAddingMultipleValuesToSameHeaderKey() {
 
 //Test set header function
 @test:Config {}
-public isolated function testSetHeaderWitheHeaders() {
+isolated function testSetHeaderWitheHeaders() {
     Entity entity = new;
     entity.setHeader("HeADEr2", "totally different value");
     var headers = entity.getHeaders("header2");
@@ -97,7 +97,7 @@ public isolated function testSetHeaderWitheHeaders() {
 
 //Test set header after add header
 @test:Config {}
-public isolated function testSetHeaderAfterAddheader() {
+isolated function testSetHeaderAfterAddheader() {
     Entity entity = new;
     entity.addHeader("heAder1", "value1");
     entity.addHeader("header1", "value2");
@@ -119,7 +119,7 @@ public isolated function testSetHeaderAfterAddheader() {
 
 //Test add header after set header
 @test:Config {}
-public isolated function testAddHeaderAfterTheSetHeader() {
+isolated function testAddHeaderAfterTheSetHeader() {
     Entity entity = new;
     entity.addHeader("heAder1", "value1");
     entity.addHeader("header1", "value2");
@@ -140,7 +140,7 @@ public isolated function testAddHeaderAfterTheSetHeader() {
 
 //Test remove header function
 @test:Config {}
-public isolated function testRemoveHeaderError() {
+isolated function testRemoveHeaderError() {
     Entity entity = new;
     entity.addHeader("heAder1", "value1");
     entity.addHeader("header1", "value2");
@@ -157,7 +157,7 @@ public isolated function testRemoveHeaderError() {
 }
 
 @test:Config {}
-public isolated function testRemoveAllHeaderError() {
+isolated function testRemoveAllHeaderError() {
     Entity entity = new;
     entity.addHeader("heAder1", "value1");
     entity.addHeader("header1", "value2");
@@ -174,7 +174,7 @@ public isolated function testRemoveAllHeaderError() {
 
 //Test getting a value out of a non existence header
 @test:Config {}
-public isolated function testForNonExistenceHeader() {
+isolated function testForNonExistenceHeader() {
     Entity entity = new;
     entity.addHeader("heAder1", "value1");
     var result = entity.getHeader("header");
@@ -185,7 +185,7 @@ public isolated function testForNonExistenceHeader() {
 
 //Test getting all header names
 @test:Config {}
-public isolated function testGetAllHeaderNames() {
+isolated function testGetAllHeaderNames() {
     Entity entity = new;
     entity.addHeader("heAder1", "value1");
     entity.addHeader("header1", "value2");
@@ -202,7 +202,7 @@ public isolated function testGetAllHeaderNames() {
 
 //Test manipulating return headers
 @test:Config {}
-public isolated function testManipulatingReturnHeaders() {
+isolated function testManipulatingReturnHeaders() {
     Entity entity = new;
     entity.addHeader("heAder1", "value1");
     entity.addHeader("header1", "value2");
@@ -221,7 +221,7 @@ public isolated function testManipulatingReturnHeaders() {
 
 //Test has header function
 @test:Config {}
-public isolated function testHasHeaderFunction() {
+isolated function testHasHeaderFunction() {
     Entity entity = new;
     entity.addHeader("heAder1", "value1");
     test:assertTrue(entity.hasHeader("header1"), msg = "Found unexpected output");
@@ -229,7 +229,7 @@ public isolated function testHasHeaderFunction() {
 
 //Test has header function for a non-existence header
 @test:Config {}
-public isolated function testHasHeaderForNonExistence() {
+isolated function testHasHeaderForNonExistence() {
     Entity entity = new;
     entity.addHeader("heAder1", "value1");
     test:assertFalse(entity.hasHeader("header2"), msg = "Found unexpected output");
@@ -237,7 +237,7 @@ public isolated function testHasHeaderForNonExistence() {
 
 //Test headers with a newly created entity
 @test:Config {}
-public isolated function testHeaderInNewEntity() {
+isolated function testHeaderInNewEntity() {
     Entity entity = new;
     test:assertFalse(entity.hasHeader("header2"), msg = "Newly created entity can't have any headers");
     test:assertTrue(entity.getHeaderNames().length() == 0, msg = "HeaderNames for newly created entity are empty");
