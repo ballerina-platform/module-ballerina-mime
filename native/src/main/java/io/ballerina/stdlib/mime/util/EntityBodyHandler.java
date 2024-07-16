@@ -517,7 +517,7 @@ public class EntityBodyHandler {
      */
     public static BStream getEventStream(BObject entityObj) {
         String contentType = MimeUtil.getContentTypeWithParameters(entityObj);
-        return TEXT_EVENT_STREAM.equals(contentType) ? getByteStream(entityObj) : null;
+        return contentType.startsWith(TEXT_EVENT_STREAM) ? getByteStream(entityObj) : null;
     }
 
     public static void closeByteChannel(Channel byteChannel) {

@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [Unreleased]
 
 ### Added
-- [Add native methods to handle text/event-stream content type](https://github.com/ballerina-platform/ballerina-library/issues/6739)
+- [Add MIME entity methods to handle server sent events](https://github.com/ballerina-platform/ballerina-library/issues/6739)
 
 ## Changed
 - [Make some of the Java classes proper utility classes](https://github.com/ballerina-platform/ballerina-standard-library/issues/4940)
