@@ -70,3 +70,6 @@ public const string TEXT_HTML = "text/html";
 
 # Represents the `text/xml` media type.
 public const string TEXT_XML = "text/xml";
+
+# Represents the `text/event-stream` media type.
+public const string TEXT_EVENT_STREAM= "text/event-stream";

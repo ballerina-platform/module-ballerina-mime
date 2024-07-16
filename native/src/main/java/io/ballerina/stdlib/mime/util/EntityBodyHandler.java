@@ -62,6 +62,7 @@ import static io.ballerina.stdlib.mime.util.MimeConstants.FIELD_VALUE;
 import static io.ballerina.stdlib.mime.util.MimeConstants.FIRST_BODY_PART_INDEX;
 import static io.ballerina.stdlib.mime.util.MimeConstants.MESSAGE_DATA_SOURCE;
 import static io.ballerina.stdlib.mime.util.MimeConstants.MULTIPART_AS_PRIMARY_TYPE;
+import static io.ballerina.stdlib.mime.util.MimeConstants.TEXT_EVENT_STREAM;
 import static io.ballerina.stdlib.mime.util.MimeUtil.isNotNullAndEmpty;
 
 /**
@@ -388,7 +389,7 @@ public class EntityBodyHandler {
 
     private static void writeContent(Environment env, BObject entity, OutputStream outputStream,
                                      BObject iteratorObj, CountDownLatch latch) {
-        env.getRuntime().invokeMethodAsync(iteratorObj, BYTE_STREAM_NEXT_FUNC, null, null, new Callback() {
+        env.getRuntime().invokeMethodAsyncConcurrently(iteratorObj, BYTE_STREAM_NEXT_FUNC, null, null, new Callback() {
             @Override
             public void notifySuccess(Object result) {
                 if (result == null) {
@@ -396,14 +397,7 @@ public class EntityBodyHandler {
                     latch.countDown();
                     return;
                 }
-                BArray arrayValue = ((BMap) result).getArrayValue(FIELD_VALUE);
-                byte[] bytes = arrayValue.getBytes();
-                try (ByteArrayInputStream str = new ByteArrayInputStream(bytes)) {
-                    MimeUtil.writeInputToOutputStream(str, outputStream);
-                } catch (IOException e) {
-                    throw ErrorCreator.createError(StringUtils.fromString(
-                            "Error occurred while writing content parts to outputstream: " + e.getMessage()));
-                }
+                writeContentPart((BMap) result, outputStream);
                 writeContent(env, entity, outputStream, iteratorObj, latch);
             }
 
@@ -413,7 +407,66 @@ public class EntityBodyHandler {
                 throw ErrorCreator.createError(StringUtils.fromString(
                         "Error occurred while streaming content: " + bError.getMessage()));
             }
-        });
+        }, null, null);
+    }
+
+    /**
+     * Write event-stream directly to the output-stream without converting it to a data source.
+     *
+     * @param env          the environment of the resource invoked
+     * @param entity       Represent a ballerina entity
+     * @param outputStream Represent the output-stream that the message should be written to
+     */
+    public static void writeEventStreamToOutputStream(Environment env, BObject entity, OutputStream outputStream) {
+        BStream eventByteStream = EntityBodyHandler.getEventStream(entity);
+        if (eventByteStream != null) {
+            BObject iteratorObj = eventByteStream.getIteratorObj();
+            writeEvent(env, entity, outputStream, iteratorObj);
+        }
+    }
+
+    private static void writeEvent(Environment env, BObject entity, OutputStream outputStream,
+                                   BObject iteratorObj) {
+        env.getRuntime().invokeMethodAsyncConcurrently(iteratorObj, BYTE_STREAM_NEXT_FUNC, null, null, new Callback() {
+            @Override
+            public void notifySuccess(Object result) {
+                if (result == null) {
+                    entity.addNativeData(ENTITY_BYTE_STREAM, null);
+                    EntityBodyHandler.closeMessageOutputStream(outputStream);
+                    return;
+                }
+                writeContentPart((BMap) result, outputStream);
+                writeEvent(env, entity, outputStream, iteratorObj);
+            }
+
+            @Override
+            public void notifyFailure(BError bError) {
+                EntityBodyHandler.closeMessageOutputStream(outputStream);
+                throw ErrorCreator.createError(StringUtils.fromString(
+                        "Error occurred while streaming content: " + bError.getMessage()));
+            }
+        }, null, null);
+    }
+
+    private static void closeMessageOutputStream(OutputStream messageOutputStream) {
+        try {
+            if (messageOutputStream != null) {
+                messageOutputStream.close();
+            }
+        } catch (IOException e) {
+            log.error("Couldn't close message output stream", e);
+        }
+    }
+
+    private static void writeContentPart(BMap part, OutputStream outputStream) {
+        BArray arrayValue = part.getArrayValue(FIELD_VALUE);
+        byte[] bytes = arrayValue.getBytes();
+        try (ByteArrayInputStream str = new ByteArrayInputStream(bytes)) {
+            MimeUtil.writeInputToOutputStream(str, outputStream);
+        } catch (IOException e) {
+            throw ErrorCreator.createError(StringUtils.fromString(
+                    "Error occurred while writing content parts to outputstream: " + e.getMessage()));
+        }
     }
 
     /**
@@ -454,6 +507,17 @@ public class EntityBodyHandler {
     public static BStream getByteStream(BObject entityObj) {
         return entityObj.getNativeData(ENTITY_BYTE_STREAM) != null ? (BStream) entityObj.getNativeData
                 (ENTITY_BYTE_STREAM) : null;
+    }
+
+    /**
+     * Obtains the byte stream if the content type is text/event-stream.
+     *
+     * @param entityObj Represent a ballerina entity
+     * @return A Ballerina byte stream
+     */
+    public static BStream getEventStream(BObject entityObj) {
+        String contentType = MimeUtil.getContentTypeWithParameters(entityObj);
+        return TEXT_EVENT_STREAM.equals(contentType) ? getByteStream(entityObj) : null;
     }
 
     public static void closeByteChannel(Channel byteChannel) {
