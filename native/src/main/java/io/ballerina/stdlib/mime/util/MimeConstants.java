@@ -101,6 +101,11 @@ public final class MimeConstants {
      */
     public static final String MULTIPART_MIXED = "multipart/mixed";
 
+    /**
+     * Content-type text/event-stream.
+     */
+    public static final String TEXT_EVENT_STREAM = "text/event-stream";
+
     public static final String JSON_SUFFIX = "+json";
 
     public static final String JSON_TYPE_IDENTIFIER = "/json";
