@@ -435,7 +435,7 @@ public class EntityBodyHandler {
                     EntityBodyHandler.closeMessageOutputStream(outputStream);
                     return;
                 }
-                writeContentPart((BMap) result, outputStream);
+                writeEventToOutputStream((BMap) result, outputStream);
                 writeEvent(env, entity, outputStream, iteratorObj);
             }
 
@@ -455,6 +455,17 @@ public class EntityBodyHandler {
             }
         } catch (IOException e) {
             log.error("Couldn't close message output stream", e);
+        }
+    }
+
+    private static void writeEventToOutputStream(BMap part, OutputStream outputStream) {
+        BArray arrayValue = part.getArrayValue(FIELD_VALUE);
+        byte[] bytes = arrayValue.getBytes();
+        try {
+            outputStream.write(bytes);
+        } catch (IOException e) {
+            throw ErrorCreator.createError(StringUtils.fromString(
+                    "Error occurred while writing event to outputstream: " + e.getMessage()));
         }
     }
 
