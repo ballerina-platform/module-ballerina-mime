@@ -47,6 +47,8 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static io.ballerina.stdlib.mime.util.MimeConstants.ASSIGNMENT;
 import static io.ballerina.stdlib.mime.util.MimeConstants.BODY_PARTS;
@@ -547,4 +549,11 @@ public class MimeUtil {
     }
 
     private MimeUtil() {}
+
+    public static String removeJavaExceptionPrefix(String errorMessage) {
+        String prefixRegex = "^(?:[a-z]+\\.)+[A-Za-z]+Exception:";
+        Pattern pattern = Pattern.compile(prefixRegex);
+        Matcher matcher = pattern.matcher(errorMessage);
+        return matcher.find() ? matcher.replaceFirst("").trim() : errorMessage;
+    }
 }
