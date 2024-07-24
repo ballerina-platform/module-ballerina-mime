@@ -234,7 +234,7 @@ public class MimeEntityBody {
                 } while (arraySize > 0);
                 bytes = output.toByteArray();
             }
-        } catch (IOException ex) {
+        } catch (RuntimeException | IOException ex) {
             return IOUtils.createError(IOConstants.ErrorCode.GenericError,
                                        "Error occurred while reading stream:" + ex.getMessage());
         }
