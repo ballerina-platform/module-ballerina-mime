@@ -400,15 +400,15 @@ public class EntityBodyHandler {
                 }
                 if (result instanceof BError error) {
                     entity.addNativeData(ENTITY_BYTE_STREAM, null);
-                    EntityBodyHandler.closeMessageOutputStream(outputStream);
-                    throw error;
+                    this.notifyFailure(error);
                 }
                 try {
                     writeContentPart((BMap) result, outputStream);
                 } catch (Exception e) {
-                    BError error = ErrorCreator.createError(StringUtils.fromString(
-                            removeJavaExceptionPrefix(e.getMessage())));
-                    this.notifyFailure(error);
+                    latch.countDown();
+                    throw ErrorCreator.createError(StringUtils.fromString(
+                            "Error occurred while writing the stream content: "
+                                    + removeJavaExceptionPrefix(e.getMessage())));
                 }
                 writeContent(env, entity, outputStream, iteratorObj, latch);
             }
@@ -449,15 +449,15 @@ public class EntityBodyHandler {
                 }
                 if (result instanceof BError error) {
                     entity.addNativeData(ENTITY_BYTE_STREAM, null);
-                    EntityBodyHandler.closeMessageOutputStream(outputStream);
-                    throw error;
+                    this.notifyFailure(error);
                 }
                 try {
                     writeContentPart((BMap) result, outputStream);
                 } catch (Exception e) {
-                    BError error = ErrorCreator.createError(StringUtils.fromString(
-                            removeJavaExceptionPrefix(e.getMessage())));
-                    this.notifyFailure(error);
+                    EntityBodyHandler.closeMessageOutputStream(outputStream);
+                    throw ErrorCreator.createError(StringUtils.fromString(
+                            "Error occurred while writing the stream content: "
+                                    + removeJavaExceptionPrefix(e.getMessage())));
                 }
                 writeEvent(env, entity, outputStream, iteratorObj);
             }
