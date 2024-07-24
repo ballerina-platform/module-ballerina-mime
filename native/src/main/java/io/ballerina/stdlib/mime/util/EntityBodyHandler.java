@@ -64,6 +64,7 @@ import static io.ballerina.stdlib.mime.util.MimeConstants.MESSAGE_DATA_SOURCE;
 import static io.ballerina.stdlib.mime.util.MimeConstants.MULTIPART_AS_PRIMARY_TYPE;
 import static io.ballerina.stdlib.mime.util.MimeConstants.TEXT_EVENT_STREAM;
 import static io.ballerina.stdlib.mime.util.MimeUtil.isNotNullAndEmpty;
+import static io.ballerina.stdlib.mime.util.MimeUtil.removeJavaExceptionPrefix;
 
 /**
  * Entity body related operations are included here.
@@ -397,7 +398,18 @@ public class EntityBodyHandler {
                     latch.countDown();
                     return;
                 }
-                writeContentPart((BMap) result, outputStream);
+                if (result instanceof BError error) {
+                    entity.addNativeData(ENTITY_BYTE_STREAM, null);
+                    this.notifyFailure(error);
+                }
+                try {
+                    writeContentPart((BMap) result, outputStream);
+                } catch (Exception e) {
+                    latch.countDown();
+                    throw ErrorCreator.createError(StringUtils.fromString(
+                            "Error occurred while writing the stream content: "
+                                    + removeJavaExceptionPrefix(e.getMessage())));
+                }
                 writeContent(env, entity, outputStream, iteratorObj, latch);
             }
 
@@ -407,7 +419,7 @@ public class EntityBodyHandler {
                 throw ErrorCreator.createError(StringUtils.fromString(
                         "Error occurred while streaming content: " + bError.getMessage()));
             }
-        }, null, null);
+        }, null, null, new Object[]{});
     }
 
     /**
@@ -435,7 +447,18 @@ public class EntityBodyHandler {
                     EntityBodyHandler.closeMessageOutputStream(outputStream);
                     return;
                 }
-                writeContentPart((BMap) result, outputStream);
+                if (result instanceof BError error) {
+                    entity.addNativeData(ENTITY_BYTE_STREAM, null);
+                    this.notifyFailure(error);
+                }
+                try {
+                    writeContentPart((BMap) result, outputStream);
+                } catch (Exception e) {
+                    EntityBodyHandler.closeMessageOutputStream(outputStream);
+                    throw ErrorCreator.createError(StringUtils.fromString(
+                            "Error occurred while writing the stream content: "
+                                    + removeJavaExceptionPrefix(e.getMessage())));
+                }
                 writeEvent(env, entity, outputStream, iteratorObj);
             }
 
@@ -453,7 +476,7 @@ public class EntityBodyHandler {
             if (messageOutputStream != null) {
                 messageOutputStream.close();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Couldn't close message output stream", e);
         }
     }
