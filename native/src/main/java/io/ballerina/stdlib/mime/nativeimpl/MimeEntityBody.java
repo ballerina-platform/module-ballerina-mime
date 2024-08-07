@@ -309,5 +309,9 @@ public class MimeEntityBody {
         MimeUtil.setMediaTypeToEntity(entityObj, contentType != null ? contentType.getValue() : APPLICATION_XML);
     }
 
+    public static Object writeEventStreamBytesToOutputStream(BObject eventStreamWriter, BArray bytes) {
+        return EntityBodyHandler.writeEventStreamBytesToOutputStream(eventStreamWriter, bytes.getBytes());
+    }
+
     private MimeEntityBody() {}
 }

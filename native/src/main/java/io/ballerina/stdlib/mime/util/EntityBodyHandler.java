@@ -63,8 +63,6 @@ import static io.ballerina.stdlib.mime.util.MimeConstants.FIRST_BODY_PART_INDEX;
 import static io.ballerina.stdlib.mime.util.MimeConstants.MESSAGE_DATA_SOURCE;
 import static io.ballerina.stdlib.mime.util.MimeConstants.MULTIPART_AS_PRIMARY_TYPE;
 import static io.ballerina.stdlib.mime.util.MimeConstants.TEXT_EVENT_STREAM;
-import static io.ballerina.stdlib.mime.util.MimeUtil.isNotNullAndEmpty;
-import static io.ballerina.stdlib.mime.util.MimeUtil.removeJavaExceptionPrefix;
 
 /**
  * Entity body related operations are included here.
@@ -77,6 +75,9 @@ public class EntityBodyHandler {
     private static final Type MIME_ENTITY_TYPE =
             TypeUtils.getType(ValueCreator.createObjectValue(MimeUtil.getMimePackage(), ENTITY));
     private static final ArrayType mimeEntityArrayType = TypeCreator.createArrayType(MIME_ENTITY_TYPE);
+    public static final String OUTPUT_STREAM = "output_stream_object";
+    public static final String WRITE_EVENT_STREAM_METHOD = "writeEventStream";
+    public static final String EVENT_STREAM_WRITER_OBJECT = "EventStreamWriter";
 
     /**
      * Get a byte channel for a given text data.
@@ -193,9 +194,9 @@ public class EntityBodyHandler {
     public static Object constructJsonDataSource(BObject entity, InputStream inputStream) {
         Object jsonData;
         String contentTypeValue = EntityHeaderHandler.getHeaderValue(entity, CONTENT_TYPE);
-        if (isNotNullAndEmpty(contentTypeValue)) {
+        if (MimeUtil.isNotNullAndEmpty(contentTypeValue)) {
             String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
-            if (isNotNullAndEmpty(charsetValue)) {
+            if (MimeUtil.isNotNullAndEmpty(charsetValue)) {
                 jsonData = JsonUtils.parse(inputStream, charsetValue);
             } else {
                 jsonData = JsonUtils.parse(inputStream);
@@ -236,9 +237,9 @@ public class EntityBodyHandler {
     public static BXml constructXmlDataSource(BObject entityObj, InputStream inputStream) {
         BXml xmlContent;
         String contentTypeValue = EntityHeaderHandler.getHeaderValue(entityObj, CONTENT_TYPE);
-        if (isNotNullAndEmpty(contentTypeValue)) {
+        if (MimeUtil.isNotNullAndEmpty(contentTypeValue)) {
             String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
-            if (isNotNullAndEmpty(charsetValue)) {
+            if (MimeUtil.isNotNullAndEmpty(charsetValue)) {
                 xmlContent = XmlUtils.parse(inputStream, charsetValue);
             } else {
                 xmlContent = XmlUtils.parse(inputStream);
@@ -279,9 +280,9 @@ public class EntityBodyHandler {
     public static BString constructStringDataSource(BObject entity, InputStream inputStream) {
         BString textContent;
         String contentTypeValue = EntityHeaderHandler.getHeaderValue(entity, CONTENT_TYPE);
-        if (isNotNullAndEmpty(contentTypeValue)) {
+        if (MimeUtil.isNotNullAndEmpty(contentTypeValue)) {
             String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
-            if (isNotNullAndEmpty(charsetValue)) {
+            if (MimeUtil.isNotNullAndEmpty(charsetValue)) {
                 textContent = StringUtils.getStringFromInputStream(inputStream, charsetValue);
             } else {
                 textContent = StringUtils.getStringFromInputStream(inputStream);
@@ -408,7 +409,7 @@ public class EntityBodyHandler {
                     latch.countDown();
                     throw ErrorCreator.createError(StringUtils.fromString(
                             "Error occurred while writing the stream content: "
-                                    + removeJavaExceptionPrefix(e.getMessage())));
+                                    + MimeUtil.removeJavaExceptionPrefix(e.getMessage())));
                 }
                 writeContent(env, entity, outputStream, iteratorObj, latch);
             }
@@ -432,43 +433,40 @@ public class EntityBodyHandler {
     public static void writeEventStreamToOutputStream(Environment env, BObject entity, OutputStream outputStream) {
         BStream eventByteStream = EntityBodyHandler.getEventStream(entity);
         if (eventByteStream != null) {
-            BObject iteratorObj = eventByteStream.getIteratorObj();
-            writeEvent(env, entity, outputStream, iteratorObj);
+            BObject eventStreamWriter = ValueCreator.createObjectValue(MimeUtil.getMimePackage(),
+                    EVENT_STREAM_WRITER_OBJECT, eventByteStream);
+            eventStreamWriter.addNativeData(ENTITY, entity);
+            eventStreamWriter.addNativeData(OUTPUT_STREAM, outputStream);
+            writeEvent(env, eventStreamWriter);
         }
     }
 
-    private static void writeEvent(Environment env, BObject entity, OutputStream outputStream,
-                                   BObject iteratorObj) {
-        env.getRuntime().invokeMethodAsyncConcurrently(iteratorObj, BYTE_STREAM_NEXT_FUNC, null, null, new Callback() {
-            @Override
-            public void notifySuccess(Object result) {
-                if (result == null) {
-                    entity.addNativeData(ENTITY_BYTE_STREAM, null);
-                    EntityBodyHandler.closeMessageOutputStream(outputStream);
-                    return;
-                }
-                if (result instanceof BError error) {
-                    entity.addNativeData(ENTITY_BYTE_STREAM, null);
-                    this.notifyFailure(error);
-                }
-                try {
-                    writeContentPart((BMap) result, outputStream);
-                } catch (Exception e) {
-                    EntityBodyHandler.closeMessageOutputStream(outputStream);
-                    throw ErrorCreator.createError(StringUtils.fromString(
-                            "Error occurred while writing the stream content: "
-                                    + removeJavaExceptionPrefix(e.getMessage())));
-                }
-                writeEvent(env, entity, outputStream, iteratorObj);
-            }
+    private static void writeEvent(Environment env, BObject eventStreamWriter) {
+        env.getRuntime().invokeMethodAsyncConcurrently(eventStreamWriter, WRITE_EVENT_STREAM_METHOD, null, null,
+                new Callback() {
+                    @Override
+                    public void notifySuccess(Object result) {
+                        BObject entity = (BObject) eventStreamWriter.getNativeData(ENTITY);
+                        OutputStream outputStream = (OutputStream) eventStreamWriter.getNativeData(OUTPUT_STREAM);
+                        if (result == null) {
+                            entity.addNativeData(ENTITY_BYTE_STREAM, null);
+                            EntityBodyHandler.closeMessageOutputStream(outputStream);
+                            return;
+                        }
+                        if (result instanceof BError error) {
+                            entity.addNativeData(ENTITY_BYTE_STREAM, null);
+                            throw error;
+                        }
+                    }
 
-            @Override
-            public void notifyFailure(BError bError) {
-                EntityBodyHandler.closeMessageOutputStream(outputStream);
-                throw ErrorCreator.createError(StringUtils.fromString(
-                        "Error occurred while streaming content: " + bError.getMessage()));
-            }
-        }, null, null);
+                    @Override
+                    public void notifyFailure(BError bError) {
+                        OutputStream outputStream = (OutputStream) eventStreamWriter.getNativeData(OUTPUT_STREAM);
+                        EntityBodyHandler.closeMessageOutputStream(outputStream);
+                        throw ErrorCreator.createError(StringUtils.fromString(
+                                "Error occurred while streaming content: " + bError.getMessage()));
+                    }
+                }, null, null);
     }
 
     private static void closeMessageOutputStream(OutputStream messageOutputStream) {
@@ -483,13 +481,26 @@ public class EntityBodyHandler {
 
     private static void writeContentPart(BMap part, OutputStream outputStream) {
         BArray arrayValue = part.getArrayValue(FIELD_VALUE);
-        byte[] bytes = arrayValue.getBytes();
+        writeContentPart(arrayValue.getBytes(), outputStream);
+    }
+
+    private static void writeContentPart(byte[] bytes, OutputStream outputStream) {
         try (ByteArrayInputStream str = new ByteArrayInputStream(bytes)) {
             MimeUtil.writeInputToOutputStream(str, outputStream);
         } catch (IOException e) {
             throw ErrorCreator.createError(StringUtils.fromString(
-                    "Error occurred while writing content parts to outputstream: " + e.getMessage()));
+                    "Error occurred while writing content parts to output stream: " + e.getMessage()));
         }
+    }
+
+    public static Object writeEventStreamBytesToOutputStream(BObject eventStreamWriter, byte[] bytes) {
+        OutputStream outputStream = (OutputStream) eventStreamWriter.getNativeData(OUTPUT_STREAM);
+        try {
+            writeContentPart(bytes, outputStream);
+        } catch (Exception e) {
+            return ErrorCreator.createError(StringUtils.fromString(MimeUtil.removeJavaExceptionPrefix(e.getMessage())));
+        }
+        return null;
     }
 
     /**
@@ -501,7 +512,7 @@ public class EntityBodyHandler {
      */
     public static void decodeEntityBody(BObject entityObj, Channel byteChannel) throws IOException {
         String contentType = MimeUtil.getContentTypeWithParameters(entityObj);
-        if (!isNotNullAndEmpty(contentType) || !contentType.startsWith(MULTIPART_AS_PRIMARY_TYPE)) {
+        if (!MimeUtil.isNotNullAndEmpty(contentType) || !contentType.startsWith(MULTIPART_AS_PRIMARY_TYPE)) {
             return;
         }
         try {
