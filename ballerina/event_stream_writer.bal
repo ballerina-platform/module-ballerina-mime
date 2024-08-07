@@ -24,28 +24,28 @@ class EventStreamWriter {
         self.eventStream = eventStream;
     }
 
-    isolated function writeEventStream() returns error? {
-        var iterator = self.eventStream.iterator();
+    isolated function writeEventStream() {
         do {
             while true {
-                record {byte[] value;}? event = check iterator.next();
+                record {byte[] value;}? event = check self.eventStream.next();
                 if event is () {
+                    self.closeEventStream();
                     return;
                 }
-                check trap self.writeEventStreamBytesToOutputStream(event.value);
+                check externWriteEventStreamBytesToOutputStream(self, event.value);
             }
         } on fail error err {
             log:printError("unable to write event stream to wire", err);
-            error? result = self.eventStream.close();
-            if result is error {
-                log:printError("unable to close the stream", err);
-            }
+            self.closeEventStream();
             return;
         }
     }
 
-    isolated function writeEventStreamBytesToOutputStream(byte[] eventBytes) returns error? {
-        return externWriteEventStreamBytesToOutputStream(self, eventBytes);
+    isolated function closeEventStream() {
+        error? result = self.eventStream.close();
+        if result is error {
+            log:printError("unable to close the stream", result);
+        }
     }
 }
 
