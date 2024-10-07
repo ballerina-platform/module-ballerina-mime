@@ -19,7 +19,6 @@
 package io.ballerina.stdlib.mime.util;
 
 import io.ballerina.runtime.api.Environment;
-import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
@@ -48,8 +47,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import static io.ballerina.stdlib.mime.util.MimeConstants.BODY_PARTS;
 import static io.ballerina.stdlib.mime.util.MimeConstants.BYTE_STREAM_NEXT_FUNC;
@@ -374,53 +371,44 @@ public class EntityBodyHandler {
         BStream byteStream = EntityBodyHandler.getByteStream(entity);
         if (byteStream != null) {
             BObject iteratorObj = byteStream.getIteratorObj();
-            CountDownLatch latch = new CountDownLatch(1);
-            writeContent(env, entity, outputStream, iteratorObj, latch);
-            try {
-                int timeout = 120;
-                boolean countDownReached = latch.await(timeout, TimeUnit.SECONDS);
-                if (!countDownReached) {
-                    throw ErrorCreator.createError(StringUtils.fromString(
-                            "Could not complete byte stream serialization within " + timeout + " seconds"));
-                }
-            } catch (InterruptedException e) {
-                log.warn("Interrupted before completing the content write");
-            }
+            writeContent(env, entity, outputStream, iteratorObj);
         }
     }
 
     private static void writeContent(Environment env, BObject entity, OutputStream outputStream,
-                                     BObject iteratorObj, CountDownLatch latch) {
-        env.getRuntime().invokeMethodAsyncConcurrently(iteratorObj, BYTE_STREAM_NEXT_FUNC, null, null, new Callback() {
-            @Override
-            public void notifySuccess(Object result) {
-                if (result == null) {
-                    entity.addNativeData(ENTITY_BYTE_STREAM, null);
-                    latch.countDown();
-                    return;
-                }
-                if (result instanceof BError error) {
-                    entity.addNativeData(ENTITY_BYTE_STREAM, null);
-                    this.notifyFailure(error);
-                }
-                try {
-                    writeContentPart((BMap) result, outputStream);
-                } catch (Exception e) {
-                    latch.countDown();
-                    throw ErrorCreator.createError(StringUtils.fromString(
-                            "Error occurred while writing the stream content: "
-                                    + MimeUtil.removeJavaExceptionPrefix(e.getMessage())));
-                }
-                writeContent(env, entity, outputStream, iteratorObj, latch);
-            }
+                                     BObject iteratorObj) {
+        try {
+            Object result = env.getRuntime().call(iteratorObj, BYTE_STREAM_NEXT_FUNC);
+            handleContentResult(env, entity, outputStream, result, iteratorObj);
+        } catch (BError error) {
+            handleContentPanic(error);
+        } catch (Throwable throwable) {
+            handleContentPanic(ErrorCreator.createError(throwable));
+        }
+    }
 
-            @Override
-            public void notifyFailure(BError bError) {
-                latch.countDown();
-                throw ErrorCreator.createError(StringUtils.fromString(
-                        "Error occurred while streaming content: " + bError.getMessage()));
-            }
-        }, null, null, new Object[]{});
+    public static void handleContentResult(Environment env, BObject entity, OutputStream outputStream, Object result,
+                                           BObject iteratorObj) {
+        if (result == null) {
+            entity.addNativeData(ENTITY_BYTE_STREAM, null);
+            return;
+        }
+        if (result instanceof BError error) {
+            entity.addNativeData(ENTITY_BYTE_STREAM, null);
+            handleContentPanic(error);
+        }
+        try {
+            writeContentPart((BMap) result, outputStream);
+        } catch (Exception e) {
+            throw ErrorCreator.createError(StringUtils.fromString("Error occurred while writing the stream content: " +
+                    MimeUtil.removeJavaExceptionPrefix(e.getMessage())));
+        }
+        writeContent(env, entity, outputStream, iteratorObj);
+    }
+
+    public static void handleContentPanic(BError bError) {
+        throw ErrorCreator.createError(StringUtils.fromString("Error occurred while streaming content: " +
+                bError.getMessage()));
     }
 
     /**
@@ -442,31 +430,34 @@ public class EntityBodyHandler {
     }
 
     private static void writeEvent(Environment env, BObject eventStreamWriter) {
-        env.getRuntime().invokeMethodAsyncConcurrently(eventStreamWriter, WRITE_EVENT_STREAM_METHOD, null, null,
-                new Callback() {
-                    @Override
-                    public void notifySuccess(Object result) {
-                        BObject entity = (BObject) eventStreamWriter.getNativeData(ENTITY);
-                        OutputStream outputStream = (OutputStream) eventStreamWriter.getNativeData(OUTPUT_STREAM);
-                        if (result == null) {
-                            entity.addNativeData(ENTITY_BYTE_STREAM, null);
-                            EntityBodyHandler.closeMessageOutputStream(outputStream);
-                            return;
-                        }
-                        if (result instanceof BError error) {
-                            entity.addNativeData(ENTITY_BYTE_STREAM, null);
-                            throw error;
-                        }
-                    }
+        try {
+            handleEventPanic(eventStreamWriter, env.getRuntime().call(eventStreamWriter, WRITE_EVENT_STREAM_METHOD));
+        } catch (BError error) {
+            handleEventPanic(eventStreamWriter, error);
+        } catch (Throwable throwable) {
+            handleEventPanic(eventStreamWriter, ErrorCreator.createError(throwable));
+        }
+    }
 
-                    @Override
-                    public void notifyFailure(BError bError) {
-                        OutputStream outputStream = (OutputStream) eventStreamWriter.getNativeData(OUTPUT_STREAM);
-                        EntityBodyHandler.closeMessageOutputStream(outputStream);
-                        throw ErrorCreator.createError(StringUtils.fromString(
-                                "Error occurred while streaming content: " + bError.getMessage()));
-                    }
-                }, null, null);
+    public static void handleEventPanic(BObject eventStreamWriter, Object result) {
+        BObject entity = (BObject) eventStreamWriter.getNativeData(ENTITY);
+        OutputStream outputStream = (OutputStream) eventStreamWriter.getNativeData(OUTPUT_STREAM);
+        if (result == null) {
+            entity.addNativeData(ENTITY_BYTE_STREAM, null);
+            EntityBodyHandler.closeMessageOutputStream(outputStream);
+            return;
+        }
+        if (result instanceof BError error) {
+            entity.addNativeData(ENTITY_BYTE_STREAM, null);
+            throw error;
+        }
+    }
+
+    private static void handleEventPanic(BObject eventStreamWriter, BError bError) {
+        OutputStream outputStream = (OutputStream) eventStreamWriter.getNativeData(OUTPUT_STREAM);
+        EntityBodyHandler.closeMessageOutputStream(outputStream);
+        throw ErrorCreator.createError(StringUtils.fromString("Error occurred while streaming content: " +
+                bError.getMessage()));
     }
 
     private static void closeMessageOutputStream(OutputStream messageOutputStream) {
