@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [2.10.1] - 2024-10-15
+
 ## Changed
 - [Fix packing snapshot dependencies](https://github.com/ballerina-platform/ballerina-library/issues/7266)
 
