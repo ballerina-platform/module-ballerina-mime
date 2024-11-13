@@ -19,6 +19,7 @@
 package io.ballerina.stdlib.mime.util;
 
 import io.ballerina.runtime.api.Environment;
+import io.ballerina.runtime.api.concurrent.StrandMetadata;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
@@ -378,7 +379,8 @@ public class EntityBodyHandler {
     private static void writeContent(Environment env, BObject entity, OutputStream outputStream,
                                      BObject iteratorObj) {
         try {
-            Object result = env.getRuntime().call(iteratorObj, BYTE_STREAM_NEXT_FUNC);
+            Object result = env.getRuntime().callMethod(iteratorObj, BYTE_STREAM_NEXT_FUNC,
+                    new StrandMetadata(true, null));
             handleContentResult(env, entity, outputStream, result, iteratorObj);
         } catch (BError error) {
             handleContentPanic(error);
@@ -431,7 +433,8 @@ public class EntityBodyHandler {
 
     private static void writeEvent(Environment env, BObject eventStreamWriter) {
         try {
-            handleEventPanic(eventStreamWriter, env.getRuntime().call(eventStreamWriter, WRITE_EVENT_STREAM_METHOD));
+            handleEventPanic(eventStreamWriter, env.getRuntime().callMethod(eventStreamWriter,
+                    WRITE_EVENT_STREAM_METHOD, new StrandMetadata(true, null)));
         } catch (BError error) {
             handleEventPanic(eventStreamWriter, error);
         } catch (Throwable throwable) {
