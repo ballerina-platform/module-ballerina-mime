@@ -433,7 +433,7 @@ public class EntityBodyHandler {
 
     private static void writeEvent(Environment env, BObject eventStreamWriter) {
         try {
-            handleEventPanic(eventStreamWriter, env.getRuntime().callMethod(eventStreamWriter,
+            handleEventResult(eventStreamWriter, env.getRuntime().callMethod(eventStreamWriter,
                     WRITE_EVENT_STREAM_METHOD, new StrandMetadata(true, null)));
         } catch (BError error) {
             handleEventPanic(eventStreamWriter, error);
@@ -442,7 +442,7 @@ public class EntityBodyHandler {
         }
     }
 
-    public static void handleEventPanic(BObject eventStreamWriter, Object result) {
+    public static void handleEventResult(BObject eventStreamWriter, Object result) {
         BObject entity = (BObject) eventStreamWriter.getNativeData(ENTITY);
         OutputStream outputStream = (OutputStream) eventStreamWriter.getNativeData(OUTPUT_STREAM);
         if (result == null) {
