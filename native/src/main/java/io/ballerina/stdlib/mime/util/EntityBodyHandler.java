@@ -379,8 +379,7 @@ public class EntityBodyHandler {
     private static void writeContent(Environment env, BObject entity, OutputStream outputStream,
                                      BObject iteratorObj) {
         try {
-            Object result = env.getRuntime().callMethod(iteratorObj, BYTE_STREAM_NEXT_FUNC,
-                    new StrandMetadata(true, null));
+            Object result = env.getRuntime().callMethod(iteratorObj, BYTE_STREAM_NEXT_FUNC, null);
             handleContentResult(env, entity, outputStream, result, iteratorObj);
         } catch (BError error) {
             handleContentPanic(error);
@@ -434,7 +433,7 @@ public class EntityBodyHandler {
     private static void writeEvent(Environment env, BObject eventStreamWriter) {
         try {
             handleEventResult(eventStreamWriter, env.getRuntime().callMethod(eventStreamWriter,
-                    WRITE_EVENT_STREAM_METHOD, new StrandMetadata(true, null)));
+                    WRITE_EVENT_STREAM_METHOD, null));
         } catch (BError error) {
             handleEventPanic(eventStreamWriter, error);
         } catch (Throwable throwable) {
