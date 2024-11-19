@@ -19,7 +19,6 @@
 package io.ballerina.stdlib.mime.util;
 
 import io.ballerina.runtime.api.Environment;
-import io.ballerina.runtime.api.concurrent.StrandMetadata;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
