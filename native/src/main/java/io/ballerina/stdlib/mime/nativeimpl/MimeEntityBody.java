@@ -208,40 +208,42 @@ public class MimeEntityBody {
         }
     }
 
-    public static Object getStreamEntryRecord(BObject entityObj, long inputArraySize) {
-        Channel byteChannel = EntityBodyHandler.getByteChannel(entityObj);
-        if (byteChannel == null) {
-            return null;
-        }
-        byte[] bytes;
-        int arraySize = (int) inputArraySize;
-        try {
-            InputStream inputStream = byteChannel.getInputStream();
-            try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-                do {
-                    byte[] buffer = new byte[arraySize];
-                    int readCount = inputStream.read(buffer, 0, arraySize);
-                    arraySize -= readCount;
-                    if (readCount == -1 && output.size() == 0) {
-                        EntityBodyHandler.closeByteChannel(byteChannel);
-                        entityObj.addNativeData(ENTITY_BYTE_CHANNEL, null);
-                        return null;
-                    }
-                    if (readCount == -1) {
-                        break;
-                    }
-                    output.write(buffer, 0, readCount);
-                } while (arraySize > 0);
-                bytes = output.toByteArray();
+    public static Object getStreamEntryRecord(Environment env, BObject entityObj, long inputArraySize) {
+        return env.yieldAndRun(() -> {
+            Channel byteChannel = EntityBodyHandler.getByteChannel(entityObj);
+            if (byteChannel == null) {
+                return null;
             }
-        } catch (RuntimeException | IOException ex) {
-            return IOUtils.createError(IOConstants.ErrorCode.GenericError,
-                                       "Error occurred while reading stream:" + ex.getMessage());
-        }
+            byte[] bytes;
+            int arraySize = (int) inputArraySize;
+            try {
+                InputStream inputStream = byteChannel.getInputStream();
+                try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+                    do {
+                        byte[] buffer = new byte[arraySize];
+                        int readCount = inputStream.read(buffer, 0, arraySize);
+                        arraySize -= readCount;
+                        if (readCount == -1 && output.size() == 0) {
+                            EntityBodyHandler.closeByteChannel(byteChannel);
+                            entityObj.addNativeData(ENTITY_BYTE_CHANNEL, null);
+                            return null;
+                        }
+                        if (readCount == -1) {
+                            break;
+                        }
+                        output.write(buffer, 0, readCount);
+                    } while (arraySize > 0);
+                    bytes = output.toByteArray();
+                }
+            } catch (RuntimeException | IOException ex) {
+                return IOUtils.createError(IOConstants.ErrorCode.GenericError,
+                        "Error occurred while reading stream:" + ex.getMessage());
+            }
 
-        BMap<BString, Object> streamEntry = ValueCreator.createRecordValue(getMimePackage(), STREAM_ENTRY_RECORD);
-        streamEntry.put(MimeConstants.FIELD_VALUE, ValueCreator.createArrayValue(bytes));
-        return streamEntry;
+            BMap<BString, Object> streamEntry = ValueCreator.createRecordValue(getMimePackage(), STREAM_ENTRY_RECORD);
+            streamEntry.put(MimeConstants.FIELD_VALUE, ValueCreator.createArrayValue(bytes));
+            return streamEntry;
+        });
     }
 
     public static Object closeInputByteStream(BObject entityObj) {
