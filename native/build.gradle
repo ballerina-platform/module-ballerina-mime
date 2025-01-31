@@ -19,17 +19,14 @@ plugins {
     id 'java'
     id 'checkstyle'
     id 'com.github.spotbugs'
-}
-
-jacoco {
-    toolVersion = "0.8.10"
+    id 'jacoco'
 }
 
 description = 'Ballerina - Mime Java Utils'
 
 dependencies {
     checkstyle project(':checkstyle')
-    checkstyle "com.puppycrawl.tools:checkstyle:${puppycrawlCheckstyleVersion}"
+    checkstyle "com.puppycrawl.tools:checkstyle:${checkstyleToolVersion}"
 
     implementation group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
     implementation group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"

@@ -16,19 +16,11 @@
  */
 
 plugins {
-    id "com.github.spotbugs" version "${githubSpotbugsVersion}"
-    id "com.github.johnrengelman.shadow" version "${githubJohnrengelmanShadowVersion}"
-    id "de.undercouch.download" version "${underCouchDownloadVersion}"
-    id "net.researchgate.release" version "${researchgateReleaseVersion}"
+    id "com.github.spotbugs"
+    id "com.github.johnrengelman.shadow"
+    id "de.undercouch.download"
+    id "net.researchgate.release"
 }
-
-ext.ballerinaLangVersion = project.ballerinaLangVersion
-ext.stdlibIoVersion = project.stdlibIoVersion
-ext.stdlibLogVersion = project.stdlibLogVersion
-ext.puppycrawlCheckstyleVersion = project.puppycrawlCheckstyleVersion
-ext.testngVersion = project.testngVersion
-ext.mimepullVersion = project.mimepullVersion
-ext.slf4jVersion = "1.7.30"
 
 allprojects {
     group = project.group
