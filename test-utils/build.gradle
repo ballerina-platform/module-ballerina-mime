@@ -31,7 +31,7 @@ repositories {
 
 dependencies {
     checkstyle project(":checkstyle")
-    checkstyle "com.puppycrawl.tools:checkstyle:${puppycrawlCheckstyleVersion}"
+    checkstyle "com.puppycrawl.tools:checkstyle:${checkstyleToolVersion}"
 
     implementation project(":mime-native")
 
