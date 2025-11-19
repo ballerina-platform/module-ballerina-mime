@@ -75,6 +75,9 @@ public class EntityBodyHandler {
     public static final String OUTPUT_STREAM = "output_stream_object";
     public static final String WRITE_EVENT_STREAM_METHOD = "writeEventStream";
     public static final String EVENT_STREAM_WRITER_OBJECT = "EventStreamWriter";
+    public static final String EMPTY_JSON_DOCUMENT = "empty JSON document";
+    public static final String EMPTY_XML_PAYLOAD = "Empty xml payload";
+    public static final String UNEXPECTED_EOF_IN_PROLOG = "Unexpected EOF in prolog";
 
     /**
      * Get a byte channel for a given text data.
@@ -170,7 +173,7 @@ public class EntityBodyHandler {
     public static Object constructJsonDataSource(BObject entityObj) {
         Channel byteChannel = getByteChannel(entityObj);
         if (byteChannel == null) {
-            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, "empty JSON document");
+            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, EMPTY_JSON_DOCUMENT);
         }
         try {
             return constructJsonDataSource(entityObj, byteChannel.getInputStream());
@@ -191,15 +194,23 @@ public class EntityBodyHandler {
     public static Object constructJsonDataSource(BObject entity, InputStream inputStream) {
         Object jsonData;
         String contentTypeValue = EntityHeaderHandler.getHeaderValue(entity, CONTENT_TYPE);
-        if (MimeUtil.isNotNullAndEmpty(contentTypeValue)) {
-            String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
-            if (MimeUtil.isNotNullAndEmpty(charsetValue)) {
-                jsonData = JsonUtils.parse(inputStream, charsetValue);
+        try {
+            if (MimeUtil.isNotNullAndEmpty(contentTypeValue)) {
+                String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
+                if (MimeUtil.isNotNullAndEmpty(charsetValue)) {
+                    jsonData = JsonUtils.parse(inputStream, charsetValue);
+                } else {
+                    jsonData = JsonUtils.parse(inputStream);
+                }
             } else {
                 jsonData = JsonUtils.parse(inputStream);
             }
-        } else {
-            jsonData = JsonUtils.parse(inputStream);
+        } catch (BError parserError) {
+            String errorMsg = parserError.getMessage();
+            if (errorMsg != null && errorMsg.startsWith(EMPTY_JSON_DOCUMENT)) {
+                throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, EMPTY_JSON_DOCUMENT);
+            }
+            throw parserError;
         }
         return jsonData;
     }
@@ -213,7 +224,7 @@ public class EntityBodyHandler {
     public static BXml constructXmlDataSource(BObject entityObj) {
         Channel byteChannel = getByteChannel(entityObj);
         if (byteChannel == null) {
-            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, "Empty xml payload");
+            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, EMPTY_XML_PAYLOAD);
         }
         try {
             return constructXmlDataSource(entityObj, byteChannel.getInputStream());
@@ -234,15 +245,23 @@ public class EntityBodyHandler {
     public static BXml constructXmlDataSource(BObject entityObj, InputStream inputStream) {
         BXml xmlContent;
         String contentTypeValue = EntityHeaderHandler.getHeaderValue(entityObj, CONTENT_TYPE);
-        if (MimeUtil.isNotNullAndEmpty(contentTypeValue)) {
-            String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
-            if (MimeUtil.isNotNullAndEmpty(charsetValue)) {
-                xmlContent = XmlUtils.parse(inputStream, charsetValue);
+        try {
+            if (MimeUtil.isNotNullAndEmpty(contentTypeValue)) {
+                String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
+                if (MimeUtil.isNotNullAndEmpty(charsetValue)) {
+                    xmlContent = XmlUtils.parse(inputStream, charsetValue);
+                } else {
+                    xmlContent = XmlUtils.parse(inputStream);
+                }
             } else {
                 xmlContent = XmlUtils.parse(inputStream);
             }
-        } else {
-            xmlContent = XmlUtils.parse(inputStream);
+        } catch (BError parserError) {
+            String errorMsg = parserError.getMessage();
+            if (errorMsg != null && errorMsg.contains(UNEXPECTED_EOF_IN_PROLOG)) {
+                throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, EMPTY_XML_PAYLOAD);
+            }
+            throw parserError;
         }
         return xmlContent;
     }
