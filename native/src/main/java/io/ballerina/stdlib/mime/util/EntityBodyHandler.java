@@ -25,10 +25,8 @@ import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.ArrayType;
 import io.ballerina.runtime.api.types.ObjectType;
 import io.ballerina.runtime.api.types.Type;
-import io.ballerina.runtime.api.utils.JsonUtils;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
-import io.ballerina.runtime.api.utils.XmlUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
@@ -60,6 +58,10 @@ import static io.ballerina.stdlib.mime.util.MimeConstants.FIRST_BODY_PART_INDEX;
 import static io.ballerina.stdlib.mime.util.MimeConstants.MESSAGE_DATA_SOURCE;
 import static io.ballerina.stdlib.mime.util.MimeConstants.MULTIPART_AS_PRIMARY_TYPE;
 import static io.ballerina.stdlib.mime.util.MimeConstants.TEXT_EVENT_STREAM;
+import static io.ballerina.stdlib.mime.util.MimeUtil.EMPTY_JSON_DOCUMENT;
+import static io.ballerina.stdlib.mime.util.MimeUtil.EMPTY_XML_PAYLOAD;
+import static io.ballerina.stdlib.mime.util.MimeUtil.parseAsJson;
+import static io.ballerina.stdlib.mime.util.MimeUtil.parseAsXml;
 
 /**
  * Entity body related operations are included here.
@@ -170,7 +172,7 @@ public class EntityBodyHandler {
     public static Object constructJsonDataSource(BObject entityObj) {
         Channel byteChannel = getByteChannel(entityObj);
         if (byteChannel == null) {
-            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, "empty JSON document");
+            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, EMPTY_JSON_DOCUMENT);
         }
         try {
             return constructJsonDataSource(entityObj, byteChannel.getInputStream());
@@ -194,12 +196,12 @@ public class EntityBodyHandler {
         if (MimeUtil.isNotNullAndEmpty(contentTypeValue)) {
             String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
             if (MimeUtil.isNotNullAndEmpty(charsetValue)) {
-                jsonData = JsonUtils.parse(inputStream, charsetValue);
+                jsonData = parseAsJson(inputStream, charsetValue);
             } else {
-                jsonData = JsonUtils.parse(inputStream);
+                jsonData = parseAsJson(inputStream);
             }
         } else {
-            jsonData = JsonUtils.parse(inputStream);
+            jsonData = parseAsJson(inputStream);
         }
         return jsonData;
     }
@@ -213,7 +215,7 @@ public class EntityBodyHandler {
     public static BXml constructXmlDataSource(BObject entityObj) {
         Channel byteChannel = getByteChannel(entityObj);
         if (byteChannel == null) {
-            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, "Empty xml payload");
+            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, EMPTY_XML_PAYLOAD);
         }
         try {
             return constructXmlDataSource(entityObj, byteChannel.getInputStream());
@@ -237,12 +239,12 @@ public class EntityBodyHandler {
         if (MimeUtil.isNotNullAndEmpty(contentTypeValue)) {
             String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
             if (MimeUtil.isNotNullAndEmpty(charsetValue)) {
-                xmlContent = XmlUtils.parse(inputStream, charsetValue);
+                xmlContent = parseAsXml(inputStream, charsetValue);
             } else {
-                xmlContent = XmlUtils.parse(inputStream);
+                xmlContent = parseAsXml(inputStream);
             }
         } else {
-            xmlContent = XmlUtils.parse(inputStream);
+            xmlContent = parseAsXml(inputStream);
         }
         return xmlContent;
     }

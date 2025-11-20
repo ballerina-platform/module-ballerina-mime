@@ -20,10 +20,8 @@ package io.ballerina.stdlib.mime.nativeimpl;
 
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.Type;
-import io.ballerina.runtime.api.utils.JsonUtils;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
-import io.ballerina.runtime.api.utils.XmlUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BObject;
@@ -43,6 +41,8 @@ import static io.ballerina.stdlib.mime.util.MimeConstants.CHARSET;
 import static io.ballerina.stdlib.mime.util.MimeConstants.ENTITY_BYTE_CHANNEL;
 import static io.ballerina.stdlib.mime.util.MimeConstants.PARSER_ERROR;
 import static io.ballerina.stdlib.mime.util.MimeUtil.isNotNullAndEmpty;
+import static io.ballerina.stdlib.mime.util.MimeUtil.parseAsJson;
+import static io.ballerina.stdlib.mime.util.MimeUtil.parseAsXml;
 
 /**
  * Utilities related to MIME entity body that can be built as a data source.
@@ -106,7 +106,7 @@ public abstract class MimeDataSourceBuilder {
         } else {
             // Else, build the JSON from the string representation of the payload.
             String payload = MimeUtil.getMessageAsString(dataSource);
-            result = (BRefValue) JsonUtils.parse(payload);
+            result = (BRefValue) parseAsJson(payload);
         }
         return result;
     }
@@ -155,7 +155,7 @@ public abstract class MimeDataSourceBuilder {
         }
         // Build the XML from string representation of the payload.
         String payload = MimeUtil.getMessageAsString(dataSource);
-        return XmlUtils.parse(payload);
+        return parseAsXml(payload);
     }
 
     protected static void updateDataSource(BObject entityObj, Object result) {
