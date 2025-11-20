@@ -25,14 +25,17 @@ import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.PredefinedTypes;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.types.TypeTags;
+import io.ballerina.runtime.api.utils.JsonUtils;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
+import io.ballerina.runtime.api.utils.XmlUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BStreamingJson;
 import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.api.values.BXml;
 import io.ballerina.stdlib.mime.nativeimpl.ModuleUtils;
 import jakarta.activation.MimeType;
 import jakarta.activation.MimeTypeParameterList;
@@ -44,6 +47,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Random;
@@ -85,6 +89,10 @@ import static io.ballerina.stdlib.mime.util.MimeConstants.SUFFIX_FIELD;
  */
 public class MimeUtil {
     private static final Logger LOG = LoggerFactory.getLogger(MimeUtil.class);
+
+    public static final String EMPTY_JSON_DOCUMENT = "empty JSON document";
+    public static final String EMPTY_XML_PAYLOAD = "Empty xml payload";
+    public static final String UNEXPECTED_EOF_IN_PROLOG = "Unexpected EOF in prolog";
 
     /**
      * Given a ballerina entity, get the content-type as a base type.
@@ -516,6 +524,70 @@ public class MimeUtil {
         // A data source might not exist for multipart and byteChannel. Hence the null check. If PARSE_AS_JSON is
         // true then it indicates that the data source need to be parsed as JSON.
         return parseAsJson != null && (boolean) entity.getNativeData(MimeConstants.PARSE_AS_JSON);
+    }
+
+    public static Object parseAsJson(InputStream inputStream) {
+        return parseAsJson(inputStream, Charset.defaultCharset().name());
+    }
+
+    public static Object parseAsJson(InputStream inputStream, String charset) {
+        try {
+            return JsonUtils.parse(inputStream, charset);
+        } catch (BError parserError) {
+            handleJsonParseError(parserError);
+            throw parserError;
+        }
+    }
+
+    public static Object parseAsJson(String jsonString) {
+        try {
+            return JsonUtils.parse(jsonString);
+        } catch (BError parserError) {
+            handleJsonParseError(parserError);
+            throw parserError;
+        }
+    }
+
+    public static BXml parseAsXml(InputStream inputStream) {
+        return parseAsXml(inputStream, Charset.defaultCharset().name());
+    }
+
+    public static BXml parseAsXml(InputStream inputStream, String charsetValue) {
+        try {
+            return XmlUtils.parse(inputStream, charsetValue);
+        } catch (BError parserError) {
+            handleXmlParseError(parserError);
+            throw parserError;
+        }
+    }
+
+    public static BXml parseAsXml(String xmlString) {
+        try {
+            return XmlUtils.parse(xmlString);
+        } catch (BError parserError) {
+            handleXmlParseError(parserError);
+            throw parserError;
+        }
+    }
+
+    private static void handleJsonParseError(BError parserError) {
+        String errorMsg = parserError.getMessage();
+        // This EMPTY_JSON_DOCUMENT error occurs when the JSON payload is empty.
+        // Currently, the lang lib JSON parser does not have a specific error for empty JSON payloads.
+        // Therefore, we are checking for this specific error message to identify empty JSON payloads.
+        if (errorMsg != null && errorMsg.startsWith(EMPTY_JSON_DOCUMENT)) {
+            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, EMPTY_JSON_DOCUMENT, parserError);
+        }
+    }
+
+    private static void handleXmlParseError(BError parserError) {
+        String errorMsg = parserError.getMessage();
+        // This UNEXPECTED_EOF_IN_PROLOG error occurs when the XML payload is empty.
+        // Currently, the lang lib XML parser does not have a specific error for empty XML payloads.
+        // Therefore, we are checking for this specific error message to identify empty XML payloads.
+        if (errorMsg != null && errorMsg.contains(UNEXPECTED_EOF_IN_PROLOG)) {
+            throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, EMPTY_XML_PAYLOAD, parserError);
+        }
     }
 
     /**

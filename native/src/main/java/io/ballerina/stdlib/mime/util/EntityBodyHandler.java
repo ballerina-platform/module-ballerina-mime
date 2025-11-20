@@ -25,10 +25,8 @@ import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.ArrayType;
 import io.ballerina.runtime.api.types.ObjectType;
 import io.ballerina.runtime.api.types.Type;
-import io.ballerina.runtime.api.utils.JsonUtils;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
-import io.ballerina.runtime.api.utils.XmlUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
@@ -60,6 +58,10 @@ import static io.ballerina.stdlib.mime.util.MimeConstants.FIRST_BODY_PART_INDEX;
 import static io.ballerina.stdlib.mime.util.MimeConstants.MESSAGE_DATA_SOURCE;
 import static io.ballerina.stdlib.mime.util.MimeConstants.MULTIPART_AS_PRIMARY_TYPE;
 import static io.ballerina.stdlib.mime.util.MimeConstants.TEXT_EVENT_STREAM;
+import static io.ballerina.stdlib.mime.util.MimeUtil.EMPTY_JSON_DOCUMENT;
+import static io.ballerina.stdlib.mime.util.MimeUtil.EMPTY_XML_PAYLOAD;
+import static io.ballerina.stdlib.mime.util.MimeUtil.parseAsJson;
+import static io.ballerina.stdlib.mime.util.MimeUtil.parseAsXml;
 
 /**
  * Entity body related operations are included here.
@@ -75,9 +77,6 @@ public class EntityBodyHandler {
     public static final String OUTPUT_STREAM = "output_stream_object";
     public static final String WRITE_EVENT_STREAM_METHOD = "writeEventStream";
     public static final String EVENT_STREAM_WRITER_OBJECT = "EventStreamWriter";
-    public static final String EMPTY_JSON_DOCUMENT = "empty JSON document";
-    public static final String EMPTY_XML_PAYLOAD = "Empty xml payload";
-    public static final String UNEXPECTED_EOF_IN_PROLOG = "Unexpected EOF in prolog";
 
     /**
      * Get a byte channel for a given text data.
@@ -194,26 +193,15 @@ public class EntityBodyHandler {
     public static Object constructJsonDataSource(BObject entity, InputStream inputStream) {
         Object jsonData;
         String contentTypeValue = EntityHeaderHandler.getHeaderValue(entity, CONTENT_TYPE);
-        try {
-            if (MimeUtil.isNotNullAndEmpty(contentTypeValue)) {
-                String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
-                if (MimeUtil.isNotNullAndEmpty(charsetValue)) {
-                    jsonData = JsonUtils.parse(inputStream, charsetValue);
-                } else {
-                    jsonData = JsonUtils.parse(inputStream);
-                }
+        if (MimeUtil.isNotNullAndEmpty(contentTypeValue)) {
+            String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
+            if (MimeUtil.isNotNullAndEmpty(charsetValue)) {
+                jsonData = parseAsJson(inputStream, charsetValue);
             } else {
-                jsonData = JsonUtils.parse(inputStream);
+                jsonData = parseAsJson(inputStream);
             }
-        } catch (BError parserError) {
-            String errorMsg = parserError.getMessage();
-            // This EMPTY_JSON_DOCUMENT error occurs when the JSON payload is empty.
-            // Currently, the lang lib JSON parser does not have a specific error for empty JSON payloads.
-            // Therefore, we are checking for this specific error message to identify empty JSON payloads.
-            if (errorMsg != null && errorMsg.startsWith(EMPTY_JSON_DOCUMENT)) {
-                throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, EMPTY_JSON_DOCUMENT, parserError);
-            }
-            throw parserError;
+        } else {
+            jsonData = parseAsJson(inputStream);
         }
         return jsonData;
     }
@@ -248,26 +236,15 @@ public class EntityBodyHandler {
     public static BXml constructXmlDataSource(BObject entityObj, InputStream inputStream) {
         BXml xmlContent;
         String contentTypeValue = EntityHeaderHandler.getHeaderValue(entityObj, CONTENT_TYPE);
-        try {
-            if (MimeUtil.isNotNullAndEmpty(contentTypeValue)) {
-                String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
-                if (MimeUtil.isNotNullAndEmpty(charsetValue)) {
-                    xmlContent = XmlUtils.parse(inputStream, charsetValue);
-                } else {
-                    xmlContent = XmlUtils.parse(inputStream);
-                }
+        if (MimeUtil.isNotNullAndEmpty(contentTypeValue)) {
+            String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
+            if (MimeUtil.isNotNullAndEmpty(charsetValue)) {
+                xmlContent = parseAsXml(inputStream, charsetValue);
             } else {
-                xmlContent = XmlUtils.parse(inputStream);
+                xmlContent = parseAsXml(inputStream);
             }
-        } catch (BError parserError) {
-            String errorMsg = parserError.getMessage();
-            // This UNEXPECTED_EOF_IN_PROLOG error occurs when the XML payload is empty.
-            // Currently, the lang lib XML parser does not have a specific error for empty XML payloads.
-            // Therefore, we are checking for this specific error message to identify empty XML payloads.
-            if (errorMsg != null && errorMsg.contains(UNEXPECTED_EOF_IN_PROLOG)) {
-                throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, EMPTY_XML_PAYLOAD, parserError);
-            }
-            throw parserError;
+        } else {
+            xmlContent = parseAsXml(inputStream);
         }
         return xmlContent;
     }
