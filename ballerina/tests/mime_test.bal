@@ -1586,6 +1586,71 @@ isolated function getPartsFromInvalidChannel() {
     }
 }
 
+@test:Config {}
+function testEmptyJson1() {
+    Entity entity = new;
+    byte[][] emptyPayload = [];
+    entity.setByteStream(emptyPayload.toStream());
+    json|error content = entity.getJson();
+    if content is json {
+        test:assertFail("Expected an error but got JSON content: " + content.toString());
+    } else {
+        test:assertTrue(content is ParserError);
+        error? cause = content.cause();
+        if cause is () {
+            test:assertFail("Expected a cause for the ParserError but got none.");
+        }
+        test:assertTrue(cause is NoContentError);
+        test:assertEquals(cause.message(), "empty JSON document");
+    }
+}
+
+@test:Config {}
+function testEmptyJson2() {
+    Entity entity = new;
+    entity.setText("");
+    json|error content = entity.getJson();
+    if content is json {
+        test:assertFail("Expected an error but got JSON content: " + content.toString());
+    } else {
+        test:assertTrue(content is ParserError);
+        error? cause = content.cause();
+        if cause is () {
+            test:assertFail("Expected a cause for the ParserError but got none.");
+        }
+        test:assertTrue(cause is NoContentError);
+        test:assertEquals(cause.message(), "empty JSON document");
+    }
+}
+
+@test:Config {}
+function testEmptyXml1() {
+    Entity entity = new;
+    byte[][] emptyPayload = [];
+    entity.setByteStream(emptyPayload.toStream());
+    xml|error content = entity.getXml();
+    if content is xml {
+        test:assertFail("Expected an error but got XML content: " + content.toString());
+    } else {
+        test:assertTrue(content is ParserError);
+        error? cause = content.cause();
+        if cause is () {
+            test:assertFail("Expected a cause for the ParserError but got none.");
+        }
+        test:assertTrue(cause is NoContentError);
+        test:assertTrue(cause.message().includes("Empty xml payload"));
+    }
+}
+
+@test:Config {}
+function testEmptyXml2() {
+    Entity entity = new;
+    entity.setText("");
+    xml|error content = entity.getXml();
+    // XML parser in Ballerina returns empty XML for empty string input
+    test:assertEquals(content, xml ``);
+}
+
 isolated function assertByteArray(byte[]|error returnResult, string expectValue) {
     if returnResult is byte[] {
         var value = strings:fromBytes(returnResult);
