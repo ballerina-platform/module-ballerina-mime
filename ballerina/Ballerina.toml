@@ -16,10 +16,10 @@ graalvmCompatible = true
 groupId = "io.ballerina.stdlib"
 artifactId = "mime-native"
 version = "2.12.1"
-path = "../native/build/libs/mime-native-2.12.1-SNAPSHOT.jar"
+path = "../native/build/libs/mime-native-2.12.1.jar"
 
 [[platform.java21.dependency]]
-path = "../test-utils/build/libs/mime-test-utils-2.12.1-SNAPSHOT.jar"
+path = "../test-utils/build/libs/mime-test-utils-2.12.1.jar"
 scope = "testOnly"
 
 [[platform.java21.dependency]]
