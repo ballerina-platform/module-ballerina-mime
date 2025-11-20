@@ -207,8 +207,11 @@ public class EntityBodyHandler {
             }
         } catch (BError parserError) {
             String errorMsg = parserError.getMessage();
+            // This EMPTY_JSON_DOCUMENT error occurs when the JSON payload is empty.
+            // Currently, the lang lib JSON parser does not have a specific error for empty JSON payloads.
+            // Therefore, we are checking for this specific error message to identify empty JSON payloads.
             if (errorMsg != null && errorMsg.startsWith(EMPTY_JSON_DOCUMENT)) {
-                throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, EMPTY_JSON_DOCUMENT);
+                throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, EMPTY_JSON_DOCUMENT, parserError);
             }
             throw parserError;
         }
@@ -258,8 +261,11 @@ public class EntityBodyHandler {
             }
         } catch (BError parserError) {
             String errorMsg = parserError.getMessage();
+            // This UNEXPECTED_EOF_IN_PROLOG error occurs when the XML payload is empty.
+            // Currently, the lang lib XML parser does not have a specific error for empty XML payloads.
+            // Therefore, we are checking for this specific error message to identify empty XML payloads.
             if (errorMsg != null && errorMsg.contains(UNEXPECTED_EOF_IN_PROLOG)) {
-                throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, EMPTY_XML_PAYLOAD);
+                throw MimeUtil.createError(MimeConstants.NO_CONTENT_ERROR, EMPTY_XML_PAYLOAD, parserError);
             }
             throw parserError;
         }
