@@ -42,6 +42,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class ExternTestUtils {
     }
 
     public static File getTemporaryFile(String fileName, String fileType, String valueTobeWritten) throws IOException {
-        File file = File.createTempFile(fileName, fileType);
+        File file = Files.createTempFile(fileName, fileType).toFile();
         file.deleteOnExit();
         OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(file), Charset.defaultCharset());
         try (BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
