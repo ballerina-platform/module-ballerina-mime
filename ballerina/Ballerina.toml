@@ -1,34 +1,34 @@
 [package]
 org = "ballerina"
 name = "mime"
-version = "2.12.1"
+version = "2.12.2"
 authors = ["Ballerina"]
 keywords = ["mime", "multipart", "entity"]
 repository = "https://github.com/ballerina-platform/module-ballerina-mime"
 icon = "icon.png"
 license = ["Apache-2.0"]
-distribution = "2201.12.0"
+distribution = "2201.14.0-20260527-050400-74f7e6bf"
 
-[platform.java21]
+[platform.java25]
 graalvmCompatible = true
 
-[[platform.java21.dependency]]
+[[platform.java25.dependency]]
 groupId = "io.ballerina.stdlib"
 artifactId = "mime-native"
-version = "2.12.1"
-path = "../native/build/libs/mime-native-2.12.1.jar"
+version = "2.12.2"
+path = "../native/build/libs/mime-native-2.12.2-SNAPSHOT.jar"
 
-[[platform.java21.dependency]]
-path = "../test-utils/build/libs/mime-test-utils-2.12.1.jar"
+[[platform.java25.dependency]]
+path = "../test-utils/build/libs/mime-test-utils-2.12.2-SNAPSHOT.jar"
 scope = "testOnly"
 
-[[platform.java21.dependency]]
+[[platform.java25.dependency]]
 path = "./lib/mimepull-1.9.11.jar"
 groupId = "org.jvnet.mimepull"
 artifactId = "mimepull"
 version = "1.9.11"
 
-[[platform.java21.dependency]]
+[[platform.java25.dependency]]
 path = "./lib/jakarta.activation-api-2.0.1.jar"
 groupId = "jakarta.activation"
 artifactId = "jakarta.activation-api"
