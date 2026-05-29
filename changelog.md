@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2.12.2] - 2026-05-29
+
 ### Fixed
 
 - [Fix buffered writer flush and improve boundary generation randomness in MIME multipart handling](https://github.com/ballerina-platform/ballerina-library/issues/8805)
