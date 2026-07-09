@@ -6,9 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2.12.2] - 2026-05-29
+
+### Fixed
+
+- [Fix buffered writer flush and improve boundary generation randomness in MIME multipart handling](https://github.com/ballerina-platform/ballerina-library/issues/8805)
+
+## [2.12.1] - 2025-11-20
+
 ### Fixed
 
 - [Add no content error for runtime parser no content exception](https://github.com/ballerina-platform/ballerina-library/issues/8475)
+
+## [2.12.0] - 2025-03-12
+- This version maintains the latest dependency versions.
 
 ## [2.11.0] - 2025-02-11
 - This version maintains the latest dependency versions.

@@ -49,8 +49,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.Enumeration;
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -425,7 +425,7 @@ public class MimeUtil {
      * @return a boundary string
      */
     public static String getNewMultipartDelimiter() {
-        Random random = new Random();
+        SecureRandom random = new SecureRandom();
         return Long.toHexString(random.nextLong());
     }
 
