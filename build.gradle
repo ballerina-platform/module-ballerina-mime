@@ -97,6 +97,14 @@ release {
     }
 }
 
-tasks.named('build') {
-    dependsOn('mime-ballerina:build')
+if (tasks.names.contains('build')) {
+    tasks.named('build') {
+        dependsOn('mime-ballerina:build')
+
+    }
+} else {
+    tasks.register('build') {
+        dependsOn('mime-ballerina:build')
+
+    }
 }
