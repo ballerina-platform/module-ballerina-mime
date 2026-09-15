@@ -1,5 +1,4 @@
-Ballerina MIME Library
-===================
+# Ballerina MIME Library
 
   [![Build](https://github.com/ballerina-platform/module-ballerina-mime/actions/workflows/build-timestamped-master.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-mime/actions/workflows/build-timestamped-master.yml)
   [![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-mime/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-mime)
@@ -7,8 +6,9 @@ Ballerina MIME Library
   [![GraalVM Check](https://github.com/ballerina-platform/module-ballerina-mime/actions/workflows/build-with-bal-test-graalvm.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-mime/actions/workflows/build-with-bal-test-graalvm.yml)
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-mime.svg)](https://github.com/ballerina-platform/module-ballerina-mime/commits/master)
 
-This library provides a set of APIs to work with messages, which follow the Multipurpose Internet Mail Extensions
-(MIME) specification as specified in the [RFC 2045 standard](https://www.ietf.org/rfc/rfc2045.txt).
+## Overview
+
+This module provides a set of APIs to work with messages, which follow the Multipurpose Internet Mail Extensions (MIME) specification as specified in the [RFC 2045 standard](https://www.ietf.org/rfc/rfc2045.txt).
 
 ```
 Entity refers to the header fields and the content of a message or a part of the body in a multipart entity. 
@@ -94,7 +94,7 @@ Execute the commands below to build from the source.
 
 ## Contribute to Ballerina
 
-As an open source project, Ballerina welcomes contributions from the community. 
+As an open-source project, Ballerina welcomes contributions from the community. 
 
 For more information, go to the [contribution guidelines](https://github.com/ballerina-platform/ballerina-lang/blob/master/CONTRIBUTING.md).
 
