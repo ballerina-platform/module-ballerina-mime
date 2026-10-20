@@ -2,7 +2,7 @@
 
   [![Build](https://github.com/ballerina-platform/module-ballerina-mime/actions/workflows/build-timestamped-master.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-mime/actions/workflows/build-timestamped-master.yml)
   [![codecov](https://codecov.io/gh/ballerina-platform/module-ballerina-mime/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-mime)
-  [![Trivy](https://github.com/ballerina-platform/module-ballerina-mime/actions/workflows/trivy-scan.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-mime/actions/workflows/trivy-scan.yml)
+  [![Security Scan](https://github.com/ballerina-platform/module-ballerina-mime/actions/workflows/security-scan.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-mime/actions/workflows/security-scan.yml)
   [![GraalVM Check](https://github.com/ballerina-platform/module-ballerina-mime/actions/workflows/build-with-bal-test-graalvm.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerina-mime/actions/workflows/build-with-bal-test-graalvm.yml)
   [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-mime.svg)](https://github.com/ballerina-platform/module-ballerina-mime/commits/master)
 
