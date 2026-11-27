@@ -580,6 +580,47 @@ isolated function testGetTextDataSourceWithCharset() {
     assertTextPayload(entity.getText(), content);
 }
 
+@test:Config {}
+isolated function testGetTextDataSourceWithMultiByteCharsAndNoCharset() {
+    string content = "ballerina සිංහල தமிழ் 😀";
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", "");
+    checkpanic io:fileWriteBytes(fileLocation, content.toBytes());
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+    entity.setHeader("content-type", "text/plain");
+    assertTextPayload(entity.getText(), content);
+}
+
+@test:Config {}
+isolated function testGetTextDataSourceWithNonUtf8Charset() {
+    // "café" in ISO-8859-1
+    byte[] content = [0x63, 0x61, 0x66, 0xE9];
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", "");
+    checkpanic io:fileWriteBytes(fileLocation, content);
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+    entity.setHeader("content-type", "text/plain; charset=ISO-8859-1");
+    assertTextPayload(entity.getText(), "café");
+}
+
+@test:Config {}
+isolated function testGetLargeTextDataSource() {
+    string chunk = "ballerina සිංහල 😀\n";
+    string content = "";
+    foreach int i in 0 ..< 50000 {
+        content += chunk;
+    }
+    string fileLocation = checkpanic createTemporaryFile("testFile", ".tmp", "");
+    checkpanic io:fileWriteBytes(fileLocation, content.toBytes());
+    io:ReadableByteChannel byteChannel = checkpanic io:openReadableFile(fileLocation);
+    Entity entity = new;
+    entity.setByteChannel(byteChannel);
+    entity.setHeader("content-type", "text/plain; charset=UTF-8");
+    assertTextPayload(entity.getText(), content);
+}
+
 //Once the byte stream is consumed by the user, check whether the content retrieved as a text data source is empty
 @test:Config {}
 isolated function testGetTextDataSourceOncetheStreamIsConsumed() {

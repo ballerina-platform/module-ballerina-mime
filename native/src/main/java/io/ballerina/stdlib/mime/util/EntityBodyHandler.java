@@ -43,6 +43,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
@@ -277,19 +278,19 @@ public class EntityBodyHandler {
      * @return StringDataSource which represent the entity body which is kept in memory
      */
     public static BString constructStringDataSource(BObject entity, InputStream inputStream) {
-        BString textContent;
+        Charset charset = StandardCharsets.UTF_8;
         String contentTypeValue = EntityHeaderHandler.getHeaderValue(entity, CONTENT_TYPE);
         if (MimeUtil.isNotNullAndEmpty(contentTypeValue)) {
             String charsetValue = MimeUtil.getContentTypeParamValue(contentTypeValue, CHARSET);
             if (MimeUtil.isNotNullAndEmpty(charsetValue)) {
-                textContent = StringUtils.getStringFromInputStream(inputStream, charsetValue);
-            } else {
-                textContent = StringUtils.getStringFromInputStream(inputStream);
+                charset = Charset.forName(charsetValue);
             }
-        } else {
-            textContent = StringUtils.getStringFromInputStream(inputStream);
         }
-        return textContent;
+        try (inputStream) {
+            return StringUtils.fromString(new String(inputStream.readAllBytes(), charset));
+        } catch (IOException e) {
+            throw ErrorCreator.createError(StringUtils.fromString("Error occurred when reading input stream"), e);
+        }
     }
 
     /**
